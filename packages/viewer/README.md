@@ -1,4 +1,4 @@
-# Yutra Trace Viewer
+ï»¿# Yutra Trace Viewer
 
 Minimal three-column trace viewer for local JSONL traces.
 
@@ -10,18 +10,21 @@ Minimal three-column trace viewer for local JSONL traces.
 
 ## Localization
 
-- Supports `English` and `ÖÐÎÄ£¨¼òÌå£©` UI labels.
+Localization:
+- Supports English and ä¸­æ–‡ï¼ˆç®€ä½“ï¼‰ UI switching.
+- Switching locale only changes UI labels.
+- Trace event type strings and payload raw fields remain unchanged.
+
+Implementation details:
 - Default locale is inferred from browser language (`zh*` -> `zh-CN`, otherwise `en`).
 - Manual language switch is persisted in `localStorage` key `yutra.viewer.locale`.
-- Localization affects UI labels only.
-- Trace event types and payload raw values are not translated or mutated.
 
 ## Features
 
 - Load built-in sample JSONL
 - Upload local JSONL file
 - Switch run and inspect event payload
-- Switch UI language between English and ÖÐÎÄ
+- Switch UI language between English and ä¸­æ–‡
 
 ## Commands
 
