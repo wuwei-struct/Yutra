@@ -1,0 +1,4 @@
+export const EXIT_CODE_SUCCESS = 0;
+export const EXIT_CODE_GENERAL_FAILURE = 1;
+export const EXIT_CODE_VALIDATION_FAILURE = 2;
+export const EXIT_CODE_TRACE_FAILURE = 3;

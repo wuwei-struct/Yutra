@@ -1,0 +1,6 @@
+agent: broken-initial
+version: 0.1.0
+initial_state: missing
+states:
+  idle:
+    final: true

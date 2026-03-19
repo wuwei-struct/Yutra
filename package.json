@@ -1,0 +1,50 @@
+{
+    "name":  "yutra",
+    "version":  "0.1.0-rc.1",
+    "private":  true,
+    "description":  "Yutra monorepo: Agent Execution Standard and Reference Runtime.",
+    "packageManager":  "pnpm@10.0.0",
+    "scripts":  {
+                    "yutra":  "pnpm exec yutra",
+                    "build":  "pnpm -r --filter @yutra/* run build",
+                    "test":  "vitest run --passWithNoTests",
+                    "lint":  "eslint .",
+                    "format":  "prettier --check .",
+                    "verify":  "pnpm lint \u0026\u0026 pnpm test \u0026\u0026 pnpm build",
+                    "demo:it-helpdesk":  "pnpm exec yutra run examples/it-helpdesk/agent.yutra.yaml --input examples/it-helpdesk/demo-inputs/case1.json --trace-file demo-artifacts/it-helpdesk.jsonl",
+                    "demo:ecommerce":  "pnpm exec yutra run examples/ecommerce-support/agent.yutra.yaml --input examples/ecommerce-support/demo-inputs/case1.json --trace-file demo-artifacts/ecommerce-support.jsonl",
+                    "demo:approval":  "pnpm exec yutra run examples/approval-agent/agent.yutra.yaml --input examples/approval-agent/demo-inputs/case1.json --trace-file demo-artifacts/approval-agent-completed.jsonl \u0026\u0026 pnpm exec yutra run examples/approval-agent/agent.yutra.yaml --input examples/approval-agent/demo-inputs/case2.json --trace-file demo-artifacts/approval-agent-handoff.jsonl",
+                    "viewer:dev":  "pnpm --filter @yutra/viewer dev",
+                    "viewer:build":  "pnpm --filter @yutra/viewer build"
+                },
+    "devDependencies":  {
+                            "@types/react":  "^19.0.10",
+                            "@types/react-dom":  "^19.0.4",
+                            "@vitejs/plugin-react":  "^4.3.4",
+                            "@yutra/cli":  "workspace:*",
+                            "@yutra/knowledge-core":  "workspace:*",
+                            "@yutra/tool-core":  "workspace:*",
+                            "@types/node":  "^22.13.10",
+                            "eslint":  "^9.22.0",
+                            "prettier":  "^3.5.3",
+                            "react":  "^19.0.0",
+                            "react-dom":  "^19.0.0",
+                            "tsup":  "^8.4.0",
+                            "typescript":  "^5.8.2",
+                            "typescript-eslint":  "^8.26.1",
+                            "vite":  "^5.4.14",
+                            "vitest":  "^3.0.8",
+                            "jsdom":  "^26.1.0",
+                            "@testing-library/react":  "^16.3.0"
+                        },
+    "license":  "MIT",
+    "author":  "Yutra Contributors",
+    "keywords":  [
+                     "agent",
+                     "state-machine",
+                     "runtime",
+                     "trace",
+                     "dsl",
+                     "yutra"
+                 ]
+}

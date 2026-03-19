@@ -1,0 +1,8 @@
+{
+  "message": "My order has not arrived yet. Can you check shipping?",
+  "intent": "support_request",
+  "context": {
+    "order_id": "EC-1001",
+    "user_id": "U-1"
+  }
+}

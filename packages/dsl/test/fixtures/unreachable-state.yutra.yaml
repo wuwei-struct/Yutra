@@ -1,0 +1,11 @@
+agent: unreachable-agent
+version: 0.1.0
+initial_state: a
+states:
+  a:
+    transitions:
+      - to: b
+  b:
+    final: true
+  orphan:
+    final: true

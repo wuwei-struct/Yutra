@@ -1,0 +1,35 @@
+{
+    "name":  "@yutra/trace",
+    "version":  "0.1.0-rc.1",
+    "private":  false,
+    "description":  "Yutra trace core v0.1",
+    "type":  "module",
+    "main":  "dist/index.js",
+    "module":  "dist/index.js",
+    "types":  "dist/index.d.ts",
+    "exports":  {
+                    ".":  {
+                              "types":  "./dist/index.d.ts",
+                              "import":  "./dist/index.js"
+                          }
+                },
+    "files":  [
+                  "dist"
+              ],
+    "scripts":  {
+                    "build":  "tsup src/index.ts --format esm --dts",
+                    "test":  "vitest run --passWithNoTests",
+                    "lint":  "eslint src test --max-warnings=0"
+                },
+    "dependencies":  {
+                         "@yutra/spec":  "workspace:*"
+                     },
+    "license":  "MIT",
+    "author":  "Yutra Contributors",
+    "keywords":  [
+                     "yutra",
+                     "trace",
+                     "jsonl",
+                     "replay"
+                 ]
+}

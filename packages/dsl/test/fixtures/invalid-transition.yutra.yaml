@@ -1,0 +1,7 @@
+agent: broken-transition
+version: 0.1.0
+initial_state: idle
+states:
+  idle:
+    transitions:
+      - to: missing_state

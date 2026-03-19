@@ -1,0 +1,11 @@
+{
+  "message": "Request read access to internal dashboard",
+  "intent": "access_request",
+  "context": {
+    "request_type": "access",
+    "target_resource": "internal-dashboard",
+    "risk_level": "low",
+    "auto_approvable": false,
+    "approval_decision": "approved"
+  }
+}

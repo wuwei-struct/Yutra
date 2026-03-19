@@ -1,0 +1,11 @@
+{
+  "message": "Request admin access to production secrets",
+  "intent": "access_request",
+  "context": {
+    "request_type": "access",
+    "target_resource": "prod-secrets",
+    "risk_level": "high",
+    "auto_approvable": false,
+    "approval_decision": "pending"
+  }
+}

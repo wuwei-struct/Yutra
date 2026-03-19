@@ -1,0 +1,83 @@
+agent: approval-agent
+version: 0.1.0
+intents:
+  - name: access_request
+    entry_state: intake
+context:
+  fields:
+    request_type:
+      type: string
+    target_resource:
+      type: string
+    risk_level:
+      type: string
+      default: unknown
+    auto_approvable:
+      type: boolean
+      default: false
+    approval_status:
+      type: string
+initial_state: intake
+actions:
+  - name: intake_request
+  - name: validate_request_data
+  - name: request_approval
+  - name: execute_change
+  - name: notify_result
+guards:
+  - name: auto_approvable
+    expression: ctx.auto_approvable == true
+  - name: approval_granted
+    expression: ctx.approval_status == "approved"
+  - name: approval_denied
+    expression: ctx.approval_status == "denied"
+  - name: high_risk
+    expression: ctx.risk_level == "high"
+states:
+  intake:
+    actions:
+      - intake_request
+    transitions:
+      - to: validate_request
+  validate_request:
+    actions:
+      - validate_request_data
+    transitions:
+      - to: handoff_security
+        when: ctx.is_valid_request == false
+      - to: handoff_security
+        guard: high_risk
+      - to: approval_required
+  approval_required:
+    transitions:
+      - to: approved
+        guard: auto_approvable
+      - to: await_approval
+  await_approval:
+    actions:
+      - request_approval
+    transitions:
+      - to: approved
+        guard: approval_granted
+      - to: denied
+        guard: approval_denied
+      - to: handoff_security
+  approved:
+    transitions:
+      - to: execute_request
+  denied:
+    final: true
+  execute_request:
+    actions:
+      - execute_change
+    transitions:
+      - to: notify_result
+  notify_result:
+    actions:
+      - notify_result
+    transitions:
+      - to: completed
+  completed:
+    final: true
+  handoff_security:
+    handoff: true

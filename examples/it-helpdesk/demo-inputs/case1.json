@@ -1,0 +1,9 @@
+{
+  "text": "resolve ticket TCK-100",
+  "intent": "resolve_ticket",
+  "context": {
+    "ticket_id": "TCK-100",
+    "priority": "normal",
+    "ticket_has_solution": true
+  }
+}

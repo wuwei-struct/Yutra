@@ -1,0 +1,15 @@
+"\u667A\u80FD\u4F53": cn-agent
+"\u7248\u672C": 0.1.0
+"\u521D\u59CB\u72B6\u6001": "\u5206\u6D41"
+"\u52A8\u4F5C":
+  - name: "\u67E5\u8BE2\u5DE5\u5355"
+    side_effect: read
+"\u72B6\u6001":
+  "\u5206\u6D41":
+    "\u52A8\u4F5C":
+      - "\u67E5\u8BE2\u5DE5\u5355"
+    "\u8F6C\u79FB":
+      - "\u5230": "\u5B8C\u6210"
+        "\u6761\u4EF6": "ctx.ticket_has_solution == true"
+  "\u5B8C\u6210":
+    final: true

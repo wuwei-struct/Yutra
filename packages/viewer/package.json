@@ -1,0 +1,43 @@
+{
+    "name":  "@yutra/viewer",
+    "version":  "0.1.0-rc.1",
+    "private":  false,
+    "description":  "Yutra Trace Viewer v0.1 (local JSONL trace visualization)",
+    "type":  "module",
+    "scripts":  {
+                    "dev":  "vite",
+                    "build":  "vite build",
+                    "preview":  "vite preview",
+                    "test":  "vitest run --passWithNoTests",
+                    "lint":  "eslint src test vite.config.ts --max-warnings=0"
+                },
+    "dependencies":  {
+                         "react":  "^19.0.0",
+                         "react-dom":  "^19.0.0"
+                     },
+    "devDependencies":  {
+                            "@types/react":  "^19.0.10",
+                            "@types/react-dom":  "^19.0.4",
+                            "@vitejs/plugin-react":  "^4.3.4",
+                            "vite":  "^5.4.14",
+                            "@testing-library/react":  "^16.3.0",
+                            "jsdom":  "^26.1.0"
+                        },
+    "license":  "MIT",
+    "author":  "Yutra Contributors",
+    "keywords":  [
+                     "yutra",
+                     "viewer",
+                     "trace",
+                     "react",
+                     "vite"
+                 ],
+    "main":  "dist/index.html",
+    "module":  "dist/index.html",
+    "exports":  {
+                    ".":  "./dist/index.html"
+                },
+    "files":  [
+                  "dist"
+              ]
+}

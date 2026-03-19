@@ -1,0 +1,14 @@
+agent: json-minimal
+version: 0.1.0
+initial_state: idle
+actions:
+  - name: lookup
+    side_effect: read
+states:
+  idle:
+    actions:
+      - lookup
+    transitions:
+      - to: done
+  done:
+    final: true

@@ -1,0 +1,41 @@
+{
+    "name":  "@yutra/cli",
+    "version":  "0.1.0-rc.1",
+    "private":  false,
+    "description":  "Yutra CLI v0.1",
+    "type":  "module",
+    "main":  "dist/index.js",
+    "module":  "dist/index.js",
+    "types":  "dist/index.d.ts",
+    "bin":  {
+                "yutra":  "dist/main.js"
+            },
+    "exports":  {
+                    ".":  {
+                              "types":  "./dist/index.d.ts",
+                              "import":  "./dist/index.js"
+                          }
+                },
+    "files":  [
+                  "dist"
+              ],
+    "scripts":  {
+                    "build":  "tsup src/index.ts src/main.ts --format esm --dts ",
+                    "test":  "vitest run --passWithNoTests",
+                    "lint":  "eslint src test --max-warnings=0"
+                },
+    "dependencies":  {
+                         "@yutra/dsl":  "workspace:*",
+                         "@yutra/runtime":  "workspace:*",
+                         "@yutra/trace":  "workspace:*"
+                     },
+    "license":  "MIT",
+    "author":  "Yutra Contributors",
+    "keywords":  [
+                     "yutra",
+                     "cli",
+                     "validator",
+                     "runtime",
+                     "trace"
+                 ]
+}
