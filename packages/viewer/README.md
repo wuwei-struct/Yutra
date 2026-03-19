@@ -1,5 +1,7 @@
 ﻿# Yutra Trace Viewer
 
+Language docs: [English](../../README.md) | [简体中文](../../README.zh-CN.md)
+
 Minimal three-column trace viewer for local JSONL traces.
 
 ## Layout

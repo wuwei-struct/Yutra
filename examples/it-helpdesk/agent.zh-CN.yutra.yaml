@@ -1,0 +1,35 @@
+﻿智能体: IT支持
+版本: 0.1.0
+意图:
+  - name: 处理工单
+    description: Resolve IT helpdesk ticket
+    entry_state: 诊断
+上下文:
+  fields:
+    ticket_id:
+      type: string
+      required: true
+    priority:
+      type: string
+      default: normal
+初始状态: 诊断
+动作:
+  - name: lookup_ticket
+    side_effect: read
+  - name: close_ticket
+    side_effect: write
+守卫:
+  - name: can_close
+    expression: ctx.priority != "critical"
+状态集:
+  诊断:
+    动作:
+      - lookup_ticket
+    转移:
+      - 到: 已解决
+        guard: can_close
+        条件: ctx.ticket_has_solution == true
+  已解决:
+    动作:
+      - close_ticket
+    final: true
