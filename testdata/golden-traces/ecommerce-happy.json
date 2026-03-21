@@ -1,0 +1,51 @@
+{
+  "scenario": "ecommerce-happy",
+  "status": "completed",
+  "finalState": "resolved",
+  "statePath": [
+    "triage",
+    "fetch_order",
+    "answer_shipping",
+    "resolved"
+  ],
+  "actionSequence": [
+    "classify_issue",
+    "lookup_order",
+    "check_shipping"
+  ],
+  "eventTypeSequence": [
+    "run.started",
+    "intent.resolved",
+    "state.entered",
+    "action.started",
+    "action.succeeded",
+    "transition.resolved",
+    "state.exited",
+    "state.entered",
+    "action.started",
+    "action.succeeded",
+    "transition.resolved",
+    "state.exited",
+    "state.entered",
+    "action.started",
+    "action.succeeded",
+    "transition.resolved",
+    "state.exited",
+    "state.entered",
+    "state.exited",
+    "run.completed"
+  ],
+  "handoffReasonCodes": [],
+  "errorCodes": [],
+  "approvalStatuses": [],
+  "reviewSources": [],
+  "contextChangedKeys": [
+    "issue_type",
+    "order_found",
+    "policy_excerpt",
+    "refund_eligible",
+    "return_eligible",
+    "shipping_note",
+    "shipping_status"
+  ]
+}

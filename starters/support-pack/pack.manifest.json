@@ -1,0 +1,18 @@
+{
+  "pack": "starter-support-pack",
+  "version": "0.1.0",
+  "domain": "customer-support-starter",
+  "description": "Starter for support-like triage and resolution flows.",
+  "language": ["en"],
+  "includes": {
+    "dsl": ["agent.yutra.yaml"],
+    "inputs": ["demo-inputs/case1.json"],
+    "policy": ["policy.demo.json"],
+    "docs": ["README.md"]
+  },
+  "entrypoints": {
+    "canonical": "agent.yutra.yaml"
+  },
+  "capabilities": ["triage_to_resolution", "policy_placeholder"],
+  "constraints": ["starter_only_no_real_integrations"]
+}

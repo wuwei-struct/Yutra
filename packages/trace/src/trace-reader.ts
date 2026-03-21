@@ -1,4 +1,5 @@
 import type { TraceEvent } from "@yutra/spec";
+import { sortTraceEventsDeterministically } from "./replay-frames";
 import type { RunSummary, TraceStorage } from "./types";
 
 export class TraceReader {
@@ -18,7 +19,7 @@ export class TraceReader {
 
   public async getRunTimeline(runId: string): Promise<TraceEvent[]> {
     const events = await this.storage.getRunEvents(runId);
-    return [...events].sort((a, b) => a.ts.localeCompare(b.ts));
+    return sortTraceEventsDeterministically(events);
   }
 
   public async getLatestRun(): Promise<RunSummary | null> {

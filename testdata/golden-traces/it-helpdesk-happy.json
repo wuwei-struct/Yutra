@@ -1,0 +1,37 @@
+{
+  "scenario": "it-helpdesk-happy",
+  "status": "completed",
+  "finalState": "resolved",
+  "statePath": [
+    "triage",
+    "resolved"
+  ],
+  "actionSequence": [
+    "lookup_ticket",
+    "close_ticket"
+  ],
+  "eventTypeSequence": [
+    "run.started",
+    "intent.resolved",
+    "state.entered",
+    "action.started",
+    "action.succeeded",
+    "guard.evaluated",
+    "transition.resolved",
+    "state.exited",
+    "state.entered",
+    "action.started",
+    "action.succeeded",
+    "state.exited",
+    "run.completed"
+  ],
+  "handoffReasonCodes": [],
+  "errorCodes": [],
+  "approvalStatuses": [],
+  "reviewSources": [],
+  "contextChangedKeys": [
+    "resolved_by",
+    "ticket_found",
+    "ticket_status"
+  ]
+}

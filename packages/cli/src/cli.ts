@@ -1,9 +1,12 @@
 import { existsSync, readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
+import { isAbsolute } from "node:path";
 import { pathToFileURL } from "node:url";
-import { loadAndValidateDslFile } from "@yutra/dsl";
+import { mkdir, writeFile } from "node:fs/promises";
+import { formatExplainOutput, inspectCanonicalization, loadAndValidateDslFile, loadDslFile } from "@yutra/dsl";
 import { executeRun } from "@yutra/runtime";
 import type { ActionRegistry } from "@yutra/runtime";
+import * as TraceCore from "@yutra/trace";
 import { JsonlTraceStorage, TraceReader } from "@yutra/trace";
 import { getStringFlag, parseArgs } from "./args";
 import { EXIT_CODE_GENERAL_FAILURE, EXIT_CODE_SUCCESS, EXIT_CODE_TRACE_FAILURE, EXIT_CODE_VALIDATION_FAILURE } from "./exit-codes";
@@ -28,6 +31,10 @@ function findWorkspaceRoot(start: string): string {
 }
 
 function resolveWorkspacePath(inputPath: string): string {
+  if (isAbsolute(inputPath)) {
+    return inputPath;
+  }
+
   const cwdPath = resolve(process.cwd(), inputPath);
   if (existsSync(cwdPath)) {
     return cwdPath;
@@ -43,8 +50,11 @@ function printHelp(io: CliIO): void {
   io.stdout("Commands:");
   io.stdout("  yutra validate <file>");
   io.stdout("  yutra run <file> [--input <json>] [--trace-file <jsonl>]");
+  io.stdout("  yutra dsl explain <file>");
+  io.stdout("  yutra dsl inspect <file> [--json]");
   io.stdout("  yutra trace list [--trace-file <jsonl>]");
   io.stdout("  yutra trace show <runId> [--trace-file <jsonl>] [--json]");
+  io.stdout("  yutra trace export <runId> --out <json> [--trace-file <jsonl>]");
 }
 
 function createDefaultActionRegistry(actionNames: string[] = []) {
@@ -233,6 +243,115 @@ async function runTraceShow(
   }
 }
 
+async function runTraceExport(
+  args: string[],
+  flags: Record<string, string | boolean>,
+  io: CliIO
+): Promise<number> {
+  const runId = args[0];
+  if (!runId) {
+    io.stderr("Missing required argument <runId>.");
+    return EXIT_CODE_GENERAL_FAILURE;
+  }
+
+  const out = getStringFlag(flags, "out");
+  if (!out) {
+    io.stderr("Missing required flag --out <json>.");
+    return EXIT_CODE_GENERAL_FAILURE;
+  }
+
+  const traceFile = resolveWorkspacePath(getStringFlag(flags, "trace-file") ?? DEFAULT_TRACE_FILE);
+  const outPath = resolveWorkspacePath(out);
+  const storage = new JsonlTraceStorage(traceFile);
+
+  try {
+    const maybeExportAuditBundle = (TraceCore as { exportAuditBundle?: unknown }).exportAuditBundle;
+    const bundle =
+      typeof maybeExportAuditBundle === "function"
+        ? await (
+            maybeExportAuditBundle as (
+              storageArg: JsonlTraceStorage,
+              runIdArg: string,
+              outPathArg: string
+            ) => Promise<{ meta: { runId: string }; runtimeResult: { status: string; eventCount: number } }>
+          )(storage, runId, outPath)
+        : await exportAuditBundleFallback(storage, runId, outPath);
+    io.stdout(`audit_bundle: ${outPath}`);
+    io.stdout(`runId: ${bundle.meta.runId}`);
+    io.stdout(`status: ${bundle.runtimeResult.status}`);
+    io.stdout(`eventCount: ${bundle.runtimeResult.eventCount}`);
+    return EXIT_CODE_SUCCESS;
+  } catch (error) {
+    io.stderr(`Trace export failed: ${(error as Error).message}`);
+    return EXIT_CODE_TRACE_FAILURE;
+  }
+}
+
+async function exportAuditBundleFallback(
+  storage: JsonlTraceStorage,
+  runId: string,
+  outPath: string
+): Promise<{ meta: { runId: string }; runtimeResult: { status: string; eventCount: number } }> {
+  const reader = new TraceReader(storage);
+  const events = await reader.getRunTimeline(runId);
+  const summary = await storage.getRunSummary(runId);
+  const bundle = {
+    meta: {
+      runId
+    },
+    runtimeResult: {
+      status: summary?.status ?? "unknown",
+      eventCount: events.length
+    },
+    traceEvents: events
+  };
+
+  await mkdir(dirname(outPath), { recursive: true });
+  await writeFile(outPath, JSON.stringify(bundle, null, 2), "utf8");
+  return bundle;
+}
+
+async function runDslExplain(args: string[], io: CliIO): Promise<number> {
+  const file = args[0];
+  if (!file) {
+    io.stderr("Missing required argument <file>.");
+    return EXIT_CODE_GENERAL_FAILURE;
+  }
+
+  const loaded = loadDslFile(resolveWorkspacePath(file));
+  const report = inspectCanonicalization(loaded.raw, { path: loaded.path, format: loaded.format });
+  formatExplainOutput(report).forEach((line) => io.stdout(line));
+  return EXIT_CODE_SUCCESS;
+}
+
+async function runDslInspect(
+  args: string[],
+  flags: Record<string, string | boolean>,
+  io: CliIO
+): Promise<number> {
+  const file = args[0];
+  if (!file) {
+    io.stderr("Missing required argument <file>.");
+    return EXIT_CODE_GENERAL_FAILURE;
+  }
+
+  const loaded = loadDslFile(resolveWorkspacePath(file));
+  const report = inspectCanonicalization(loaded.raw, { path: loaded.path, format: loaded.format });
+
+  if (flags.json === true) {
+    io.stdout(JSON.stringify(report, null, 2));
+    return EXIT_CODE_SUCCESS;
+  }
+
+  io.stdout(`path: ${report.source.path ?? "-"}`);
+  io.stdout(`format: ${report.source.format ?? "-"}`);
+  io.stdout(`field_alias_mappings: ${report.mappings.fieldAliases.length}`);
+  io.stdout(`canonical_name_mappings: ${report.mappings.canonicalNames.length}`);
+  io.stdout(`issues: ${report.issues.length}`);
+  io.stdout(`warnings: ${report.warnings.length}`);
+  return EXIT_CODE_SUCCESS;
+}
+
 export async function runCli(argv: string[], io: CliIO): Promise<number> {
   const { positionals, flags } = parseArgs(argv);
   const [command, subcommand, ...rest] = positionals;
@@ -257,6 +376,18 @@ export async function runCli(argv: string[], io: CliIO): Promise<number> {
 
     if (command === "trace" && subcommand === "show") {
       return runTraceShow(rest, flags, io);
+    }
+
+    if (command === "trace" && subcommand === "export") {
+      return runTraceExport(rest, flags, io);
+    }
+
+    if (command === "dsl" && subcommand === "explain") {
+      return runDslExplain(rest, io);
+    }
+
+    if (command === "dsl" && subcommand === "inspect") {
+      return runDslInspect(rest, flags, io);
     }
 
     io.stderr(`Unknown command: ${positionals.join(" ")}`);

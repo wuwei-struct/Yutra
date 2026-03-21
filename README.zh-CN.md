@@ -112,8 +112,15 @@ actions:
 - 设计目标：用户可写中文 DSL，底层统一为 canonical IR。
 - 当前实现：
   - 已支持：字段 alias 显式映射（如 `智能体 -> agent`、`状态集 -> states`、`到 -> to`、`条件 -> when`）。
-  - 已支持：中文字符串值可被 parse/validate（例如中文状态名、中文意图名）。
-  - 未实现：中文“值语义”的自动翻译/归一化（例如不会把“已完成”自动转换为 `completed`）。
+  - 已支持：中文名称可做确定性 canonicalization（agent/intents/context fields/states/actions/guards）。
+  - 未实现：任意中文“值语义”自动翻译/归一化（不会对自由文本做智能翻译）。
+
+可调试命令：
+
+```bash
+pnpm exec yutra dsl explain examples/it-helpdesk/agent.zh-CN.yutra.yaml
+pnpm exec yutra dsl inspect examples/it-helpdesk/agent.zh-CN.yutra.yaml --json
+```
 
 ## English DSL Example
 
@@ -166,18 +173,47 @@ actions:
 ```bash
 pnpm install
 pnpm verify
+pnpm certify
 pnpm exec yutra validate examples/it-helpdesk/agent.yutra.yaml
 pnpm exec yutra validate examples/it-helpdesk/agent.zh-CN.yutra.yaml
+pnpm exec yutra dsl explain examples/it-helpdesk/agent.zh-CN.yutra.yaml
+pnpm exec yutra dsl inspect examples/it-helpdesk/agent.zh-CN.yutra.yaml --json
 pnpm exec yutra run examples/it-helpdesk/agent.zh-CN.yutra.yaml --input examples/it-helpdesk/demo-inputs/case1.json
 pnpm exec yutra trace list --trace-file .yutra/traces/events.jsonl
 pnpm --filter @yutra/viewer dev
 ```
+
+## 一致性与 Golden Trace
+
+Yutra 提供本地一致性认证与 golden trace 投影比对：
+
+```bash
+pnpm certify
+```
+
+认证结果输出到：
+- `.yutra/certification/summary.json`
 
 ## 示例矩阵
 
 - IT Helpdesk：状态机 + 工具调用 + 分支转移。
 - E-commerce Support：客服 SOP + knowledge + tool。
 - Approval Agent：guard + 审批链 + handoff。
+
+## 已认证 Scenario Packs
+
+- `examples/it-helpdesk`（`it-helpdesk-pack`）
+- `examples/ecommerce-support`（`ecommerce-support-pack`）
+- `examples/approval-agent`（`approval-agent-pack`）
+
+每个 pack 都包含 `pack.manifest.json`，用于描述入口 DSL、包含资源与认证场景引用。
+
+## Starter Packs
+
+- `starters/minimal-agent-pack`：最小可复制起步模板
+- `starters/support-pack`：支持类流程起步模板（含可选 policy 占位）
+
+详见：[docs/scenario-packs.md](docs/scenario-packs.md)
 
 ## Trace Viewer
 
@@ -202,6 +238,9 @@ Yutra 当前不是：
 ## 文档导航
 
 - [English README](./README.md)
+- [DSL Authoring 指南](docs/dsl-authoring.md)
+- [Conformance 与 Golden Trace](docs/conformance.md)
+- [Scenario Packs 与 Starter Packs](docs/scenario-packs.md)
 - [Execution Standard](docs/execution-standard.md)
 - [Tool Interface](docs/tool-interface.md)
 - [Knowledge Interface](docs/knowledge-interface.md)

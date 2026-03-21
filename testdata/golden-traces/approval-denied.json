@@ -1,0 +1,60 @@
+{
+  "scenario": "approval-denied",
+  "status": "completed",
+  "finalState": "denied",
+  "statePath": [
+    "intake",
+    "validate_request",
+    "approval_required",
+    "await_approval",
+    "denied"
+  ],
+  "actionSequence": [
+    "intake_request",
+    "validate_request_data",
+    "request_approval"
+  ],
+  "eventTypeSequence": [
+    "run.started",
+    "intent.resolved",
+    "state.entered",
+    "action.started",
+    "action.succeeded",
+    "transition.resolved",
+    "state.exited",
+    "state.entered",
+    "action.started",
+    "action.succeeded",
+    "guard.evaluated",
+    "transition.resolved",
+    "state.exited",
+    "state.entered",
+    "guard.evaluated",
+    "transition.resolved",
+    "state.exited",
+    "state.entered",
+    "action.started",
+    "action.succeeded",
+    "guard.evaluated",
+    "guard.evaluated",
+    "transition.resolved",
+    "state.exited",
+    "state.entered",
+    "state.exited",
+    "run.completed"
+  ],
+  "handoffReasonCodes": [],
+  "errorCodes": [],
+  "approvalStatuses": [
+    "denied"
+  ],
+  "reviewSources": [],
+  "contextChangedKeys": [
+    "approval_decision",
+    "approval_reason",
+    "approval_status",
+    "approver",
+    "is_valid_request",
+    "policy_excerpt"
+  ]
+}

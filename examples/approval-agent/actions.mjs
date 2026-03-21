@@ -40,6 +40,10 @@ export const actionRegistry = {
 
   request_approval: async (ctx) => {
     const result = await requestApproval(ctx);
+    const status = result.data?.status;
+    const decisionId =
+      result.data?.decisionId ??
+      (typeof result.data?.requestId === "string" ? `${result.data.requestId}-decision` : undefined);
     const policy = await policyKb.query(
       { query: "high risk request", topK: 1 },
       {
@@ -53,17 +57,52 @@ export const actionRegistry = {
     return {
       ok: result.ok,
       output: {
-        approval: result.data,
+        approvalDecision: result.data,
         policy: policy[0]?.content
       },
       contextPatch: {
         approval_status:
-          result.data?.status === "approved"
+          status === "approved"
             ? "approved"
-            : result.data?.status === "rejected"
+            : status === "denied" || status === "rejected"
               ? "denied"
-              : "pending",
-        policy_excerpt: policy[0]?.content
+              : status === "escalated"
+                ? "escalated"
+                : "pending",
+        approval_decision: result.data,
+        policy_excerpt: policy[0]?.content,
+        ...(result.data?.approver ? { approver: result.data.approver } : {}),
+        ...(result.data?.reason ? { approval_reason: result.data.reason } : {}),
+        ...(status === "pending" || status === "escalated"
+          ? {
+              ...(decisionId ? { review_id: decisionId } : {}),
+              review_requested_at: new Date().toISOString(),
+              human_review_request: {
+                reviewId: decisionId ?? `review-${Date.now()}`,
+                reasonCode: status === "escalated" ? "approval_escalated" : "approval_pending",
+                reason:
+                  status === "escalated"
+                    ? "Approval escalated to higher reviewer."
+                    : "Approval is pending manual review.",
+                source: "tool",
+                severity: status === "escalated" ? "high" : "medium",
+                state: ctx.currentState,
+                action: "request_approval",
+                summary:
+                  status === "escalated"
+                    ? "Approval decision escalated; handoff to security reviewer."
+                    : "Approval decision is pending; handoff to manual reviewer.",
+                recommendedActions:
+                  status === "escalated"
+                    ? ["escalate_to_security", "collect_additional_evidence"]
+                    : ["wait_for_approval", "collect_missing_context"],
+                requestedAt: new Date().toISOString(),
+                metadata: {
+                  decisionId
+                }
+              }
+            }
+          : {})
       },
       error: result.error
     };

@@ -1,0 +1,10 @@
+﻿agent: starter-support-agent
+initial_state: triage
+states:
+  triage:
+    transitions:
+      - to: resolved
+        when: "true"
+  resolved:
+    final: true
+

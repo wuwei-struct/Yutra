@@ -24,7 +24,8 @@
     "dependencies":  {
                          "@yutra/dsl":  "workspace:*",
                          "@yutra/spec":  "workspace:*",
-                         "@yutra/trace":  "workspace:*"
+                         "@yutra/trace":  "workspace:*",
+                         "yaml":  "^2.8.1"
                      },
     "license":  "MIT",
     "author":  "Yutra Contributors",

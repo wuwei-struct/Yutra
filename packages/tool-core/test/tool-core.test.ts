@@ -4,6 +4,7 @@ import {
   approvalTool,
   createFunctionTool,
   ticketTool,
+  type ApprovalDecisionStatus,
   type ToolRunContext
 } from "../src/index";
 
@@ -42,11 +43,16 @@ describe("@yutra/tool-core", () => {
     expect(registry.list()).toHaveLength(1);
   });
 
-  it("approval_tool returns structured pending or approved result", async () => {
-    const result = await approvalTool.run({ requestId: "APR-1", action: "pending" }, ctx);
-    expect(result.ok).toBe(true);
-    expect(result.data?.status).toBe("pending");
-    expect(result.data?.stub).toBe(true);
+  it("approval_tool returns stable ApprovalDecision shape", async () => {
+    const statuses: ApprovalDecisionStatus[] = ["pending", "approved", "denied", "escalated"];
+    const actions = ["pending", "approve", "deny", "escalate"] as const;
+    for (const [index, action] of actions.entries()) {
+      const result = await approvalTool.run({ requestId: `APR-${index}`, action }, ctx);
+      expect(result.ok).toBe(true);
+      expect(statuses).toContain(result.data?.status);
+      expect(typeof result.data?.decisionId).toBe("string");
+      expect(result.data?.stub).toBe(true);
+    }
   });
 
   it("ticket_tool returns structured stub result", async () => {

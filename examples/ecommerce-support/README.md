@@ -1,5 +1,7 @@
 # E-commerce Support Example
 
+This directory is also a certified Scenario Pack (`ecommerce-support-pack`).
+
 ## What this example proves
 
 Execution-first customer support SOP: issue triage, order lookup, policy lookup, and ticket actions.
@@ -34,3 +36,11 @@ pnpm yutra run examples/ecommerce-support/agent.yutra.yaml --input examples/ecom
 - SOP progression across multiple states (not one-shot prompt).
 - `action.succeeded` payloads with context delta.
 - `transition.resolved` showing path selection.
+
+## Pack customization
+
+- Manifest: `examples/ecommerce-support/pack.manifest.json`
+- Replace knowledge: files under `knowledge/`
+- Replace tools/actions: files under `tools/` and `actions.mjs`
+- Optional policy overlay: add local policy file and pass runtime options/environment
+- Certification reference in this pack: `ecommerce-happy`

@@ -1,0 +1,656 @@
+{
+  "meta": {
+    "runId": "b2e45731-b0ee-4606-9cc4-fbf750861fd8",
+    "agent": "approval_agent",
+    "startedAt": "2026-03-21T01:41:02.763Z",
+    "endedAt": "2026-03-21T01:41:02.779Z",
+    "isResumed": false
+  },
+  "specSummary": {
+    "agent": "approval_agent",
+    "initialState": "intake",
+    "finalState": "denied"
+  },
+  "inputSummary": {
+    "text": "Request temporary access to finance dashboard",
+    "intent": "access_request",
+    "contextKeys": [
+      "approval_decision_status",
+      "auto_approvable",
+      "request_type",
+      "risk_level",
+      "target_resource"
+    ]
+  },
+  "runtimeResult": {
+    "status": "completed",
+    "eventCount": 27
+  },
+  "traceEvents": [
+    {
+      "id": "b2e45731-b0ee-4606-9cc4-fbf750861fd8-1",
+      "runId": "b2e45731-b0ee-4606-9cc4-fbf750861fd8",
+      "type": "run.started",
+      "ts": "2026-03-21T01:41:02.763Z",
+      "agent": "approval_agent",
+      "payload": {
+        "input": {
+          "text": "Request temporary access to finance dashboard",
+          "intent": "access_request",
+          "context": {
+            "request_type": "access",
+            "target_resource": "finance-dashboard",
+            "risk_level": "low",
+            "auto_approvable": false,
+            "approval_decision_status": "denied"
+          }
+        },
+        "isResumed": false,
+        "environment": "dev"
+      }
+    },
+    {
+      "id": "b2e45731-b0ee-4606-9cc4-fbf750861fd8-2",
+      "runId": "b2e45731-b0ee-4606-9cc4-fbf750861fd8",
+      "type": "intent.resolved",
+      "ts": "2026-03-21T01:41:02.765Z",
+      "agent": "approval_agent",
+      "payload": {
+        "intent": "access_request",
+        "entryState": "intake",
+        "meta": {
+          "source": "input.intent"
+        },
+        "isResumed": false,
+        "environment": "dev"
+      }
+    },
+    {
+      "id": "b2e45731-b0ee-4606-9cc4-fbf750861fd8-3",
+      "runId": "b2e45731-b0ee-4606-9cc4-fbf750861fd8",
+      "type": "state.entered",
+      "ts": "2026-03-21T01:41:02.766Z",
+      "agent": "approval_agent",
+      "state": "intake"
+    },
+    {
+      "id": "b2e45731-b0ee-4606-9cc4-fbf750861fd8-4",
+      "runId": "b2e45731-b0ee-4606-9cc4-fbf750861fd8",
+      "type": "action.started",
+      "ts": "2026-03-21T01:41:02.767Z",
+      "agent": "approval_agent",
+      "state": "intake",
+      "action": "intake_request",
+      "payload": {
+        "attempt": 1,
+        "maxAttempts": 1,
+        "timeoutMs": 5000,
+        "idempotencyKey": "b2e45731-b0ee-4606-9cc4-fbf750861fd8:intake:intake_request:18b5bb926a98d5f07f84b2ad0a6026044696fd77",
+        "idempotencyHit": false,
+        "resumedRun": false
+      }
+    },
+    {
+      "id": "b2e45731-b0ee-4606-9cc4-fbf750861fd8-5",
+      "runId": "b2e45731-b0ee-4606-9cc4-fbf750861fd8",
+      "type": "action.succeeded",
+      "ts": "2026-03-21T01:41:02.769Z",
+      "agent": "approval_agent",
+      "state": "intake",
+      "action": "intake_request",
+      "payload": {
+        "attempt": 1,
+        "maxAttempts": 1,
+        "durationMs": 1,
+        "sideEffect": "none",
+        "output": {
+          "received": true,
+          "requestType": "access",
+          "target": "finance-dashboard"
+        },
+        "idempotencyKey": "b2e45731-b0ee-4606-9cc4-fbf750861fd8:intake:intake_request:18b5bb926a98d5f07f84b2ad0a6026044696fd77",
+        "idempotencyHit": false,
+        "resumedRun": false,
+        "meta": {
+          "idempotencyHit": false
+        }
+      }
+    },
+    {
+      "id": "b2e45731-b0ee-4606-9cc4-fbf750861fd8-6",
+      "runId": "b2e45731-b0ee-4606-9cc4-fbf750861fd8",
+      "type": "transition.resolved",
+      "ts": "2026-03-21T01:41:02.770Z",
+      "agent": "approval_agent",
+      "state": "intake",
+      "transition": "intake->validate_request",
+      "payload": {
+        "to": "validate_request"
+      }
+    },
+    {
+      "id": "b2e45731-b0ee-4606-9cc4-fbf750861fd8-7",
+      "runId": "b2e45731-b0ee-4606-9cc4-fbf750861fd8",
+      "type": "state.exited",
+      "ts": "2026-03-21T01:41:02.770Z",
+      "agent": "approval_agent",
+      "state": "intake",
+      "payload": {
+        "to": "validate_request"
+      }
+    },
+    {
+      "id": "b2e45731-b0ee-4606-9cc4-fbf750861fd8-8",
+      "runId": "b2e45731-b0ee-4606-9cc4-fbf750861fd8",
+      "type": "state.entered",
+      "ts": "2026-03-21T01:41:02.771Z",
+      "agent": "approval_agent",
+      "state": "validate_request"
+    },
+    {
+      "id": "b2e45731-b0ee-4606-9cc4-fbf750861fd8-9",
+      "runId": "b2e45731-b0ee-4606-9cc4-fbf750861fd8",
+      "type": "action.started",
+      "ts": "2026-03-21T01:41:02.772Z",
+      "agent": "approval_agent",
+      "state": "validate_request",
+      "action": "validate_request_data",
+      "payload": {
+        "attempt": 1,
+        "maxAttempts": 1,
+        "timeoutMs": 5000,
+        "idempotencyKey": "b2e45731-b0ee-4606-9cc4-fbf750861fd8:validate_request:validate_request_data:0dc4d4e56d5008c03e2732cec00b512c0daf69b1",
+        "idempotencyHit": false,
+        "resumedRun": false
+      }
+    },
+    {
+      "id": "b2e45731-b0ee-4606-9cc4-fbf750861fd8-10",
+      "runId": "b2e45731-b0ee-4606-9cc4-fbf750861fd8",
+      "type": "action.succeeded",
+      "ts": "2026-03-21T01:41:02.772Z",
+      "agent": "approval_agent",
+      "state": "validate_request",
+      "action": "validate_request_data",
+      "payload": {
+        "attempt": 1,
+        "maxAttempts": 1,
+        "durationMs": 0,
+        "contextDelta": {
+          "is_valid_request": true
+        },
+        "sideEffect": "none",
+        "output": {
+          "isValidRequest": true
+        },
+        "idempotencyKey": "b2e45731-b0ee-4606-9cc4-fbf750861fd8:validate_request:validate_request_data:0dc4d4e56d5008c03e2732cec00b512c0daf69b1",
+        "idempotencyHit": false,
+        "resumedRun": false,
+        "meta": {
+          "idempotencyHit": false
+        }
+      }
+    },
+    {
+      "id": "b2e45731-b0ee-4606-9cc4-fbf750861fd8-11",
+      "runId": "b2e45731-b0ee-4606-9cc4-fbf750861fd8",
+      "type": "guard.evaluated",
+      "ts": "2026-03-21T01:41:02.773Z",
+      "agent": "approval_agent",
+      "state": "validate_request",
+      "payload": {
+        "guard": "high_risk",
+        "passed": false,
+        "expression": "ctx.risk_level == \"high\"",
+        "scope": "transition"
+      }
+    },
+    {
+      "id": "b2e45731-b0ee-4606-9cc4-fbf750861fd8-12",
+      "runId": "b2e45731-b0ee-4606-9cc4-fbf750861fd8",
+      "type": "transition.resolved",
+      "ts": "2026-03-21T01:41:02.774Z",
+      "agent": "approval_agent",
+      "state": "validate_request",
+      "transition": "validate_request->approval_required",
+      "payload": {
+        "to": "approval_required"
+      }
+    },
+    {
+      "id": "b2e45731-b0ee-4606-9cc4-fbf750861fd8-13",
+      "runId": "b2e45731-b0ee-4606-9cc4-fbf750861fd8",
+      "type": "state.exited",
+      "ts": "2026-03-21T01:41:02.774Z",
+      "agent": "approval_agent",
+      "state": "validate_request",
+      "payload": {
+        "to": "approval_required"
+      }
+    },
+    {
+      "id": "b2e45731-b0ee-4606-9cc4-fbf750861fd8-14",
+      "runId": "b2e45731-b0ee-4606-9cc4-fbf750861fd8",
+      "type": "state.entered",
+      "ts": "2026-03-21T01:41:02.775Z",
+      "agent": "approval_agent",
+      "state": "approval_required"
+    },
+    {
+      "id": "b2e45731-b0ee-4606-9cc4-fbf750861fd8-15",
+      "runId": "b2e45731-b0ee-4606-9cc4-fbf750861fd8",
+      "type": "guard.evaluated",
+      "ts": "2026-03-21T01:41:02.775Z",
+      "agent": "approval_agent",
+      "state": "approval_required",
+      "payload": {
+        "guard": "auto_approvable",
+        "passed": false,
+        "expression": "ctx.auto_approvable == true",
+        "scope": "transition"
+      }
+    },
+    {
+      "id": "b2e45731-b0ee-4606-9cc4-fbf750861fd8-16",
+      "runId": "b2e45731-b0ee-4606-9cc4-fbf750861fd8",
+      "type": "transition.resolved",
+      "ts": "2026-03-21T01:41:02.776Z",
+      "agent": "approval_agent",
+      "state": "approval_required",
+      "transition": "approval_required->await_approval",
+      "payload": {
+        "to": "await_approval"
+      }
+    },
+    {
+      "id": "b2e45731-b0ee-4606-9cc4-fbf750861fd8-17",
+      "runId": "b2e45731-b0ee-4606-9cc4-fbf750861fd8",
+      "type": "state.exited",
+      "ts": "2026-03-21T01:41:02.776Z",
+      "agent": "approval_agent",
+      "state": "approval_required",
+      "payload": {
+        "to": "await_approval"
+      }
+    },
+    {
+      "id": "b2e45731-b0ee-4606-9cc4-fbf750861fd8-18",
+      "runId": "b2e45731-b0ee-4606-9cc4-fbf750861fd8",
+      "type": "state.entered",
+      "ts": "2026-03-21T01:41:02.777Z",
+      "agent": "approval_agent",
+      "state": "await_approval"
+    },
+    {
+      "id": "b2e45731-b0ee-4606-9cc4-fbf750861fd8-19",
+      "runId": "b2e45731-b0ee-4606-9cc4-fbf750861fd8",
+      "type": "action.started",
+      "ts": "2026-03-21T01:41:02.777Z",
+      "agent": "approval_agent",
+      "state": "await_approval",
+      "action": "request_approval",
+      "payload": {
+        "attempt": 1,
+        "maxAttempts": 1,
+        "timeoutMs": 5000,
+        "idempotencyKey": "b2e45731-b0ee-4606-9cc4-fbf750861fd8:await_approval:request_approval:6f0ffcbd7df25cf0bdeb52c8bd908af4570521c4",
+        "idempotencyHit": false,
+        "resumedRun": false
+      }
+    },
+    {
+      "id": "b2e45731-b0ee-4606-9cc4-fbf750861fd8-20",
+      "runId": "b2e45731-b0ee-4606-9cc4-fbf750861fd8",
+      "type": "action.succeeded",
+      "ts": "2026-03-21T01:41:02.778Z",
+      "agent": "approval_agent",
+      "state": "await_approval",
+      "action": "request_approval",
+      "payload": {
+        "attempt": 1,
+        "maxAttempts": 1,
+        "durationMs": 1,
+        "contextDelta": {
+          "approval_status": "denied",
+          "approval_decision": {
+            "decisionId": "APR-finance-dashboard-denied",
+            "status": "denied",
+            "approver": "security-approver",
+            "reason": "decision from input: denied",
+            "decidedAt": "2026-03-21T01:41:02.777Z",
+            "metadata": {
+              "requestId": "APR-finance-dashboard",
+              "request_type": "access",
+              "target_resource": "finance-dashboard"
+            },
+            "stub": true
+          },
+          "policy_excerpt": "# Approval Policy\n\n- Missing request type or target resource must be handed off.\n- High risk requests require security handoff.\n- Low risk requests can proceed to approval decision.\n- Only approved requests can execute changes.\r\n",
+          "approver": "security-approver",
+          "approval_reason": "decision from input: denied"
+        },
+        "sideEffect": "none",
+        "output": {
+          "approvalDecision": {
+            "decisionId": "APR-finance-dashboard-denied",
+            "status": "denied",
+            "approver": "security-approver",
+            "reason": "decision from input: denied",
+            "decidedAt": "2026-03-21T01:41:02.777Z",
+            "metadata": {
+              "requestId": "APR-finance-dashboard",
+              "request_type": "access",
+              "target_resource": "finance-dashboard"
+            },
+            "stub": true
+          },
+          "policy": "# Approval Policy\n\n- Missing request type or target resource must be handed off.\n- High risk requests require security handoff.\n- Low risk requests can proceed to approval decision.\n- Only approved requests can execute changes.\r\n"
+        },
+        "idempotencyKey": "b2e45731-b0ee-4606-9cc4-fbf750861fd8:await_approval:request_approval:6f0ffcbd7df25cf0bdeb52c8bd908af4570521c4",
+        "idempotencyHit": false,
+        "resumedRun": false,
+        "meta": {
+          "idempotencyHit": false
+        }
+      }
+    },
+    {
+      "id": "b2e45731-b0ee-4606-9cc4-fbf750861fd8-21",
+      "runId": "b2e45731-b0ee-4606-9cc4-fbf750861fd8",
+      "type": "guard.evaluated",
+      "ts": "2026-03-21T01:41:02.778Z",
+      "agent": "approval_agent",
+      "state": "await_approval",
+      "payload": {
+        "guard": "approval_granted",
+        "passed": false,
+        "expression": "ctx.approval_status == \"approved\"",
+        "scope": "transition"
+      }
+    },
+    {
+      "id": "b2e45731-b0ee-4606-9cc4-fbf750861fd8-22",
+      "runId": "b2e45731-b0ee-4606-9cc4-fbf750861fd8",
+      "type": "guard.evaluated",
+      "ts": "2026-03-21T01:41:02.778Z",
+      "agent": "approval_agent",
+      "state": "await_approval",
+      "payload": {
+        "guard": "approval_denied",
+        "passed": true,
+        "expression": "ctx.approval_status == \"denied\"",
+        "scope": "transition"
+      }
+    },
+    {
+      "id": "b2e45731-b0ee-4606-9cc4-fbf750861fd8-23",
+      "runId": "b2e45731-b0ee-4606-9cc4-fbf750861fd8",
+      "type": "transition.resolved",
+      "ts": "2026-03-21T01:41:02.778Z",
+      "agent": "approval_agent",
+      "state": "await_approval",
+      "transition": "await_approval->denied",
+      "payload": {
+        "to": "denied",
+        "guard": "approval_denied"
+      }
+    },
+    {
+      "id": "b2e45731-b0ee-4606-9cc4-fbf750861fd8-24",
+      "runId": "b2e45731-b0ee-4606-9cc4-fbf750861fd8",
+      "type": "state.exited",
+      "ts": "2026-03-21T01:41:02.779Z",
+      "agent": "approval_agent",
+      "state": "await_approval",
+      "payload": {
+        "to": "denied"
+      }
+    },
+    {
+      "id": "b2e45731-b0ee-4606-9cc4-fbf750861fd8-25",
+      "runId": "b2e45731-b0ee-4606-9cc4-fbf750861fd8",
+      "type": "state.entered",
+      "ts": "2026-03-21T01:41:02.779Z",
+      "agent": "approval_agent",
+      "state": "denied"
+    },
+    {
+      "id": "b2e45731-b0ee-4606-9cc4-fbf750861fd8-26",
+      "runId": "b2e45731-b0ee-4606-9cc4-fbf750861fd8",
+      "type": "state.exited",
+      "ts": "2026-03-21T01:41:02.779Z",
+      "agent": "approval_agent",
+      "state": "denied",
+      "payload": {
+        "reason": "No transition matched."
+      }
+    },
+    {
+      "id": "b2e45731-b0ee-4606-9cc4-fbf750861fd8-27",
+      "runId": "b2e45731-b0ee-4606-9cc4-fbf750861fd8",
+      "type": "run.completed",
+      "ts": "2026-03-21T01:41:02.779Z",
+      "agent": "approval_agent",
+      "state": "denied",
+      "payload": {
+        "steps": 5,
+        "isResumed": false,
+        "environment": "dev",
+        "approvalSummary": {
+          "status": "denied",
+          "decisionId": "APR-finance-dashboard-denied",
+          "approver": "security-approver",
+          "reason": "decision from input: denied",
+          "decidedAt": "2026-03-21T01:41:02.777Z"
+        }
+      }
+    }
+  ],
+  "replaySummary": {
+    "frameCount": 27,
+    "stepCount": 26,
+    "statePath": [
+      "intake",
+      "validate_request",
+      "approval_required",
+      "await_approval",
+      "denied"
+    ],
+    "actionSequence": [
+      "intake_request",
+      "validate_request_data",
+      "request_approval"
+    ]
+  },
+  "contextDiffSummary": {
+    "totalActionSuccessFrames": 3,
+    "completeFrames": 2,
+    "changedKeys": [
+      "approval_decision",
+      "approval_reason",
+      "approval_status",
+      "approver",
+      "is_valid_request",
+      "policy_excerpt"
+    ],
+    "frames": [
+      {
+        "step": 4,
+        "eventId": "b2e45731-b0ee-4606-9cc4-fbf750861fd8-5",
+        "runId": "b2e45731-b0ee-4606-9cc4-fbf750861fd8",
+        "ts": "2026-03-21T01:41:02.769Z",
+        "state": "intake",
+        "action": "intake_request",
+        "change": {
+          "addedKeys": [],
+          "changedKeys": [],
+          "removedKeys": []
+        },
+        "complete": false,
+        "reason": "contextDelta missing"
+      },
+      {
+        "step": 9,
+        "eventId": "b2e45731-b0ee-4606-9cc4-fbf750861fd8-10",
+        "runId": "b2e45731-b0ee-4606-9cc4-fbf750861fd8",
+        "ts": "2026-03-21T01:41:02.772Z",
+        "state": "validate_request",
+        "action": "validate_request_data",
+        "before": {
+          "request_type": "access",
+          "target_resource": "finance-dashboard",
+          "risk_level": "low",
+          "auto_approvable": false,
+          "approval_decision_status": "denied"
+        },
+        "delta": {
+          "is_valid_request": true
+        },
+        "after": {
+          "request_type": "access",
+          "target_resource": "finance-dashboard",
+          "risk_level": "low",
+          "auto_approvable": false,
+          "approval_decision_status": "denied",
+          "is_valid_request": true
+        },
+        "change": {
+          "addedKeys": [
+            "is_valid_request"
+          ],
+          "changedKeys": [],
+          "removedKeys": []
+        },
+        "complete": true
+      },
+      {
+        "step": 19,
+        "eventId": "b2e45731-b0ee-4606-9cc4-fbf750861fd8-20",
+        "runId": "b2e45731-b0ee-4606-9cc4-fbf750861fd8",
+        "ts": "2026-03-21T01:41:02.778Z",
+        "state": "await_approval",
+        "action": "request_approval",
+        "before": {
+          "request_type": "access",
+          "target_resource": "finance-dashboard",
+          "risk_level": "low",
+          "auto_approvable": false,
+          "approval_decision_status": "denied",
+          "is_valid_request": true
+        },
+        "delta": {
+          "approval_status": "denied",
+          "approval_decision": {
+            "decisionId": "APR-finance-dashboard-denied",
+            "status": "denied",
+            "approver": "security-approver",
+            "reason": "decision from input: denied",
+            "decidedAt": "2026-03-21T01:41:02.777Z",
+            "metadata": {
+              "requestId": "APR-finance-dashboard",
+              "request_type": "access",
+              "target_resource": "finance-dashboard"
+            },
+            "stub": true
+          },
+          "policy_excerpt": "# Approval Policy\n\n- Missing request type or target resource must be handed off.\n- High risk requests require security handoff.\n- Low risk requests can proceed to approval decision.\n- Only approved requests can execute changes.\r\n",
+          "approver": "security-approver",
+          "approval_reason": "decision from input: denied"
+        },
+        "after": {
+          "request_type": "access",
+          "target_resource": "finance-dashboard",
+          "risk_level": "low",
+          "auto_approvable": false,
+          "approval_decision_status": "denied",
+          "is_valid_request": true,
+          "approval_status": "denied",
+          "approval_decision": {
+            "decisionId": "APR-finance-dashboard-denied",
+            "status": "denied",
+            "approver": "security-approver",
+            "reason": "decision from input: denied",
+            "decidedAt": "2026-03-21T01:41:02.777Z",
+            "metadata": {
+              "requestId": "APR-finance-dashboard",
+              "request_type": "access",
+              "target_resource": "finance-dashboard"
+            },
+            "stub": true
+          },
+          "policy_excerpt": "# Approval Policy\n\n- Missing request type or target resource must be handed off.\n- High risk requests require security handoff.\n- Low risk requests can proceed to approval decision.\n- Only approved requests can execute changes.\r\n",
+          "approver": "security-approver",
+          "approval_reason": "decision from input: denied"
+        },
+        "change": {
+          "addedKeys": [
+            "approval_status",
+            "approval_decision",
+            "policy_excerpt",
+            "approver",
+            "approval_reason"
+          ],
+          "changedKeys": [],
+          "removedKeys": []
+        },
+        "complete": true
+      }
+    ]
+  },
+  "compareHint": {
+    "summary": {
+      "runId": "b2e45731-b0ee-4606-9cc4-fbf750861fd8",
+      "agent": "approval_agent",
+      "status": "completed",
+      "finalEventType": "run.completed",
+      "finalState": "denied",
+      "statePath": [
+        "intake",
+        "validate_request",
+        "approval_required",
+        "await_approval",
+        "denied"
+      ],
+      "actionSequence": [
+        "intake_request",
+        "validate_request_data",
+        "request_approval"
+      ],
+      "contextKeys": [
+        "approval_decision",
+        "approval_reason",
+        "approval_status",
+        "approver",
+        "is_valid_request",
+        "policy_excerpt"
+      ],
+      "eventCount": 27
+    }
+  },
+  "handoffOrErrorSummary": {
+    "handoff": false,
+    "failed": false
+  },
+  "governanceSummary": {
+    "environment": "dev",
+    "policyErrorCodes": [],
+    "handoffReasonCodes": []
+  },
+  "approvalSummary": {
+    "decisionCount": 1,
+    "statuses": [
+      "denied"
+    ],
+    "latestDecision": {
+      "status": "denied",
+      "decisionId": "APR-finance-dashboard-denied",
+      "approver": "security-approver",
+      "reason": "decision from input: denied",
+      "decidedAt": "2026-03-21T01:41:02.777Z"
+    }
+  },
+  "humanReviewSummary": {
+    "requestCount": 0,
+    "sources": []
+  }
+}

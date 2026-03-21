@@ -1,0 +1,27 @@
+{
+  "pack": "it-helpdesk-pack",
+  "version": "0.1.0",
+  "domain": "it-helpdesk",
+  "description": "Deterministic IT helpdesk scenario pack with canonical and zh-CN DSL entrypoints.",
+  "language": ["en", "zh-CN"],
+  "includes": {
+    "dsl": ["agent.yutra.yaml", "agent.zh-CN.yutra.yaml"],
+    "tools": ["actions.mjs", "actions.ts"],
+    "inputs": ["demo-inputs/case1.json"],
+    "certification": ["it-helpdesk-happy", "it-helpdesk-zh"],
+    "docs": ["README.md"]
+  },
+  "entrypoints": {
+    "canonical": "agent.yutra.yaml",
+    "zhCN": "agent.zh-CN.yutra.yaml"
+  },
+  "capabilities": [
+    "state_machine_execution",
+    "tool_action_execution",
+    "zh_authoring_aliases"
+  ],
+  "constraints": [
+    "no_llm_first_control_flow",
+    "local_first_runtime"
+  ]
+}

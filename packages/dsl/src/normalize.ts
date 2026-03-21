@@ -1,6 +1,8 @@
 import type { AgentSpec } from "@yutra/spec";
 import { agentSpecSchema } from "@yutra/spec";
+import { canonicalizeDslNames } from "./canonicalize";
 import { DslError } from "./errors";
+import type { DslNormalizationResult, FieldAliasMappingRecord } from "./types";
 
 const aliasKeyMap: Readonly<Record<string, string>> = {
   "\u667A\u80FD\u4F53": "agent",
@@ -22,49 +24,17 @@ const aliasKeyMap: Readonly<Record<string, string>> = {
   "\u6761\u4EF6": "when"
 };
 
-const canonicalKeys = new Set<string>([
-  "agent",
-  "version",
-  "intents",
-  "context",
-  "initial_state",
-  "states",
-  "actions",
-  "guards",
-  "transitions",
-  "on_enter",
-  "on_exit",
-  "to",
-  "when",
-  "description",
-  "entry_state",
-  "fields",
-  "type",
-  "required",
-  "default",
-  "final",
-  "handoff",
-  "name",
-  "input",
-  "output",
-  "side_effect",
-  "expression",
-  "guard",
-  "action",
-  "payload"
-]);
-
 function isPlainObject(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
-function toCanonicalKey(key: string): string {
-  return aliasKeyMap[key] ?? key;
-}
-
-function normalizeValue(value: unknown): unknown {
+function normalizeStructurally(
+  value: unknown,
+  path: string[] = [],
+  aliasMappings: FieldAliasMappingRecord[] = []
+): unknown {
   if (Array.isArray(value)) {
-    return value.map((item) => normalizeValue(item));
+    return value.map((item, index) => normalizeStructurally(item, [...path, String(index)], aliasMappings));
   }
 
   if (!isPlainObject(value)) {
@@ -72,26 +42,25 @@ function normalizeValue(value: unknown): unknown {
   }
 
   const normalized: Record<string, unknown> = {};
-
-  for (const [key, entry] of Object.entries(value)) {
-    const canonicalKey = toCanonicalKey(key);
-    const normalizedEntry = normalizeValue(entry);
-
-    if (canonicalKeys.has(canonicalKey)) {
-      normalized[canonicalKey] = normalizedEntry;
-      continue;
+  for (const [rawKey, rawValue] of Object.entries(value)) {
+    const canonicalKey = aliasKeyMap[rawKey] ?? rawKey;
+    if (canonicalKey !== rawKey) {
+      aliasMappings.push({
+        from: rawKey,
+        to: canonicalKey,
+        provenance: "alias_map",
+        path: [...path, rawKey]
+      });
     }
 
-    normalized[canonicalKey] = normalizedEntry;
+    normalized[canonicalKey] = normalizeStructurally(rawValue, [...path, canonicalKey], aliasMappings);
   }
 
   return normalized;
 }
 
-export function normalizeDsl(input: unknown): AgentSpec {
-  const normalized = normalizeValue(input);
+function parseAgentSpec(normalized: unknown): AgentSpec {
   const parsed = agentSpecSchema.safeParse(normalized);
-
   if (!parsed.success) {
     const issue = parsed.error.issues[0];
     throw new DslError({
@@ -101,8 +70,26 @@ export function normalizeDsl(input: unknown): AgentSpec {
       severity: "error"
     });
   }
-
   return parsed.data;
+}
+
+export function normalizeDslWithDetails(input: unknown): DslNormalizationResult {
+  const fieldAliasMappings: FieldAliasMappingRecord[] = [];
+  const structurallyNormalized = normalizeStructurally(input, [], fieldAliasMappings);
+  const parsed = parseAgentSpec(structurallyNormalized);
+  const canonicalized = canonicalizeDslNames(parsed);
+
+  return {
+    normalizedInput: structurallyNormalized,
+    spec: canonicalized.spec,
+    fieldAliasMappings,
+    nameCanonicalizations: canonicalized.mappings,
+    issues: canonicalized.issues
+  };
+}
+
+export function normalizeDsl(input: unknown): AgentSpec {
+  return normalizeDslWithDetails(input).spec;
 }
 
 export const DSL_ALIAS_KEY_MAP = aliasKeyMap;

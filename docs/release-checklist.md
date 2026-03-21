@@ -7,6 +7,8 @@
 - [ ] `pnpm test`
 - [ ] `pnpm build`
 - [ ] `pnpm verify`
+- [ ] `pnpm certify`
+- [ ] Check `.yutra/certification/summary.json`
 
 ## Example execution
 
@@ -15,6 +17,12 @@
 - [ ] `pnpm exec yutra run examples/ecommerce-support/agent.yutra.yaml --input examples/ecommerce-support/demo-inputs/case1.json --trace-file demo-artifacts/ecommerce-support.jsonl`
 - [ ] `pnpm exec yutra run examples/approval-agent/agent.yutra.yaml --input examples/approval-agent/demo-inputs/case1.json --trace-file demo-artifacts/approval-agent-completed.jsonl`
 - [ ] `pnpm exec yutra run examples/approval-agent/agent.yutra.yaml --input examples/approval-agent/demo-inputs/case2.json --trace-file demo-artifacts/approval-agent-handoff.jsonl`
+
+## Scenario packs / starters
+
+- [ ] `examples/*/pack.manifest.json` exists and is valid (covered by `pnpm certify`)
+- [ ] `starters/minimal-agent-pack` validates
+- [ ] `starters/support-pack` validates
 
 ## Viewer checks
 

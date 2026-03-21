@@ -5,3 +5,7 @@ export * from "./sqlite-storage";
 export * from "./trace-recorder";
 export * from "./trace-reader";
 export * from "./replay";
+export * from "./replay-frames";
+export * from "./context-diff";
+export * from "./compare";
+export * from "./audit-bundle";

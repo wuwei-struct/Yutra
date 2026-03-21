@@ -1,0 +1,10 @@
+﻿agent: starter-minimal-agent
+initial_state: start
+states:
+  start:
+    transitions:
+      - to: completed
+        when: "true"
+  completed:
+    final: true
+

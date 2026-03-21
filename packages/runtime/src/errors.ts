@@ -3,11 +3,11 @@ import type { RuntimeError } from "./types";
 export function createRuntimeError(
   code: string,
   message: string,
-  details?: Record<string, unknown>
+  extras?: Partial<Omit<RuntimeError, "code" | "message">>
 ): RuntimeError {
   return {
     code,
     message,
-    details
+    ...extras
   };
 }

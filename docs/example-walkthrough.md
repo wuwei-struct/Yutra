@@ -1,5 +1,19 @@
 ﻿# Example Walkthrough
 
+## 0) Conformance Gate (Recommended Before Demo)
+
+```bash
+pnpm certify
+```
+
+Check summary:
+- `.yutra/certification/summary.json`
+
+Pack and starter references:
+- `docs/scenario-packs.md`
+- `examples/*/pack.manifest.json`
+- `starters/minimal-agent-pack`
+
 ## 1) Run IT Helpdesk
 
 ```bash
@@ -9,6 +23,13 @@ pnpm yutra run examples/it-helpdesk/agent.yutra.yaml --input examples/it-helpdes
 Trace focus:
 - deterministic two-state flow
 - action execution and close transition
+
+DSL debug entry (Chinese authoring):
+
+```bash
+pnpm yutra dsl explain examples/it-helpdesk/agent.zh-CN.yutra.yaml
+pnpm yutra dsl inspect examples/it-helpdesk/agent.zh-CN.yutra.yaml --json
+```
 
 ## 2) Run E-commerce Support
 

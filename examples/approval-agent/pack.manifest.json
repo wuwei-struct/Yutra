@@ -1,0 +1,32 @@
+{
+  "pack": "approval-agent-pack",
+  "version": "0.1.0",
+  "domain": "approval-workflow",
+  "description": "Approval and human-in-the-loop scenario pack with approved/denied/handoff paths.",
+  "language": ["en"],
+  "includes": {
+    "dsl": ["agent.yutra.yaml"],
+    "knowledge": ["knowledge/policy.md"],
+    "tools": [
+      "actions.mjs",
+      "tools/request-approval.mjs",
+      "tools/execute-change.mjs",
+      "tools/notify-requester.mjs"
+    ],
+    "inputs": ["demo-inputs/case1.json", "demo-inputs/case2.json", "demo-inputs/case3.json"],
+    "certification": ["approval-approved", "approval-denied", "approval-handoff"],
+    "docs": ["README.md"]
+  },
+  "entrypoints": {
+    "canonical": "agent.yutra.yaml"
+  },
+  "capabilities": [
+    "governance_aware_actions",
+    "approval_contract",
+    "human_review_handoff"
+  ],
+  "constraints": [
+    "no_remote_approval_system",
+    "no_multitenant_governance_backend"
+  ]
+}

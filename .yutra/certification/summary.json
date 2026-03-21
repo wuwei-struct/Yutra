@@ -1,0 +1,69 @@
+{
+  "generatedAt": "2026-03-21T02:03:48.160Z",
+  "updateGolden": false,
+  "totals": {
+    "pass": 11,
+    "fail": 0
+  },
+  "records": [
+    {
+      "scenario": "spec-conformance",
+      "status": "pass"
+    },
+    {
+      "scenario": "dsl-conformance",
+      "status": "pass"
+    },
+    {
+      "scenario": "it-helpdesk-happy",
+      "status": "pass",
+      "actualStatus": "completed",
+      "expectedStatus": "completed"
+    },
+    {
+      "scenario": "ecommerce-happy",
+      "status": "pass",
+      "actualStatus": "completed",
+      "expectedStatus": "completed"
+    },
+    {
+      "scenario": "approval-approved",
+      "status": "pass",
+      "actualStatus": "completed",
+      "expectedStatus": "completed"
+    },
+    {
+      "scenario": "approval-denied",
+      "status": "pass",
+      "actualStatus": "completed",
+      "expectedStatus": "completed"
+    },
+    {
+      "scenario": "approval-handoff",
+      "status": "pass",
+      "actualStatus": "handoff",
+      "expectedStatus": "handoff"
+    },
+    {
+      "scenario": "it-helpdesk-zh",
+      "status": "pass",
+      "actualStatus": "completed",
+      "expectedStatus": "completed"
+    },
+    {
+      "scenario": "resumed-run",
+      "status": "pass",
+      "actualStatus": "completed",
+      "expectedStatus": "completed"
+    },
+    {
+      "scenario": "resumed-run-idempotent",
+      "status": "pass",
+      "message": "calls=1"
+    },
+    {
+      "scenario": "trace-audit-conformance",
+      "status": "pass"
+    }
+  ]
+}

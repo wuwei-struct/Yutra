@@ -1,0 +1,391 @@
+{
+  "meta": {
+    "runId": "c4b3a057-b143-4e43-a43e-f29c33c938fc",
+    "agent": "approval_agent",
+    "startedAt": "2026-03-21T01:41:04.334Z",
+    "endedAt": "2026-03-21T01:41:04.343Z",
+    "isResumed": false
+  },
+  "specSummary": {
+    "agent": "approval_agent",
+    "initialState": "intake",
+    "finalState": "handoff_security"
+  },
+  "inputSummary": {
+    "text": "Request admin access to production secrets",
+    "intent": "access_request",
+    "contextKeys": [
+      "approval_decision_status",
+      "auto_approvable",
+      "request_type",
+      "risk_level",
+      "target_resource"
+    ]
+  },
+  "runtimeResult": {
+    "status": "handoff",
+    "eventCount": 16
+  },
+  "traceEvents": [
+    {
+      "id": "c4b3a057-b143-4e43-a43e-f29c33c938fc-1",
+      "runId": "c4b3a057-b143-4e43-a43e-f29c33c938fc",
+      "type": "run.started",
+      "ts": "2026-03-21T01:41:04.334Z",
+      "agent": "approval_agent",
+      "payload": {
+        "input": {
+          "text": "Request admin access to production secrets",
+          "intent": "access_request",
+          "context": {
+            "request_type": "access",
+            "target_resource": "prod-secrets",
+            "risk_level": "high",
+            "auto_approvable": false,
+            "approval_decision_status": "pending"
+          }
+        },
+        "isResumed": false,
+        "environment": "dev"
+      }
+    },
+    {
+      "id": "c4b3a057-b143-4e43-a43e-f29c33c938fc-2",
+      "runId": "c4b3a057-b143-4e43-a43e-f29c33c938fc",
+      "type": "intent.resolved",
+      "ts": "2026-03-21T01:41:04.337Z",
+      "agent": "approval_agent",
+      "payload": {
+        "intent": "access_request",
+        "entryState": "intake",
+        "meta": {
+          "source": "input.intent"
+        },
+        "isResumed": false,
+        "environment": "dev"
+      }
+    },
+    {
+      "id": "c4b3a057-b143-4e43-a43e-f29c33c938fc-3",
+      "runId": "c4b3a057-b143-4e43-a43e-f29c33c938fc",
+      "type": "state.entered",
+      "ts": "2026-03-21T01:41:04.337Z",
+      "agent": "approval_agent",
+      "state": "intake"
+    },
+    {
+      "id": "c4b3a057-b143-4e43-a43e-f29c33c938fc-4",
+      "runId": "c4b3a057-b143-4e43-a43e-f29c33c938fc",
+      "type": "action.started",
+      "ts": "2026-03-21T01:41:04.338Z",
+      "agent": "approval_agent",
+      "state": "intake",
+      "action": "intake_request",
+      "payload": {
+        "attempt": 1,
+        "maxAttempts": 1,
+        "timeoutMs": 5000,
+        "idempotencyKey": "c4b3a057-b143-4e43-a43e-f29c33c938fc:intake:intake_request:46638b3959a3750f5e2eb892ba0264ca9c129213",
+        "idempotencyHit": false,
+        "resumedRun": false
+      }
+    },
+    {
+      "id": "c4b3a057-b143-4e43-a43e-f29c33c938fc-5",
+      "runId": "c4b3a057-b143-4e43-a43e-f29c33c938fc",
+      "type": "action.succeeded",
+      "ts": "2026-03-21T01:41:04.339Z",
+      "agent": "approval_agent",
+      "state": "intake",
+      "action": "intake_request",
+      "payload": {
+        "attempt": 1,
+        "maxAttempts": 1,
+        "durationMs": 0,
+        "sideEffect": "none",
+        "output": {
+          "received": true,
+          "requestType": "access",
+          "target": "prod-secrets"
+        },
+        "idempotencyKey": "c4b3a057-b143-4e43-a43e-f29c33c938fc:intake:intake_request:46638b3959a3750f5e2eb892ba0264ca9c129213",
+        "idempotencyHit": false,
+        "resumedRun": false,
+        "meta": {
+          "idempotencyHit": false
+        }
+      }
+    },
+    {
+      "id": "c4b3a057-b143-4e43-a43e-f29c33c938fc-6",
+      "runId": "c4b3a057-b143-4e43-a43e-f29c33c938fc",
+      "type": "transition.resolved",
+      "ts": "2026-03-21T01:41:04.340Z",
+      "agent": "approval_agent",
+      "state": "intake",
+      "transition": "intake->validate_request",
+      "payload": {
+        "to": "validate_request"
+      }
+    },
+    {
+      "id": "c4b3a057-b143-4e43-a43e-f29c33c938fc-7",
+      "runId": "c4b3a057-b143-4e43-a43e-f29c33c938fc",
+      "type": "state.exited",
+      "ts": "2026-03-21T01:41:04.340Z",
+      "agent": "approval_agent",
+      "state": "intake",
+      "payload": {
+        "to": "validate_request"
+      }
+    },
+    {
+      "id": "c4b3a057-b143-4e43-a43e-f29c33c938fc-8",
+      "runId": "c4b3a057-b143-4e43-a43e-f29c33c938fc",
+      "type": "state.entered",
+      "ts": "2026-03-21T01:41:04.340Z",
+      "agent": "approval_agent",
+      "state": "validate_request"
+    },
+    {
+      "id": "c4b3a057-b143-4e43-a43e-f29c33c938fc-9",
+      "runId": "c4b3a057-b143-4e43-a43e-f29c33c938fc",
+      "type": "action.started",
+      "ts": "2026-03-21T01:41:04.340Z",
+      "agent": "approval_agent",
+      "state": "validate_request",
+      "action": "validate_request_data",
+      "payload": {
+        "attempt": 1,
+        "maxAttempts": 1,
+        "timeoutMs": 5000,
+        "idempotencyKey": "c4b3a057-b143-4e43-a43e-f29c33c938fc:validate_request:validate_request_data:ae354d17797f453fd394f359e2fef56458395277",
+        "idempotencyHit": false,
+        "resumedRun": false
+      }
+    },
+    {
+      "id": "c4b3a057-b143-4e43-a43e-f29c33c938fc-10",
+      "runId": "c4b3a057-b143-4e43-a43e-f29c33c938fc",
+      "type": "action.succeeded",
+      "ts": "2026-03-21T01:41:04.341Z",
+      "agent": "approval_agent",
+      "state": "validate_request",
+      "action": "validate_request_data",
+      "payload": {
+        "attempt": 1,
+        "maxAttempts": 1,
+        "durationMs": 1,
+        "contextDelta": {
+          "is_valid_request": true
+        },
+        "sideEffect": "none",
+        "output": {
+          "isValidRequest": true
+        },
+        "idempotencyKey": "c4b3a057-b143-4e43-a43e-f29c33c938fc:validate_request:validate_request_data:ae354d17797f453fd394f359e2fef56458395277",
+        "idempotencyHit": false,
+        "resumedRun": false,
+        "meta": {
+          "idempotencyHit": false
+        }
+      }
+    },
+    {
+      "id": "c4b3a057-b143-4e43-a43e-f29c33c938fc-11",
+      "runId": "c4b3a057-b143-4e43-a43e-f29c33c938fc",
+      "type": "guard.evaluated",
+      "ts": "2026-03-21T01:41:04.341Z",
+      "agent": "approval_agent",
+      "state": "validate_request",
+      "payload": {
+        "guard": "high_risk",
+        "passed": true,
+        "expression": "ctx.risk_level == \"high\"",
+        "scope": "transition"
+      }
+    },
+    {
+      "id": "c4b3a057-b143-4e43-a43e-f29c33c938fc-12",
+      "runId": "c4b3a057-b143-4e43-a43e-f29c33c938fc",
+      "type": "transition.resolved",
+      "ts": "2026-03-21T01:41:04.341Z",
+      "agent": "approval_agent",
+      "state": "validate_request",
+      "transition": "validate_request->handoff_security",
+      "payload": {
+        "to": "handoff_security",
+        "guard": "high_risk"
+      }
+    },
+    {
+      "id": "c4b3a057-b143-4e43-a43e-f29c33c938fc-13",
+      "runId": "c4b3a057-b143-4e43-a43e-f29c33c938fc",
+      "type": "state.exited",
+      "ts": "2026-03-21T01:41:04.342Z",
+      "agent": "approval_agent",
+      "state": "validate_request",
+      "payload": {
+        "to": "handoff_security"
+      }
+    },
+    {
+      "id": "c4b3a057-b143-4e43-a43e-f29c33c938fc-14",
+      "runId": "c4b3a057-b143-4e43-a43e-f29c33c938fc",
+      "type": "state.entered",
+      "ts": "2026-03-21T01:41:04.342Z",
+      "agent": "approval_agent",
+      "state": "handoff_security"
+    },
+    {
+      "id": "c4b3a057-b143-4e43-a43e-f29c33c938fc-15",
+      "runId": "c4b3a057-b143-4e43-a43e-f29c33c938fc",
+      "type": "state.exited",
+      "ts": "2026-03-21T01:41:04.343Z",
+      "agent": "approval_agent",
+      "state": "handoff_security",
+      "payload": {
+        "reason": "No transition matched."
+      }
+    },
+    {
+      "id": "c4b3a057-b143-4e43-a43e-f29c33c938fc-16",
+      "runId": "c4b3a057-b143-4e43-a43e-f29c33c938fc",
+      "type": "handoff.requested",
+      "ts": "2026-03-21T01:41:04.343Z",
+      "agent": "approval_agent",
+      "state": "handoff_security",
+      "payload": {
+        "steps": 3,
+        "isResumed": false,
+        "reasonCode": "state_handoff",
+        "reason": "State 'handoff_security' is configured as handoff.",
+        "source": "runtime",
+        "state": "handoff_security",
+        "summary": "Handoff requested because state 'handoff_security' is marked as handoff.",
+        "requestedAt": "2026-03-21T01:41:04.343Z",
+        "environment": "dev"
+      }
+    }
+  ],
+  "replaySummary": {
+    "frameCount": 16,
+    "stepCount": 15,
+    "statePath": [
+      "intake",
+      "validate_request",
+      "handoff_security"
+    ],
+    "actionSequence": [
+      "intake_request",
+      "validate_request_data"
+    ]
+  },
+  "contextDiffSummary": {
+    "totalActionSuccessFrames": 2,
+    "completeFrames": 1,
+    "changedKeys": [
+      "is_valid_request"
+    ],
+    "frames": [
+      {
+        "step": 4,
+        "eventId": "c4b3a057-b143-4e43-a43e-f29c33c938fc-5",
+        "runId": "c4b3a057-b143-4e43-a43e-f29c33c938fc",
+        "ts": "2026-03-21T01:41:04.339Z",
+        "state": "intake",
+        "action": "intake_request",
+        "change": {
+          "addedKeys": [],
+          "changedKeys": [],
+          "removedKeys": []
+        },
+        "complete": false,
+        "reason": "contextDelta missing"
+      },
+      {
+        "step": 9,
+        "eventId": "c4b3a057-b143-4e43-a43e-f29c33c938fc-10",
+        "runId": "c4b3a057-b143-4e43-a43e-f29c33c938fc",
+        "ts": "2026-03-21T01:41:04.341Z",
+        "state": "validate_request",
+        "action": "validate_request_data",
+        "before": {
+          "request_type": "access",
+          "target_resource": "prod-secrets",
+          "risk_level": "high",
+          "auto_approvable": false,
+          "approval_decision_status": "pending"
+        },
+        "delta": {
+          "is_valid_request": true
+        },
+        "after": {
+          "request_type": "access",
+          "target_resource": "prod-secrets",
+          "risk_level": "high",
+          "auto_approvable": false,
+          "approval_decision_status": "pending",
+          "is_valid_request": true
+        },
+        "change": {
+          "addedKeys": [
+            "is_valid_request"
+          ],
+          "changedKeys": [],
+          "removedKeys": []
+        },
+        "complete": true
+      }
+    ]
+  },
+  "compareHint": {
+    "summary": {
+      "runId": "c4b3a057-b143-4e43-a43e-f29c33c938fc",
+      "agent": "approval_agent",
+      "status": "handoff",
+      "finalEventType": "handoff.requested",
+      "finalState": "handoff_security",
+      "statePath": [
+        "intake",
+        "validate_request",
+        "handoff_security"
+      ],
+      "actionSequence": [
+        "intake_request",
+        "validate_request_data"
+      ],
+      "contextKeys": [
+        "is_valid_request"
+      ],
+      "eventCount": 16
+    }
+  },
+  "handoffOrErrorSummary": {
+    "handoff": true,
+    "failed": false
+  },
+  "governanceSummary": {
+    "environment": "dev",
+    "policyErrorCodes": [],
+    "handoffReasonCodes": [
+      "state_handoff"
+    ]
+  },
+  "approvalSummary": {
+    "decisionCount": 0,
+    "statuses": []
+  },
+  "humanReviewSummary": {
+    "requestCount": 1,
+    "sources": [
+      "runtime"
+    ],
+    "latestRequest": {
+      "reasonCode": "state_handoff",
+      "source": "runtime",
+      "requestedAt": "2026-03-21T01:41:04.343Z",
+      "summary": "Handoff requested because state 'handoff_security' is marked as handoff."
+    }
+  }
+}

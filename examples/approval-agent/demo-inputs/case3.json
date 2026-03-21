@@ -1,0 +1,11 @@
+{
+  "message": "Request temporary access to finance dashboard",
+  "intent": "access_request",
+  "context": {
+    "request_type": "access",
+    "target_resource": "finance-dashboard",
+    "risk_level": "low",
+    "auto_approvable": false,
+    "approval_decision_status": "denied"
+  }
+}

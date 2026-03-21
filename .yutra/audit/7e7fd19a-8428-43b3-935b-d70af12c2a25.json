@@ -1,0 +1,359 @@
+{
+  "meta": {
+    "runId": "7e7fd19a-8428-43b3-935b-d70af12c2a25",
+    "agent": "approval_agent",
+    "startedAt": "2026-03-20T04:53:01.582Z",
+    "endedAt": "2026-03-20T04:53:01.591Z",
+    "isResumed": false
+  },
+  "specSummary": {
+    "agent": "approval_agent",
+    "initialState": "intake",
+    "finalState": "handoff_security"
+  },
+  "inputSummary": {
+    "text": "Request admin access to production secrets",
+    "intent": "access_request",
+    "contextKeys": [
+      "approval_decision",
+      "auto_approvable",
+      "request_type",
+      "risk_level",
+      "target_resource"
+    ]
+  },
+  "runtimeResult": {
+    "status": "handoff",
+    "eventCount": 16
+  },
+  "traceEvents": [
+    {
+      "id": "7e7fd19a-8428-43b3-935b-d70af12c2a25-1",
+      "runId": "7e7fd19a-8428-43b3-935b-d70af12c2a25",
+      "type": "run.started",
+      "ts": "2026-03-20T04:53:01.582Z",
+      "agent": "approval_agent",
+      "payload": {
+        "input": {
+          "text": "Request admin access to production secrets",
+          "intent": "access_request",
+          "context": {
+            "request_type": "access",
+            "target_resource": "prod-secrets",
+            "risk_level": "high",
+            "auto_approvable": false,
+            "approval_decision": "pending"
+          }
+        },
+        "isResumed": false
+      }
+    },
+    {
+      "id": "7e7fd19a-8428-43b3-935b-d70af12c2a25-2",
+      "runId": "7e7fd19a-8428-43b3-935b-d70af12c2a25",
+      "type": "intent.resolved",
+      "ts": "2026-03-20T04:53:01.584Z",
+      "agent": "approval_agent",
+      "payload": {
+        "intent": "access_request",
+        "entryState": "intake",
+        "meta": {
+          "source": "input.intent"
+        },
+        "isResumed": false
+      }
+    },
+    {
+      "id": "7e7fd19a-8428-43b3-935b-d70af12c2a25-3",
+      "runId": "7e7fd19a-8428-43b3-935b-d70af12c2a25",
+      "type": "state.entered",
+      "ts": "2026-03-20T04:53:01.585Z",
+      "agent": "approval_agent",
+      "state": "intake"
+    },
+    {
+      "id": "7e7fd19a-8428-43b3-935b-d70af12c2a25-4",
+      "runId": "7e7fd19a-8428-43b3-935b-d70af12c2a25",
+      "type": "action.started",
+      "ts": "2026-03-20T04:53:01.586Z",
+      "agent": "approval_agent",
+      "state": "intake",
+      "action": "intake_request",
+      "payload": {
+        "attempt": 1,
+        "maxAttempts": 1,
+        "timeoutMs": 5000,
+        "idempotencyKey": "7e7fd19a-8428-43b3-935b-d70af12c2a25:intake:intake_request:a4a72cb14282cc5d599494981228c71c2c0e846d",
+        "idempotencyHit": false,
+        "resumedRun": false
+      }
+    },
+    {
+      "id": "7e7fd19a-8428-43b3-935b-d70af12c2a25-5",
+      "runId": "7e7fd19a-8428-43b3-935b-d70af12c2a25",
+      "type": "action.succeeded",
+      "ts": "2026-03-20T04:53:01.587Z",
+      "agent": "approval_agent",
+      "state": "intake",
+      "action": "intake_request",
+      "payload": {
+        "attempt": 1,
+        "maxAttempts": 1,
+        "durationMs": 1,
+        "sideEffect": "none",
+        "output": {
+          "received": true,
+          "requestType": "access",
+          "target": "prod-secrets"
+        },
+        "idempotencyKey": "7e7fd19a-8428-43b3-935b-d70af12c2a25:intake:intake_request:a4a72cb14282cc5d599494981228c71c2c0e846d",
+        "idempotencyHit": false,
+        "resumedRun": false,
+        "meta": {
+          "idempotencyHit": false
+        }
+      }
+    },
+    {
+      "id": "7e7fd19a-8428-43b3-935b-d70af12c2a25-6",
+      "runId": "7e7fd19a-8428-43b3-935b-d70af12c2a25",
+      "type": "transition.resolved",
+      "ts": "2026-03-20T04:53:01.587Z",
+      "agent": "approval_agent",
+      "state": "intake",
+      "transition": "intake->validate_request",
+      "payload": {
+        "to": "validate_request"
+      }
+    },
+    {
+      "id": "7e7fd19a-8428-43b3-935b-d70af12c2a25-7",
+      "runId": "7e7fd19a-8428-43b3-935b-d70af12c2a25",
+      "type": "state.exited",
+      "ts": "2026-03-20T04:53:01.588Z",
+      "agent": "approval_agent",
+      "state": "intake",
+      "payload": {
+        "to": "validate_request"
+      }
+    },
+    {
+      "id": "7e7fd19a-8428-43b3-935b-d70af12c2a25-8",
+      "runId": "7e7fd19a-8428-43b3-935b-d70af12c2a25",
+      "type": "state.entered",
+      "ts": "2026-03-20T04:53:01.588Z",
+      "agent": "approval_agent",
+      "state": "validate_request"
+    },
+    {
+      "id": "7e7fd19a-8428-43b3-935b-d70af12c2a25-9",
+      "runId": "7e7fd19a-8428-43b3-935b-d70af12c2a25",
+      "type": "action.started",
+      "ts": "2026-03-20T04:53:01.588Z",
+      "agent": "approval_agent",
+      "state": "validate_request",
+      "action": "validate_request_data",
+      "payload": {
+        "attempt": 1,
+        "maxAttempts": 1,
+        "timeoutMs": 5000,
+        "idempotencyKey": "7e7fd19a-8428-43b3-935b-d70af12c2a25:validate_request:validate_request_data:2f5d269179dc4e502b357bab74bcac2aa5782083",
+        "idempotencyHit": false,
+        "resumedRun": false
+      }
+    },
+    {
+      "id": "7e7fd19a-8428-43b3-935b-d70af12c2a25-10",
+      "runId": "7e7fd19a-8428-43b3-935b-d70af12c2a25",
+      "type": "action.succeeded",
+      "ts": "2026-03-20T04:53:01.589Z",
+      "agent": "approval_agent",
+      "state": "validate_request",
+      "action": "validate_request_data",
+      "payload": {
+        "attempt": 1,
+        "maxAttempts": 1,
+        "durationMs": 1,
+        "contextDelta": {
+          "is_valid_request": true
+        },
+        "sideEffect": "none",
+        "output": {
+          "isValidRequest": true
+        },
+        "idempotencyKey": "7e7fd19a-8428-43b3-935b-d70af12c2a25:validate_request:validate_request_data:2f5d269179dc4e502b357bab74bcac2aa5782083",
+        "idempotencyHit": false,
+        "resumedRun": false,
+        "meta": {
+          "idempotencyHit": false
+        }
+      }
+    },
+    {
+      "id": "7e7fd19a-8428-43b3-935b-d70af12c2a25-11",
+      "runId": "7e7fd19a-8428-43b3-935b-d70af12c2a25",
+      "type": "guard.evaluated",
+      "ts": "2026-03-20T04:53:01.589Z",
+      "agent": "approval_agent",
+      "state": "validate_request",
+      "payload": {
+        "guard": "high_risk",
+        "passed": true,
+        "expression": "ctx.risk_level == \"high\"",
+        "scope": "transition"
+      }
+    },
+    {
+      "id": "7e7fd19a-8428-43b3-935b-d70af12c2a25-12",
+      "runId": "7e7fd19a-8428-43b3-935b-d70af12c2a25",
+      "type": "transition.resolved",
+      "ts": "2026-03-20T04:53:01.590Z",
+      "agent": "approval_agent",
+      "state": "validate_request",
+      "transition": "validate_request->handoff_security",
+      "payload": {
+        "to": "handoff_security",
+        "guard": "high_risk"
+      }
+    },
+    {
+      "id": "7e7fd19a-8428-43b3-935b-d70af12c2a25-13",
+      "runId": "7e7fd19a-8428-43b3-935b-d70af12c2a25",
+      "type": "state.exited",
+      "ts": "2026-03-20T04:53:01.590Z",
+      "agent": "approval_agent",
+      "state": "validate_request",
+      "payload": {
+        "to": "handoff_security"
+      }
+    },
+    {
+      "id": "7e7fd19a-8428-43b3-935b-d70af12c2a25-14",
+      "runId": "7e7fd19a-8428-43b3-935b-d70af12c2a25",
+      "type": "state.entered",
+      "ts": "2026-03-20T04:53:01.590Z",
+      "agent": "approval_agent",
+      "state": "handoff_security"
+    },
+    {
+      "id": "7e7fd19a-8428-43b3-935b-d70af12c2a25-15",
+      "runId": "7e7fd19a-8428-43b3-935b-d70af12c2a25",
+      "type": "state.exited",
+      "ts": "2026-03-20T04:53:01.591Z",
+      "agent": "approval_agent",
+      "state": "handoff_security",
+      "payload": {
+        "reason": "No transition matched."
+      }
+    },
+    {
+      "id": "7e7fd19a-8428-43b3-935b-d70af12c2a25-16",
+      "runId": "7e7fd19a-8428-43b3-935b-d70af12c2a25",
+      "type": "handoff.requested",
+      "ts": "2026-03-20T04:53:01.591Z",
+      "agent": "approval_agent",
+      "state": "handoff_security",
+      "payload": {
+        "steps": 3,
+        "isResumed": false
+      }
+    }
+  ],
+  "replaySummary": {
+    "frameCount": 16,
+    "stepCount": 15,
+    "statePath": [
+      "intake",
+      "validate_request",
+      "handoff_security"
+    ],
+    "actionSequence": [
+      "intake_request",
+      "validate_request_data"
+    ]
+  },
+  "contextDiffSummary": {
+    "totalActionSuccessFrames": 2,
+    "completeFrames": 1,
+    "changedKeys": [
+      "is_valid_request"
+    ],
+    "frames": [
+      {
+        "step": 4,
+        "eventId": "7e7fd19a-8428-43b3-935b-d70af12c2a25-5",
+        "runId": "7e7fd19a-8428-43b3-935b-d70af12c2a25",
+        "ts": "2026-03-20T04:53:01.587Z",
+        "state": "intake",
+        "action": "intake_request",
+        "change": {
+          "addedKeys": [],
+          "changedKeys": [],
+          "removedKeys": []
+        },
+        "complete": false,
+        "reason": "contextDelta missing"
+      },
+      {
+        "step": 9,
+        "eventId": "7e7fd19a-8428-43b3-935b-d70af12c2a25-10",
+        "runId": "7e7fd19a-8428-43b3-935b-d70af12c2a25",
+        "ts": "2026-03-20T04:53:01.589Z",
+        "state": "validate_request",
+        "action": "validate_request_data",
+        "before": {
+          "request_type": "access",
+          "target_resource": "prod-secrets",
+          "risk_level": "high",
+          "auto_approvable": false,
+          "approval_decision": "pending"
+        },
+        "delta": {
+          "is_valid_request": true
+        },
+        "after": {
+          "request_type": "access",
+          "target_resource": "prod-secrets",
+          "risk_level": "high",
+          "auto_approvable": false,
+          "approval_decision": "pending",
+          "is_valid_request": true
+        },
+        "change": {
+          "addedKeys": [
+            "is_valid_request"
+          ],
+          "changedKeys": [],
+          "removedKeys": []
+        },
+        "complete": true
+      }
+    ]
+  },
+  "compareHint": {
+    "summary": {
+      "runId": "7e7fd19a-8428-43b3-935b-d70af12c2a25",
+      "agent": "approval_agent",
+      "status": "handoff",
+      "finalEventType": "handoff.requested",
+      "finalState": "handoff_security",
+      "statePath": [
+        "intake",
+        "validate_request",
+        "handoff_security"
+      ],
+      "actionSequence": [
+        "intake_request",
+        "validate_request_data"
+      ],
+      "contextKeys": [
+        "is_valid_request"
+      ],
+      "eventCount": 16
+    }
+  },
+  "handoffOrErrorSummary": {
+    "handoff": true,
+    "failed": false
+  }
+}

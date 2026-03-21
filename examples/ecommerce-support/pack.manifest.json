@@ -1,0 +1,33 @@
+{
+  "pack": "ecommerce-support-pack",
+  "version": "0.1.0",
+  "domain": "ecommerce-support",
+  "description": "Customer support SOP pack with knowledge + tool integration and handoff path.",
+  "language": ["en"],
+  "includes": {
+    "dsl": ["agent.yutra.yaml"],
+    "knowledge": ["knowledge/faq.md", "knowledge/return-policy.md"],
+    "tools": [
+      "actions.mjs",
+      "tools/lookup-order.mjs",
+      "tools/check-shipping.mjs",
+      "tools/create-return-ticket.mjs",
+      "tools/create-refund-ticket.mjs"
+    ],
+    "inputs": ["demo-inputs/case1.json", "demo-inputs/case2.json"],
+    "certification": ["ecommerce-happy"],
+    "docs": ["README.md"]
+  },
+  "entrypoints": {
+    "canonical": "agent.yutra.yaml"
+  },
+  "capabilities": [
+    "sop_state_flow",
+    "knowledge_lookup",
+    "ticket_action_stub"
+  ],
+  "constraints": [
+    "no_remote_knowledge_service",
+    "no_platform_backend"
+  ]
+}

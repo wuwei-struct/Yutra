@@ -1,0 +1,43 @@
+{
+  "scenario": "approval-handoff",
+  "status": "handoff",
+  "finalState": "handoff_security",
+  "statePath": [
+    "intake",
+    "validate_request",
+    "handoff_security"
+  ],
+  "actionSequence": [
+    "intake_request",
+    "validate_request_data"
+  ],
+  "eventTypeSequence": [
+    "run.started",
+    "intent.resolved",
+    "state.entered",
+    "action.started",
+    "action.succeeded",
+    "transition.resolved",
+    "state.exited",
+    "state.entered",
+    "action.started",
+    "action.succeeded",
+    "guard.evaluated",
+    "transition.resolved",
+    "state.exited",
+    "state.entered",
+    "state.exited",
+    "handoff.requested"
+  ],
+  "handoffReasonCodes": [
+    "state_handoff"
+  ],
+  "errorCodes": [],
+  "approvalStatuses": [],
+  "reviewSources": [
+    "runtime"
+  ],
+  "contextChangedKeys": [
+    "is_valid_request"
+  ]
+}

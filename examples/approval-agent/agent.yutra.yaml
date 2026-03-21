@@ -15,6 +15,8 @@ context:
     auto_approvable:
       type: boolean
       default: false
+    approval_decision_status:
+      type: string
     approval_status:
       type: string
 initial_state: intake
@@ -31,6 +33,10 @@ guards:
     expression: ctx.approval_status == "approved"
   - name: approval_denied
     expression: ctx.approval_status == "denied"
+  - name: approval_pending
+    expression: ctx.approval_status == "pending"
+  - name: approval_escalated
+    expression: ctx.approval_status == "escalated"
   - name: high_risk
     expression: ctx.risk_level == "high"
 states:
@@ -61,12 +67,20 @@ states:
         guard: approval_granted
       - to: denied
         guard: approval_denied
-      - to: handoff_security
+      - to: pending_review
+        guard: approval_pending
+      - to: escalated_review
+        guard: approval_escalated
+      - to: pending_review
   approved:
     transitions:
       - to: execute_request
   denied:
     final: true
+  pending_review:
+    handoff: true
+  escalated_review:
+    handoff: true
   execute_request:
     actions:
       - execute_change

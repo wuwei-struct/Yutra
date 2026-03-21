@@ -19,7 +19,7 @@ Yutra is an execution-first stack for deterministic agent flows:
 - Prompt-only behavior is hard to control.
 - Enterprises need traceable execution.
 
-## English DSL Example
+## Minimal Example
 
 ```yaml
 agent: it-helpdesk-agent
@@ -40,24 +40,25 @@ actions:
   - name: close_ticket
 ```
 
-## Chinese DSL Authoring
+## Chinese Authoring and Canonical IR
 
-Chinese authoring is supported via explicit parser aliases.
-The parser normalizes DSL keys into one canonical internal schema used by runtime.
+Chinese authoring is supported via explicit parser aliases and deterministic name canonicalization.
+Runtime still executes one canonical internal schema.
 
-For a full Chinese authoring example and canonical IR mapping, see:
-- [README.zh-CN.md](./README.zh-CN.md)
+- Full Chinese authoring example and mapping: [README.zh-CN.md](./README.zh-CN.md)
+- Debug commands:
 
-Current support level:
-- Supported: key-level aliases (for example `智能体 -> agent`, `状态集 -> states`, `到 -> to`, `条件 -> when`).
-- Supported: Chinese string values can pass parse/validate when references are consistent.
-- Not implemented: semantic normalization for Chinese value meanings (value translation is not automatic).
+```bash
+pnpm exec yutra dsl explain examples/it-helpdesk/agent.zh-CN.yutra.yaml
+pnpm exec yutra dsl inspect examples/it-helpdesk/agent.zh-CN.yutra.yaml --json
+```
 
 ## Quick Start
 
 ```bash
 pnpm install
 pnpm verify
+pnpm certify
 pnpm exec yutra validate examples/it-helpdesk/agent.yutra.yaml
 pnpm exec yutra validate examples/it-helpdesk/agent.zh-CN.yutra.yaml
 pnpm exec yutra run examples/it-helpdesk/agent.yutra.yaml --input examples/it-helpdesk/demo-inputs/case1.json
@@ -70,6 +71,34 @@ pnpm --filter @yutra/viewer dev
 - IT Helpdesk: state machine + tool calls + branching transitions.
 - E-commerce Support: SOP + knowledge + tool integration.
 - Approval Agent: guards + approval chain + handoff.
+
+## Certified Scenario Packs
+
+- `examples/it-helpdesk` (`it-helpdesk-pack`)
+- `examples/ecommerce-support` (`ecommerce-support-pack`)
+- `examples/approval-agent` (`approval-agent-pack`)
+
+Each pack includes a `pack.manifest.json` with entrypoints, included assets, and certification references.
+
+## Starter Packs
+
+- `starters/minimal-agent-pack`: smallest copy-and-rename starter.
+- `starters/support-pack`: support-flow starter with optional policy placeholder.
+
+See details in [docs/scenario-packs.md](docs/scenario-packs.md).
+
+## Conformance and Golden Trace
+
+Yutra includes a local conformance suite with golden trace projections.
+
+```bash
+pnpm certify
+```
+
+Certification compares stable behavior fields (event sequence, state/action path, final status, governance/approval signals) and ignores volatile fields (`runId`, `ts`, generated IDs).
+
+Machine-readable summary:
+- `.yutra/certification/summary.json`
 
 ## Trace Viewer
 
@@ -94,6 +123,9 @@ Yutra is currently not:
 ## Documentation Map
 
 - [简体中文 README](./README.zh-CN.md)
+- [DSL Authoring Guide](docs/dsl-authoring.md)
+- [Conformance and Golden Trace](docs/conformance.md)
+- [Scenario Packs and Starters](docs/scenario-packs.md)
 - [Execution Standard](docs/execution-standard.md)
 - [Tool Interface](docs/tool-interface.md)
 - [Knowledge Interface](docs/knowledge-interface.md)

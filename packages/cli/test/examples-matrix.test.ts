@@ -227,6 +227,27 @@ describe("PR-07B approval-agent", () => {
     expect(events[events.length - 1]?.type === "run.completed" || events[events.length - 1]?.type === "handoff.requested").toBe(true);
     await rm(dir, { recursive: true, force: true });
   });
+
+  it("approval-agent denied case reaches denied final state", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "yutra-appr-denied-"));
+    const traceFile = join(dir, "events.jsonl");
+    const out = createMemoryIO();
+    const code = await runCli(
+      [
+        "run",
+        "examples/approval-agent/agent.yutra.yaml",
+        "--input",
+        "examples/approval-agent/demo-inputs/case3.json",
+        "--trace-file",
+        traceFile
+      ],
+      out.io
+    );
+
+    expect(code).toBe(0);
+    expect(out.stdout.some((line) => line.includes("final_state: denied"))).toBe(true);
+    await rm(dir, { recursive: true, force: true });
+  });
 });
 
 describe("it-helpdesk regression", () => {

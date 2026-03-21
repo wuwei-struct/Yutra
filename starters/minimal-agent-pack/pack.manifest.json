@@ -1,0 +1,17 @@
+{
+  "pack": "starter-minimal-agent-pack",
+  "version": "0.1.0",
+  "domain": "starter",
+  "description": "Smallest runnable starter to copy and rename for a new agent.",
+  "language": ["en"],
+  "includes": {
+    "dsl": ["agent.yutra.yaml"],
+    "inputs": ["demo-inputs/case1.json"],
+    "docs": ["README.md"]
+  },
+  "entrypoints": {
+    "canonical": "agent.yutra.yaml"
+  },
+  "capabilities": ["minimal_state_machine"],
+  "constraints": ["no_external_actions_by_default"]
+}

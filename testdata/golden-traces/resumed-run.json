@@ -1,0 +1,31 @@
+{
+  "scenario": "resumed-run",
+  "status": "completed",
+  "finalState": "done",
+  "statePath": [
+    "start",
+    "done"
+  ],
+  "actionSequence": [
+    "once"
+  ],
+  "eventTypeSequence": [
+    "run.started",
+    "intent.resolved",
+    "state.entered",
+    "action.started",
+    "action.succeeded",
+    "transition.resolved",
+    "state.exited",
+    "state.entered",
+    "state.exited",
+    "run.completed"
+  ],
+  "handoffReasonCodes": [],
+  "errorCodes": [],
+  "approvalStatuses": [],
+  "reviewSources": [],
+  "contextChangedKeys": [
+    "calls"
+  ]
+}

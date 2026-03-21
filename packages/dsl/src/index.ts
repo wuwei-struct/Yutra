@@ -3,5 +3,7 @@ export * from "./types";
 export * from "./loader";
 export * from "./parser";
 export * from "./normalize";
+export * from "./canonicalize";
+export * from "./explain";
 export * from "./validator";
 export * from "./load-and-validate";
