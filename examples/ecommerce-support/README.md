@@ -1,46 +1,112 @@
-# E-commerce Support Example
+﻿# E-commerce Support Pack
 
-This directory is also a certified Scenario Pack (`ecommerce-support-pack`).
+## Pack positioning
 
-## What this example proves
+This pack targets small-to-mid ecommerce merchants using auto-first support with human fallback.
+It is a customer-integration-ready scenario pack, not a customer-service SaaS platform.
 
-Execution-first customer support SOP: issue triage, order lookup, policy lookup, and ticket actions.
+## Scope freeze
 
-## State machine overview
+In scope:
+1. shipping inquiry
+2. return request
+3. refund request/progress
+4. human handoff/escalation
 
-- `triage` -> classify shipping/return/refund.
-- `fetch_order` -> load order facts.
-- `answer_shipping` -> shipping response.
-- `check_return_eligibility` -> `create_return_request`.
-- `check_refund_eligibility` -> `create_refund_request`.
-- `inform_policy` -> policy-only response.
-- `resolved` (final) / `handoff_human` (handoff).
+Out of scope:
+- pre-sale recommendation and marketing automation
+- seat-management backend
+- full OMS/ERP/CRM integration
+- multitenant support platform
 
-## Roles of tools / knowledge / guard / handoff
+## Adapter-first integration layer (P3-05)
 
-- tools: order lookup, shipping check, return/refund ticket creation.
-- knowledge: local file KB for return window, refund timeline, manual-review rules.
-- guard: not central in this example; branching is primarily `when` + context.
-- handoff: unknown/conflicting order context can route to `handoff_human`.
+Facade entrypoints (mode-aware):
+- `adapters/order-adapter.mjs`
+- `adapters/shipping-adapter.mjs`
+- `adapters/return-adapter.mjs`
+- `adapters/refund-adapter.mjs`
+- `adapters/escalation-adapter.mjs`
+- `adapters/channel-response-adapter.mjs`
+
+Concrete implementations:
+- `adapters/mock/*.mjs`
+- `adapters/real/*.real.example.mjs`
+
+Mode resolver:
+- `adapters/mode.mjs`
+
+Contracts:
+- `contracts/order-contract.md`
+- `contracts/shipping-contract.md`
+- `contracts/return-contract.md`
+- `contracts/refund-contract.md`
+- `contracts/escalation-contract.md`
+- `contracts/channel-contract.md`
+
+Tools remain runtime glue only:
+- `tools/*.mjs`
+
+## Integration profile sample
+
+- `integrations/generic-shop-profile/profile.json`
+- `integrations/generic-shop-profile/adapter-map.json`
+- `integrations/generic-shop-profile/policy.override.json`
+
+## Policy parameters
+
+- `returnWindowDays`
+- `refundAutoApproveBeforeShipment`
+- `delayedShipmentThresholdDays`
+- `allowPartialRefund`
+- `highRiskAmountThreshold`
+- `requireHumanForDamagedGoods`
+- `requireHumanForRefundAfterDelivery`
 
 ## Run commands
 
 ```bash
 pnpm yutra validate examples/ecommerce-support/agent.yutra.yaml
-pnpm yutra run examples/ecommerce-support/agent.yutra.yaml --input examples/ecommerce-support/demo-inputs/case1.json
-pnpm yutra run examples/ecommerce-support/agent.yutra.yaml --input examples/ecommerce-support/demo-inputs/case2.json
+pnpm yutra run examples/ecommerce-support/agent.yutra.yaml --input examples/ecommerce-support/demo-inputs/shipping-case.json
+pnpm yutra run examples/ecommerce-support/agent.yutra.yaml --input examples/ecommerce-support/demo-inputs/refund-case.json
+pnpm yutra run examples/ecommerce-support/agent.yutra.yaml --input examples/ecommerce-support/demo-inputs/handoff-case.json
 ```
 
-## What to observe in trace
+Mock/real switch examples:
 
-- SOP progression across multiple states (not one-shot prompt).
-- `action.succeeded` payloads with context delta.
-- `transition.resolved` showing path selection.
+```bash
+# default mock
+$env:YUTRA_ECOM_ADAPTER_MODE='mock'; pnpm yutra run examples/ecommerce-support/agent.yutra.yaml --input examples/ecommerce-support/demo-inputs/shipping-case.json
 
-## Pack customization
+# real skeleton dry-run
+$env:YUTRA_ECOM_ADAPTER_MODE='real'; $env:YUTRA_ECOM_ADAPTER_DRY_RUN='true'; pnpm yutra run examples/ecommerce-support/agent.yutra.yaml --input examples/ecommerce-support/demo-inputs/shipping-case.json
+```
 
-- Manifest: `examples/ecommerce-support/pack.manifest.json`
-- Replace knowledge: files under `knowledge/`
-- Replace tools/actions: files under `tools/` and `actions.mjs`
-- Optional policy overlay: add local policy file and pass runtime options/environment
-- Certification reference in this pack: `ecommerce-happy`
+## Delivery and integration docs
+
+- `DELIVERY.md`
+- `CONFIG.md`
+- `SOP.md`
+- `INTEGRATION.md`
+- `certification/scenarios.json`
+- `certification/expected-outcomes.json`
+
+Commercial delivery assets:
+- `docs/ecommerce-demo-path.md`
+- `docs/ecommerce-demo-script.md`
+- `docs/ecommerce-scope-checklist.md`
+- `docs/ecommerce-pricing-scope.md`
+- `docs/ecommerce-delivery-plan-template.md`
+- `docs/ecommerce-delivery-risks.md`
+- `docs/ecommerce-deliverables.md`
+- `docs/ecommerce-proposal-outline.md`
+- `docs/ecommerce-client-onboarding-checklist.md`
+- `docs/ecommerce-uat-plan.md`
+- `docs/ecommerce-joint-debug-checklist.md`
+- `docs/ecommerce-rollout-checklist.md`
+
+## Response templates
+- `response-templates/shipping.md`
+- `response-templates/return.md`
+- `response-templates/refund.md`
+- `response-templates/handoff.md`

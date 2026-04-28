@@ -1,0 +1,593 @@
+{
+  "meta": {
+    "runId": "4524c261-2bd6-4e1b-9b35-2225cd167b8f",
+    "agent": "ecommerce_support_agent",
+    "startedAt": "2026-04-23T10:25:53.993Z",
+    "endedAt": "2026-04-23T10:25:54.002Z",
+    "isResumed": false
+  },
+  "specSummary": {
+    "agent": "ecommerce_support_agent",
+    "initialState": "triage",
+    "finalState": "handoff_human"
+  },
+  "inputSummary": {
+    "text": "I have a shipping issue but cannot find my order.",
+    "intent": "support_request",
+    "contextKeys": [
+      "order_id",
+      "user_id"
+    ]
+  },
+  "runtimeResult": {
+    "status": "handoff",
+    "eventCount": 17
+  },
+  "traceEvents": [
+    {
+      "id": "4524c261-2bd6-4e1b-9b35-2225cd167b8f-1",
+      "runId": "4524c261-2bd6-4e1b-9b35-2225cd167b8f",
+      "type": "run.started",
+      "ts": "2026-04-23T10:25:53.993Z",
+      "agent": "ecommerce_support_agent",
+      "payload": {
+        "input": {
+          "text": "I have a shipping issue but cannot find my order.",
+          "intent": "support_request",
+          "context": {
+            "order_id": "EC-404",
+            "user_id": "U-HANDOFF-1"
+          }
+        },
+        "isResumed": false,
+        "environment": "dev"
+      }
+    },
+    {
+      "id": "4524c261-2bd6-4e1b-9b35-2225cd167b8f-2",
+      "runId": "4524c261-2bd6-4e1b-9b35-2225cd167b8f",
+      "type": "intent.resolved",
+      "ts": "2026-04-23T10:25:53.995Z",
+      "agent": "ecommerce_support_agent",
+      "payload": {
+        "intent": "support_request",
+        "entryState": "triage",
+        "meta": {
+          "source": "input.intent"
+        },
+        "isResumed": false,
+        "environment": "dev"
+      }
+    },
+    {
+      "id": "4524c261-2bd6-4e1b-9b35-2225cd167b8f-3",
+      "runId": "4524c261-2bd6-4e1b-9b35-2225cd167b8f",
+      "type": "state.entered",
+      "ts": "2026-04-23T10:25:53.996Z",
+      "agent": "ecommerce_support_agent",
+      "state": "triage"
+    },
+    {
+      "id": "4524c261-2bd6-4e1b-9b35-2225cd167b8f-4",
+      "runId": "4524c261-2bd6-4e1b-9b35-2225cd167b8f",
+      "type": "action.started",
+      "ts": "2026-04-23T10:25:53.997Z",
+      "agent": "ecommerce_support_agent",
+      "state": "triage",
+      "action": "classify_issue",
+      "payload": {
+        "attempt": 1,
+        "maxAttempts": 1,
+        "timeoutMs": 5000,
+        "idempotencyKey": "4524c261-2bd6-4e1b-9b35-2225cd167b8f:triage:classify_issue:a1a6bf453c4d4e40a347a6fd84e1bc80e2700e5d",
+        "idempotencyHit": false,
+        "resumedRun": false
+      }
+    },
+    {
+      "id": "4524c261-2bd6-4e1b-9b35-2225cd167b8f-5",
+      "runId": "4524c261-2bd6-4e1b-9b35-2225cd167b8f",
+      "type": "action.succeeded",
+      "ts": "2026-04-23T10:25:53.998Z",
+      "agent": "ecommerce_support_agent",
+      "state": "triage",
+      "action": "classify_issue",
+      "payload": {
+        "attempt": 1,
+        "maxAttempts": 1,
+        "durationMs": 0,
+        "contextDelta": {
+          "issue_type": "shipping"
+        },
+        "sideEffect": "none",
+        "output": {
+          "issueType": "shipping"
+        },
+        "idempotencyKey": "4524c261-2bd6-4e1b-9b35-2225cd167b8f:triage:classify_issue:a1a6bf453c4d4e40a347a6fd84e1bc80e2700e5d",
+        "idempotencyHit": false,
+        "resumedRun": false,
+        "meta": {
+          "idempotencyHit": false
+        }
+      }
+    },
+    {
+      "id": "4524c261-2bd6-4e1b-9b35-2225cd167b8f-6",
+      "runId": "4524c261-2bd6-4e1b-9b35-2225cd167b8f",
+      "type": "transition.resolved",
+      "ts": "2026-04-23T10:25:53.998Z",
+      "agent": "ecommerce_support_agent",
+      "state": "triage",
+      "transition": "triage->fetch_order",
+      "payload": {
+        "to": "fetch_order"
+      }
+    },
+    {
+      "id": "4524c261-2bd6-4e1b-9b35-2225cd167b8f-7",
+      "runId": "4524c261-2bd6-4e1b-9b35-2225cd167b8f",
+      "type": "state.exited",
+      "ts": "2026-04-23T10:25:53.999Z",
+      "agent": "ecommerce_support_agent",
+      "state": "triage",
+      "payload": {
+        "to": "fetch_order"
+      }
+    },
+    {
+      "id": "4524c261-2bd6-4e1b-9b35-2225cd167b8f-8",
+      "runId": "4524c261-2bd6-4e1b-9b35-2225cd167b8f",
+      "type": "state.entered",
+      "ts": "2026-04-23T10:25:53.999Z",
+      "agent": "ecommerce_support_agent",
+      "state": "fetch_order"
+    },
+    {
+      "id": "4524c261-2bd6-4e1b-9b35-2225cd167b8f-9",
+      "runId": "4524c261-2bd6-4e1b-9b35-2225cd167b8f",
+      "type": "action.started",
+      "ts": "2026-04-23T10:25:53.999Z",
+      "agent": "ecommerce_support_agent",
+      "state": "fetch_order",
+      "action": "lookup_order",
+      "payload": {
+        "attempt": 1,
+        "maxAttempts": 1,
+        "timeoutMs": 5000,
+        "idempotencyKey": "4524c261-2bd6-4e1b-9b35-2225cd167b8f:fetch_order:lookup_order:ebdbfb3d2020962a72482a59088fc98c8269842c",
+        "idempotencyHit": false,
+        "resumedRun": false
+      }
+    },
+    {
+      "id": "4524c261-2bd6-4e1b-9b35-2225cd167b8f-10",
+      "runId": "4524c261-2bd6-4e1b-9b35-2225cd167b8f",
+      "type": "action.succeeded",
+      "ts": "2026-04-23T10:25:54.000Z",
+      "agent": "ecommerce_support_agent",
+      "state": "fetch_order",
+      "action": "lookup_order",
+      "payload": {
+        "attempt": 1,
+        "maxAttempts": 1,
+        "durationMs": 1,
+        "contextDelta": {
+          "order_found": false,
+          "order_status": "unknown",
+          "shipping_status": "unknown",
+          "return_eligible": false,
+          "refund_eligible": false,
+          "shipping_delay_days": 0,
+          "shipping_delayed": false,
+          "shipping_exception": false,
+          "tracking_number_found": true,
+          "return_window_expired": false,
+          "damaged_goods": false,
+          "refund_amount": 0,
+          "high_risk_refund": false,
+          "missing_required_info": false,
+          "requires_human": false
+        },
+        "sideEffect": "none",
+        "output": {
+          "orderFound": false,
+          "orderId": "EC-404"
+        },
+        "idempotencyKey": "4524c261-2bd6-4e1b-9b35-2225cd167b8f:fetch_order:lookup_order:ebdbfb3d2020962a72482a59088fc98c8269842c",
+        "idempotencyHit": false,
+        "resumedRun": false,
+        "meta": {
+          "idempotencyHit": false
+        }
+      }
+    },
+    {
+      "id": "4524c261-2bd6-4e1b-9b35-2225cd167b8f-11",
+      "runId": "4524c261-2bd6-4e1b-9b35-2225cd167b8f",
+      "type": "transition.resolved",
+      "ts": "2026-04-23T10:25:54.000Z",
+      "agent": "ecommerce_support_agent",
+      "state": "fetch_order",
+      "transition": "fetch_order->handoff_human",
+      "payload": {
+        "to": "handoff_human",
+        "when": "ctx.order_found == false"
+      }
+    },
+    {
+      "id": "4524c261-2bd6-4e1b-9b35-2225cd167b8f-12",
+      "runId": "4524c261-2bd6-4e1b-9b35-2225cd167b8f",
+      "type": "state.exited",
+      "ts": "2026-04-23T10:25:54.000Z",
+      "agent": "ecommerce_support_agent",
+      "state": "fetch_order",
+      "payload": {
+        "to": "handoff_human"
+      }
+    },
+    {
+      "id": "4524c261-2bd6-4e1b-9b35-2225cd167b8f-13",
+      "runId": "4524c261-2bd6-4e1b-9b35-2225cd167b8f",
+      "type": "state.entered",
+      "ts": "2026-04-23T10:25:54.001Z",
+      "agent": "ecommerce_support_agent",
+      "state": "handoff_human"
+    },
+    {
+      "id": "4524c261-2bd6-4e1b-9b35-2225cd167b8f-14",
+      "runId": "4524c261-2bd6-4e1b-9b35-2225cd167b8f",
+      "type": "action.started",
+      "ts": "2026-04-23T10:25:54.001Z",
+      "agent": "ecommerce_support_agent",
+      "state": "handoff_human",
+      "action": "escalate_human",
+      "payload": {
+        "attempt": 1,
+        "maxAttempts": 1,
+        "timeoutMs": 5000,
+        "idempotencyKey": "4524c261-2bd6-4e1b-9b35-2225cd167b8f:handoff_human:escalate_human:3fdbad9f074040f13e8c2e5157d46d7a79cf0ef3",
+        "idempotencyHit": false,
+        "resumedRun": false
+      }
+    },
+    {
+      "id": "4524c261-2bd6-4e1b-9b35-2225cd167b8f-15",
+      "runId": "4524c261-2bd6-4e1b-9b35-2225cd167b8f",
+      "type": "action.succeeded",
+      "ts": "2026-04-23T10:25:54.001Z",
+      "agent": "ecommerce_support_agent",
+      "state": "handoff_human",
+      "action": "escalate_human",
+      "payload": {
+        "attempt": 1,
+        "maxAttempts": 1,
+        "durationMs": 0,
+        "contextDelta": {
+          "requires_human": true,
+          "escalation_id": "ESC-EC-404",
+          "handoff_reason": "manual_review_required"
+        },
+        "sideEffect": "none",
+        "output": {
+          "escalationId": "ESC-EC-404",
+          "queued": true,
+          "reason": "manual_review_required",
+          "queue": "manual-review",
+          "priority": "medium"
+        },
+        "idempotencyKey": "4524c261-2bd6-4e1b-9b35-2225cd167b8f:handoff_human:escalate_human:3fdbad9f074040f13e8c2e5157d46d7a79cf0ef3",
+        "idempotencyHit": false,
+        "resumedRun": false,
+        "meta": {
+          "stub": true,
+          "adapter": "escalation-adapter",
+          "contractVersion": "v0.1",
+          "idempotencyHit": false
+        }
+      }
+    },
+    {
+      "id": "4524c261-2bd6-4e1b-9b35-2225cd167b8f-16",
+      "runId": "4524c261-2bd6-4e1b-9b35-2225cd167b8f",
+      "type": "state.exited",
+      "ts": "2026-04-23T10:25:54.001Z",
+      "agent": "ecommerce_support_agent",
+      "state": "handoff_human",
+      "payload": {
+        "reason": "No transition matched."
+      }
+    },
+    {
+      "id": "4524c261-2bd6-4e1b-9b35-2225cd167b8f-17",
+      "runId": "4524c261-2bd6-4e1b-9b35-2225cd167b8f",
+      "type": "handoff.requested",
+      "ts": "2026-04-23T10:25:54.002Z",
+      "agent": "ecommerce_support_agent",
+      "state": "handoff_human",
+      "payload": {
+        "steps": 3,
+        "isResumed": false,
+        "reasonCode": "state_handoff",
+        "reason": "State 'handoff_human' is configured as handoff.",
+        "source": "runtime",
+        "state": "handoff_human",
+        "summary": "Handoff requested because state 'handoff_human' is marked as handoff.",
+        "requestedAt": "2026-04-23T10:25:54.002Z",
+        "environment": "dev"
+      }
+    }
+  ],
+  "replaySummary": {
+    "frameCount": 17,
+    "stepCount": 16,
+    "statePath": [
+      "triage",
+      "fetch_order",
+      "handoff_human"
+    ],
+    "actionSequence": [
+      "classify_issue",
+      "lookup_order",
+      "escalate_human"
+    ]
+  },
+  "contextDiffSummary": {
+    "totalActionSuccessFrames": 3,
+    "completeFrames": 3,
+    "changedKeys": [
+      "damaged_goods",
+      "escalation_id",
+      "handoff_reason",
+      "high_risk_refund",
+      "issue_type",
+      "missing_required_info",
+      "order_found",
+      "order_status",
+      "refund_amount",
+      "refund_eligible",
+      "requires_human",
+      "return_eligible",
+      "return_window_expired",
+      "shipping_delay_days",
+      "shipping_delayed",
+      "shipping_exception",
+      "shipping_status",
+      "tracking_number_found"
+    ],
+    "frames": [
+      {
+        "step": 4,
+        "eventId": "4524c261-2bd6-4e1b-9b35-2225cd167b8f-5",
+        "runId": "4524c261-2bd6-4e1b-9b35-2225cd167b8f",
+        "ts": "2026-04-23T10:25:53.998Z",
+        "state": "triage",
+        "action": "classify_issue",
+        "before": {
+          "order_id": "EC-404",
+          "user_id": "U-HANDOFF-1"
+        },
+        "delta": {
+          "issue_type": "shipping"
+        },
+        "after": {
+          "order_id": "EC-404",
+          "user_id": "U-HANDOFF-1",
+          "issue_type": "shipping"
+        },
+        "change": {
+          "addedKeys": [
+            "issue_type"
+          ],
+          "changedKeys": [],
+          "removedKeys": []
+        },
+        "complete": true
+      },
+      {
+        "step": 9,
+        "eventId": "4524c261-2bd6-4e1b-9b35-2225cd167b8f-10",
+        "runId": "4524c261-2bd6-4e1b-9b35-2225cd167b8f",
+        "ts": "2026-04-23T10:25:54.000Z",
+        "state": "fetch_order",
+        "action": "lookup_order",
+        "before": {
+          "order_id": "EC-404",
+          "user_id": "U-HANDOFF-1",
+          "issue_type": "shipping"
+        },
+        "delta": {
+          "order_found": false,
+          "order_status": "unknown",
+          "shipping_status": "unknown",
+          "return_eligible": false,
+          "refund_eligible": false,
+          "shipping_delay_days": 0,
+          "shipping_delayed": false,
+          "shipping_exception": false,
+          "tracking_number_found": true,
+          "return_window_expired": false,
+          "damaged_goods": false,
+          "refund_amount": 0,
+          "high_risk_refund": false,
+          "missing_required_info": false,
+          "requires_human": false
+        },
+        "after": {
+          "order_id": "EC-404",
+          "user_id": "U-HANDOFF-1",
+          "issue_type": "shipping",
+          "order_found": false,
+          "order_status": "unknown",
+          "shipping_status": "unknown",
+          "return_eligible": false,
+          "refund_eligible": false,
+          "shipping_delay_days": 0,
+          "shipping_delayed": false,
+          "shipping_exception": false,
+          "tracking_number_found": true,
+          "return_window_expired": false,
+          "damaged_goods": false,
+          "refund_amount": 0,
+          "high_risk_refund": false,
+          "missing_required_info": false,
+          "requires_human": false
+        },
+        "change": {
+          "addedKeys": [
+            "order_found",
+            "order_status",
+            "shipping_status",
+            "return_eligible",
+            "refund_eligible",
+            "shipping_delay_days",
+            "shipping_delayed",
+            "shipping_exception",
+            "tracking_number_found",
+            "return_window_expired",
+            "damaged_goods",
+            "refund_amount",
+            "high_risk_refund",
+            "missing_required_info",
+            "requires_human"
+          ],
+          "changedKeys": [],
+          "removedKeys": []
+        },
+        "complete": true
+      },
+      {
+        "step": 14,
+        "eventId": "4524c261-2bd6-4e1b-9b35-2225cd167b8f-15",
+        "runId": "4524c261-2bd6-4e1b-9b35-2225cd167b8f",
+        "ts": "2026-04-23T10:25:54.001Z",
+        "state": "handoff_human",
+        "action": "escalate_human",
+        "before": {
+          "order_id": "EC-404",
+          "user_id": "U-HANDOFF-1",
+          "issue_type": "shipping",
+          "order_found": false,
+          "order_status": "unknown",
+          "shipping_status": "unknown",
+          "return_eligible": false,
+          "refund_eligible": false,
+          "shipping_delay_days": 0,
+          "shipping_delayed": false,
+          "shipping_exception": false,
+          "tracking_number_found": true,
+          "return_window_expired": false,
+          "damaged_goods": false,
+          "refund_amount": 0,
+          "high_risk_refund": false,
+          "missing_required_info": false,
+          "requires_human": false
+        },
+        "delta": {
+          "requires_human": true,
+          "escalation_id": "ESC-EC-404",
+          "handoff_reason": "manual_review_required"
+        },
+        "after": {
+          "order_id": "EC-404",
+          "user_id": "U-HANDOFF-1",
+          "issue_type": "shipping",
+          "order_found": false,
+          "order_status": "unknown",
+          "shipping_status": "unknown",
+          "return_eligible": false,
+          "refund_eligible": false,
+          "shipping_delay_days": 0,
+          "shipping_delayed": false,
+          "shipping_exception": false,
+          "tracking_number_found": true,
+          "return_window_expired": false,
+          "damaged_goods": false,
+          "refund_amount": 0,
+          "high_risk_refund": false,
+          "missing_required_info": false,
+          "requires_human": true,
+          "escalation_id": "ESC-EC-404",
+          "handoff_reason": "manual_review_required"
+        },
+        "change": {
+          "addedKeys": [
+            "escalation_id",
+            "handoff_reason"
+          ],
+          "changedKeys": [
+            "requires_human"
+          ],
+          "removedKeys": []
+        },
+        "complete": true
+      }
+    ]
+  },
+  "compareHint": {
+    "summary": {
+      "runId": "4524c261-2bd6-4e1b-9b35-2225cd167b8f",
+      "agent": "ecommerce_support_agent",
+      "status": "handoff",
+      "finalEventType": "handoff.requested",
+      "finalState": "handoff_human",
+      "statePath": [
+        "triage",
+        "fetch_order",
+        "handoff_human"
+      ],
+      "actionSequence": [
+        "classify_issue",
+        "lookup_order",
+        "escalate_human"
+      ],
+      "contextKeys": [
+        "damaged_goods",
+        "escalation_id",
+        "handoff_reason",
+        "high_risk_refund",
+        "issue_type",
+        "missing_required_info",
+        "order_found",
+        "order_status",
+        "refund_amount",
+        "refund_eligible",
+        "requires_human",
+        "return_eligible",
+        "return_window_expired",
+        "shipping_delay_days",
+        "shipping_delayed",
+        "shipping_exception",
+        "shipping_status",
+        "tracking_number_found"
+      ],
+      "eventCount": 17
+    }
+  },
+  "handoffOrErrorSummary": {
+    "handoff": true,
+    "failed": false
+  },
+  "governanceSummary": {
+    "environment": "dev",
+    "policyErrorCodes": [],
+    "handoffReasonCodes": [
+      "state_handoff"
+    ]
+  },
+  "approvalSummary": {
+    "decisionCount": 0,
+    "statuses": []
+  },
+  "humanReviewSummary": {
+    "requestCount": 1,
+    "sources": [
+      "runtime"
+    ],
+    "latestRequest": {
+      "reasonCode": "state_handoff",
+      "source": "runtime",
+      "requestedAt": "2026-04-23T10:25:54.002Z",
+      "summary": "Handoff requested because state 'handoff_human' is marked as handoff."
+    }
+  }
+}

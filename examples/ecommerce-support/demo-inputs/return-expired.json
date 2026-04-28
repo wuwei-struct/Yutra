@@ -1,0 +1,12 @@
+{
+  "message": "I need to return this item but I may be late.",
+  "intent": "support_request",
+  "context": {
+    "order_id": "EC-RET-EXPIRED",
+    "user_id": "U-RETURN-EXPIRED",
+    "policy_params": {
+      "returnWindowDays": 7,
+      "requireHumanForDamagedGoods": false
+    }
+  }
+}

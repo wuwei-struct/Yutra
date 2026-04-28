@@ -1,0 +1,50 @@
+{
+  "pack": "ecommerce-support-pack",
+  "version": "0.2.0",
+  "outcomes": {
+    "shipping-normal": {
+      "status": "completed",
+      "mustIncludeStates": ["triage", "fetch_order", "answer_shipping", "resolved"]
+    },
+    "shipping-delayed": {
+      "status": "completed",
+      "mustIncludeStates": ["triage", "fetch_order", "answer_shipping", "resolved"]
+    },
+    "shipping-exception": {
+      "status": "handoff",
+      "mustIncludeStates": ["triage", "fetch_order", "handoff_human"]
+    },
+    "return-eligible": {
+      "status": "completed",
+      "mustIncludeStates": ["triage", "fetch_order", "check_return_eligibility", "create_return_request", "resolved"]
+    },
+    "return-expired": {
+      "status": "completed",
+      "mustIncludeStates": ["triage", "fetch_order", "check_return_eligibility", "inform_policy", "resolved"]
+    },
+    "return-damaged": {
+      "status": "handoff",
+      "mustIncludeStates": ["triage", "fetch_order", "handoff_human"]
+    },
+    "refund-before-shipment": {
+      "status": "completed",
+      "mustIncludeStates": ["triage", "fetch_order", "check_refund_eligibility", "create_refund_request", "resolved"]
+    },
+    "refund-after-delivery": {
+      "status": "completed",
+      "mustIncludeStates": ["triage", "fetch_order", "check_refund_eligibility", "inform_policy", "resolved"]
+    },
+    "refund-high-risk": {
+      "status": "handoff",
+      "mustIncludeStates": ["triage", "fetch_order", "handoff_human"]
+    },
+    "handoff-missing-info": {
+      "status": "handoff",
+      "mustIncludeStates": ["triage", "fetch_order", "handoff_human"]
+    },
+    "handoff-policy-required": {
+      "status": "handoff",
+      "mustIncludeStates": ["triage"]
+    }
+  }
+}

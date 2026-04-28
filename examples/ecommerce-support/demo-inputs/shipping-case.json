@@ -1,0 +1,8 @@
+{
+  "message": "Where is my package now?",
+  "intent": "support_request",
+  "context": {
+    "order_id": "EC-1001",
+    "user_id": "U-SHIPPING-1"
+  }
+}

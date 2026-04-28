@@ -1,0 +1,16 @@
+{
+  "name": "ecommerce-support-default-demo",
+  "version": "0.2.0",
+  "environment": "demo",
+  "parameters": {
+    "returnWindowDays": 7,
+    "refundAutoApproveBeforeShipment": true,
+    "delayedShipmentThresholdDays": 3,
+    "allowPartialRefund": true,
+    "highRiskAmountThreshold": 1000,
+    "requireHumanForDamagedGoods": false,
+    "requireHumanForRefundAfterDelivery": false
+  },
+  "actionRules": [],
+  "sideEffectRules": []
+}

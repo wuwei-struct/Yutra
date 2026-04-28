@@ -31,15 +31,18 @@ pnpm yutra dsl explain examples/it-helpdesk/agent.zh-CN.yutra.yaml
 pnpm yutra dsl inspect examples/it-helpdesk/agent.zh-CN.yutra.yaml --json
 ```
 
-## 2) Run E-commerce Support
+## 2) Run E-commerce Support (P3-02 business-depth)
 
 ```bash
-pnpm yutra run examples/ecommerce-support/agent.yutra.yaml --input examples/ecommerce-support/demo-inputs/case1.json --trace-file .yutra/traces/walkthrough-ecom.jsonl
+pnpm yutra run examples/ecommerce-support/agent.yutra.yaml --input examples/ecommerce-support/demo-inputs/shipping-delayed.json --trace-file .yutra/traces/walkthrough-ecom-shipping-delayed.jsonl
+pnpm yutra run examples/ecommerce-support/agent.yutra.yaml --input examples/ecommerce-support/demo-inputs/return-expired.json --trace-file .yutra/traces/walkthrough-ecom-return-expired.jsonl
+pnpm yutra run examples/ecommerce-support/agent.yutra.yaml --input examples/ecommerce-support/demo-inputs/refund-high-risk.json --trace-file .yutra/traces/walkthrough-ecom-refund-high-risk.jsonl
 ```
 
 Trace focus:
-- SOP decomposition across triage/order/answer states
-- knowledge + tool actions updating context
+- SOP path and exception routing
+- policy-aware handoff behavior
+- response-template layer separated from execution logic
 
 ## 3) Run Approval Agent
 
@@ -66,6 +69,21 @@ In viewer:
 ## Suggested 3-minute demo order
 
 1. 30s: Positioning (`execution-first`, not prompt script).
-2. 60s: Run one happy-path example (`it-helpdesk`).
-3. 60s: Open viewer and inspect `action.succeeded` payload + transition.
-4. 30s: Run approval high-risk case and show `handoff.requested`.
+2. 45s: Run `it-helpdesk` happy path.
+3. 45s: Run `ecommerce-support` high-risk refund case and highlight handoff reason.
+4. 45s: Open viewer and inspect `action.succeeded` + `handoff.requested` payload.
+5. 15s: Close with deterministic policy-driven execution summary.
+
+
+Integration docs:
+- docs/ecommerce-client-onboarding-checklist.md
+- docs/ecommerce-demo-path.md
+- docs/ecommerce-demo-script.md
+- docs/ecommerce-scope-checklist.md
+- docs/ecommerce-pricing-scope.md
+- docs/ecommerce-delivery-plan-template.md
+- docs/ecommerce-delivery-risks.md
+- docs/ecommerce-deliverables.md
+- docs/ecommerce-proposal-outline.md
+- examples/ecommerce-support/INTEGRATION.md
+

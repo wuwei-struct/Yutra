@@ -1,0 +1,8 @@
+{
+  "message": "I have a shipping issue but cannot find my order.",
+  "intent": "support_request",
+  "context": {
+    "order_id": "EC-404",
+    "user_id": "U-HANDOFF-1"
+  }
+}

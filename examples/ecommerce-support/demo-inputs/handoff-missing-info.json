@@ -1,0 +1,11 @@
+{
+  "message": "I need help but some information is missing.",
+  "intent": "support_request",
+  "context": {
+    "order_id": "EC-MISSING-INFO",
+    "user_id": "U-HANDOFF-MISSING-INFO",
+    "policy_params": {
+      "requireHumanForDamagedGoods": true
+    }
+  }
+}

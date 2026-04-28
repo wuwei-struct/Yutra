@@ -1,0 +1,623 @@
+{
+  "meta": {
+    "runId": "6747663c-8024-4460-9237-789953008a8c",
+    "agent": "ecommerce_support_agent",
+    "startedAt": "2026-03-21T03:26:51.573Z",
+    "endedAt": "2026-03-21T03:26:51.588Z",
+    "isResumed": false
+  },
+  "specSummary": {
+    "agent": "ecommerce_support_agent",
+    "initialState": "triage",
+    "finalState": "handoff_human"
+  },
+  "inputSummary": {
+    "text": "I need a high amount refund now.",
+    "intent": "support_request",
+    "contextKeys": [
+      "order_id",
+      "policy_params",
+      "user_id"
+    ]
+  },
+  "runtimeResult": {
+    "status": "handoff",
+    "eventCount": 17
+  },
+  "traceEvents": [
+    {
+      "id": "6747663c-8024-4460-9237-789953008a8c-1",
+      "runId": "6747663c-8024-4460-9237-789953008a8c",
+      "type": "run.started",
+      "ts": "2026-03-21T03:26:51.573Z",
+      "agent": "ecommerce_support_agent",
+      "payload": {
+        "input": {
+          "text": "I need a high amount refund now.",
+          "intent": "support_request",
+          "context": {
+            "order_id": "EC-RFD-HIGH",
+            "user_id": "U-REFUND-HIGH-RISK",
+            "policy_params": {
+              "highRiskAmountThreshold": 500
+            }
+          }
+        },
+        "isResumed": false,
+        "environment": "dev"
+      }
+    },
+    {
+      "id": "6747663c-8024-4460-9237-789953008a8c-2",
+      "runId": "6747663c-8024-4460-9237-789953008a8c",
+      "type": "intent.resolved",
+      "ts": "2026-03-21T03:26:51.575Z",
+      "agent": "ecommerce_support_agent",
+      "payload": {
+        "intent": "support_request",
+        "entryState": "triage",
+        "meta": {
+          "source": "input.intent"
+        },
+        "isResumed": false,
+        "environment": "dev"
+      }
+    },
+    {
+      "id": "6747663c-8024-4460-9237-789953008a8c-3",
+      "runId": "6747663c-8024-4460-9237-789953008a8c",
+      "type": "state.entered",
+      "ts": "2026-03-21T03:26:51.576Z",
+      "agent": "ecommerce_support_agent",
+      "state": "triage"
+    },
+    {
+      "id": "6747663c-8024-4460-9237-789953008a8c-4",
+      "runId": "6747663c-8024-4460-9237-789953008a8c",
+      "type": "action.started",
+      "ts": "2026-03-21T03:26:51.578Z",
+      "agent": "ecommerce_support_agent",
+      "state": "triage",
+      "action": "classify_issue",
+      "payload": {
+        "attempt": 1,
+        "maxAttempts": 1,
+        "timeoutMs": 5000,
+        "idempotencyKey": "6747663c-8024-4460-9237-789953008a8c:triage:classify_issue:0f0c04f084953f6db8ab7942a7efedf5936d220c",
+        "idempotencyHit": false,
+        "resumedRun": false
+      }
+    },
+    {
+      "id": "6747663c-8024-4460-9237-789953008a8c-5",
+      "runId": "6747663c-8024-4460-9237-789953008a8c",
+      "type": "action.succeeded",
+      "ts": "2026-03-21T03:26:51.579Z",
+      "agent": "ecommerce_support_agent",
+      "state": "triage",
+      "action": "classify_issue",
+      "payload": {
+        "attempt": 1,
+        "maxAttempts": 1,
+        "durationMs": 0,
+        "contextDelta": {
+          "issue_type": "refund"
+        },
+        "sideEffect": "none",
+        "output": {
+          "issueType": "refund"
+        },
+        "idempotencyKey": "6747663c-8024-4460-9237-789953008a8c:triage:classify_issue:0f0c04f084953f6db8ab7942a7efedf5936d220c",
+        "idempotencyHit": false,
+        "resumedRun": false,
+        "meta": {
+          "idempotencyHit": false
+        }
+      }
+    },
+    {
+      "id": "6747663c-8024-4460-9237-789953008a8c-6",
+      "runId": "6747663c-8024-4460-9237-789953008a8c",
+      "type": "transition.resolved",
+      "ts": "2026-03-21T03:26:51.580Z",
+      "agent": "ecommerce_support_agent",
+      "state": "triage",
+      "transition": "triage->fetch_order",
+      "payload": {
+        "to": "fetch_order"
+      }
+    },
+    {
+      "id": "6747663c-8024-4460-9237-789953008a8c-7",
+      "runId": "6747663c-8024-4460-9237-789953008a8c",
+      "type": "state.exited",
+      "ts": "2026-03-21T03:26:51.581Z",
+      "agent": "ecommerce_support_agent",
+      "state": "triage",
+      "payload": {
+        "to": "fetch_order"
+      }
+    },
+    {
+      "id": "6747663c-8024-4460-9237-789953008a8c-8",
+      "runId": "6747663c-8024-4460-9237-789953008a8c",
+      "type": "state.entered",
+      "ts": "2026-03-21T03:26:51.581Z",
+      "agent": "ecommerce_support_agent",
+      "state": "fetch_order"
+    },
+    {
+      "id": "6747663c-8024-4460-9237-789953008a8c-9",
+      "runId": "6747663c-8024-4460-9237-789953008a8c",
+      "type": "action.started",
+      "ts": "2026-03-21T03:26:51.582Z",
+      "agent": "ecommerce_support_agent",
+      "state": "fetch_order",
+      "action": "lookup_order",
+      "payload": {
+        "attempt": 1,
+        "maxAttempts": 1,
+        "timeoutMs": 5000,
+        "idempotencyKey": "6747663c-8024-4460-9237-789953008a8c:fetch_order:lookup_order:499337e6f7058bfd78895e45eab0b1db8b702918",
+        "idempotencyHit": false,
+        "resumedRun": false
+      }
+    },
+    {
+      "id": "6747663c-8024-4460-9237-789953008a8c-10",
+      "runId": "6747663c-8024-4460-9237-789953008a8c",
+      "type": "action.succeeded",
+      "ts": "2026-03-21T03:26:51.583Z",
+      "agent": "ecommerce_support_agent",
+      "state": "fetch_order",
+      "action": "lookup_order",
+      "payload": {
+        "attempt": 1,
+        "maxAttempts": 1,
+        "durationMs": 1,
+        "contextDelta": {
+          "order_found": true,
+          "order_status": "delivered",
+          "shipping_status": "delivered",
+          "return_eligible": true,
+          "refund_eligible": true,
+          "shipping_delay_days": 0,
+          "shipping_delayed": false,
+          "shipping_exception": false,
+          "tracking_number_found": true,
+          "return_window_expired": false,
+          "damaged_goods": false,
+          "refund_amount": 2800,
+          "high_risk_refund": true,
+          "missing_required_info": false,
+          "requires_human": true,
+          "handoff_reason": "high_risk_refund"
+        },
+        "sideEffect": "none",
+        "output": {
+          "orderFound": true,
+          "orderId": "EC-RFD-HIGH",
+          "status": "delivered",
+          "shippingStatus": "delivered",
+          "returnEligible": true,
+          "refundEligible": true,
+          "delivered": true,
+          "highRiskRefund": true,
+          "refundAmount": 2800,
+          "delayedByThreshold": false,
+          "requiresHuman": true,
+          "handoffReason": "high_risk_refund"
+        },
+        "idempotencyKey": "6747663c-8024-4460-9237-789953008a8c:fetch_order:lookup_order:499337e6f7058bfd78895e45eab0b1db8b702918",
+        "idempotencyHit": false,
+        "resumedRun": false,
+        "meta": {
+          "idempotencyHit": false
+        }
+      }
+    },
+    {
+      "id": "6747663c-8024-4460-9237-789953008a8c-11",
+      "runId": "6747663c-8024-4460-9237-789953008a8c",
+      "type": "transition.resolved",
+      "ts": "2026-03-21T03:26:51.583Z",
+      "agent": "ecommerce_support_agent",
+      "state": "fetch_order",
+      "transition": "fetch_order->handoff_human",
+      "payload": {
+        "to": "handoff_human",
+        "when": "ctx.requires_human == true"
+      }
+    },
+    {
+      "id": "6747663c-8024-4460-9237-789953008a8c-12",
+      "runId": "6747663c-8024-4460-9237-789953008a8c",
+      "type": "state.exited",
+      "ts": "2026-03-21T03:26:51.584Z",
+      "agent": "ecommerce_support_agent",
+      "state": "fetch_order",
+      "payload": {
+        "to": "handoff_human"
+      }
+    },
+    {
+      "id": "6747663c-8024-4460-9237-789953008a8c-13",
+      "runId": "6747663c-8024-4460-9237-789953008a8c",
+      "type": "state.entered",
+      "ts": "2026-03-21T03:26:51.584Z",
+      "agent": "ecommerce_support_agent",
+      "state": "handoff_human"
+    },
+    {
+      "id": "6747663c-8024-4460-9237-789953008a8c-14",
+      "runId": "6747663c-8024-4460-9237-789953008a8c",
+      "type": "action.started",
+      "ts": "2026-03-21T03:26:51.585Z",
+      "agent": "ecommerce_support_agent",
+      "state": "handoff_human",
+      "action": "escalate_human",
+      "payload": {
+        "attempt": 1,
+        "maxAttempts": 1,
+        "timeoutMs": 5000,
+        "idempotencyKey": "6747663c-8024-4460-9237-789953008a8c:handoff_human:escalate_human:fad6737206759e016314982621fa78745ae4ce11",
+        "idempotencyHit": false,
+        "resumedRun": false
+      }
+    },
+    {
+      "id": "6747663c-8024-4460-9237-789953008a8c-15",
+      "runId": "6747663c-8024-4460-9237-789953008a8c",
+      "type": "action.succeeded",
+      "ts": "2026-03-21T03:26:51.586Z",
+      "agent": "ecommerce_support_agent",
+      "state": "handoff_human",
+      "action": "escalate_human",
+      "payload": {
+        "attempt": 1,
+        "maxAttempts": 1,
+        "durationMs": 0,
+        "contextDelta": {
+          "requires_human": true,
+          "escalation_id": "ESC-EC-RFD-HIGH",
+          "handoff_reason": "high_risk_refund"
+        },
+        "sideEffect": "none",
+        "output": {
+          "escalationId": "ESC-EC-RFD-HIGH",
+          "queued": true,
+          "reason": "high_risk_refund"
+        },
+        "idempotencyKey": "6747663c-8024-4460-9237-789953008a8c:handoff_human:escalate_human:fad6737206759e016314982621fa78745ae4ce11",
+        "idempotencyHit": false,
+        "resumedRun": false,
+        "meta": {
+          "stub": true,
+          "idempotencyHit": false
+        }
+      }
+    },
+    {
+      "id": "6747663c-8024-4460-9237-789953008a8c-16",
+      "runId": "6747663c-8024-4460-9237-789953008a8c",
+      "type": "state.exited",
+      "ts": "2026-03-21T03:26:51.587Z",
+      "agent": "ecommerce_support_agent",
+      "state": "handoff_human",
+      "payload": {
+        "reason": "No transition matched."
+      }
+    },
+    {
+      "id": "6747663c-8024-4460-9237-789953008a8c-17",
+      "runId": "6747663c-8024-4460-9237-789953008a8c",
+      "type": "handoff.requested",
+      "ts": "2026-03-21T03:26:51.588Z",
+      "agent": "ecommerce_support_agent",
+      "state": "handoff_human",
+      "payload": {
+        "steps": 3,
+        "isResumed": false,
+        "reasonCode": "state_handoff",
+        "reason": "State 'handoff_human' is configured as handoff.",
+        "source": "runtime",
+        "state": "handoff_human",
+        "summary": "Handoff requested because state 'handoff_human' is marked as handoff.",
+        "requestedAt": "2026-03-21T03:26:51.588Z",
+        "environment": "dev"
+      }
+    }
+  ],
+  "replaySummary": {
+    "frameCount": 17,
+    "stepCount": 16,
+    "statePath": [
+      "triage",
+      "fetch_order",
+      "handoff_human"
+    ],
+    "actionSequence": [
+      "classify_issue",
+      "lookup_order",
+      "escalate_human"
+    ]
+  },
+  "contextDiffSummary": {
+    "totalActionSuccessFrames": 3,
+    "completeFrames": 3,
+    "changedKeys": [
+      "damaged_goods",
+      "escalation_id",
+      "handoff_reason",
+      "high_risk_refund",
+      "issue_type",
+      "missing_required_info",
+      "order_found",
+      "order_status",
+      "refund_amount",
+      "refund_eligible",
+      "requires_human",
+      "return_eligible",
+      "return_window_expired",
+      "shipping_delay_days",
+      "shipping_delayed",
+      "shipping_exception",
+      "shipping_status",
+      "tracking_number_found"
+    ],
+    "frames": [
+      {
+        "step": 4,
+        "eventId": "6747663c-8024-4460-9237-789953008a8c-5",
+        "runId": "6747663c-8024-4460-9237-789953008a8c",
+        "ts": "2026-03-21T03:26:51.579Z",
+        "state": "triage",
+        "action": "classify_issue",
+        "before": {
+          "order_id": "EC-RFD-HIGH",
+          "user_id": "U-REFUND-HIGH-RISK",
+          "policy_params": {
+            "highRiskAmountThreshold": 500
+          }
+        },
+        "delta": {
+          "issue_type": "refund"
+        },
+        "after": {
+          "order_id": "EC-RFD-HIGH",
+          "user_id": "U-REFUND-HIGH-RISK",
+          "policy_params": {
+            "highRiskAmountThreshold": 500
+          },
+          "issue_type": "refund"
+        },
+        "change": {
+          "addedKeys": [
+            "issue_type"
+          ],
+          "changedKeys": [],
+          "removedKeys": []
+        },
+        "complete": true
+      },
+      {
+        "step": 9,
+        "eventId": "6747663c-8024-4460-9237-789953008a8c-10",
+        "runId": "6747663c-8024-4460-9237-789953008a8c",
+        "ts": "2026-03-21T03:26:51.583Z",
+        "state": "fetch_order",
+        "action": "lookup_order",
+        "before": {
+          "order_id": "EC-RFD-HIGH",
+          "user_id": "U-REFUND-HIGH-RISK",
+          "policy_params": {
+            "highRiskAmountThreshold": 500
+          },
+          "issue_type": "refund"
+        },
+        "delta": {
+          "order_found": true,
+          "order_status": "delivered",
+          "shipping_status": "delivered",
+          "return_eligible": true,
+          "refund_eligible": true,
+          "shipping_delay_days": 0,
+          "shipping_delayed": false,
+          "shipping_exception": false,
+          "tracking_number_found": true,
+          "return_window_expired": false,
+          "damaged_goods": false,
+          "refund_amount": 2800,
+          "high_risk_refund": true,
+          "missing_required_info": false,
+          "requires_human": true,
+          "handoff_reason": "high_risk_refund"
+        },
+        "after": {
+          "order_id": "EC-RFD-HIGH",
+          "user_id": "U-REFUND-HIGH-RISK",
+          "policy_params": {
+            "highRiskAmountThreshold": 500
+          },
+          "issue_type": "refund",
+          "order_found": true,
+          "order_status": "delivered",
+          "shipping_status": "delivered",
+          "return_eligible": true,
+          "refund_eligible": true,
+          "shipping_delay_days": 0,
+          "shipping_delayed": false,
+          "shipping_exception": false,
+          "tracking_number_found": true,
+          "return_window_expired": false,
+          "damaged_goods": false,
+          "refund_amount": 2800,
+          "high_risk_refund": true,
+          "missing_required_info": false,
+          "requires_human": true,
+          "handoff_reason": "high_risk_refund"
+        },
+        "change": {
+          "addedKeys": [
+            "order_found",
+            "order_status",
+            "shipping_status",
+            "return_eligible",
+            "refund_eligible",
+            "shipping_delay_days",
+            "shipping_delayed",
+            "shipping_exception",
+            "tracking_number_found",
+            "return_window_expired",
+            "damaged_goods",
+            "refund_amount",
+            "high_risk_refund",
+            "missing_required_info",
+            "requires_human",
+            "handoff_reason"
+          ],
+          "changedKeys": [],
+          "removedKeys": []
+        },
+        "complete": true
+      },
+      {
+        "step": 14,
+        "eventId": "6747663c-8024-4460-9237-789953008a8c-15",
+        "runId": "6747663c-8024-4460-9237-789953008a8c",
+        "ts": "2026-03-21T03:26:51.586Z",
+        "state": "handoff_human",
+        "action": "escalate_human",
+        "before": {
+          "order_id": "EC-RFD-HIGH",
+          "user_id": "U-REFUND-HIGH-RISK",
+          "policy_params": {
+            "highRiskAmountThreshold": 500
+          },
+          "issue_type": "refund",
+          "order_found": true,
+          "order_status": "delivered",
+          "shipping_status": "delivered",
+          "return_eligible": true,
+          "refund_eligible": true,
+          "shipping_delay_days": 0,
+          "shipping_delayed": false,
+          "shipping_exception": false,
+          "tracking_number_found": true,
+          "return_window_expired": false,
+          "damaged_goods": false,
+          "refund_amount": 2800,
+          "high_risk_refund": true,
+          "missing_required_info": false,
+          "requires_human": true,
+          "handoff_reason": "high_risk_refund"
+        },
+        "delta": {
+          "requires_human": true,
+          "escalation_id": "ESC-EC-RFD-HIGH",
+          "handoff_reason": "high_risk_refund"
+        },
+        "after": {
+          "order_id": "EC-RFD-HIGH",
+          "user_id": "U-REFUND-HIGH-RISK",
+          "policy_params": {
+            "highRiskAmountThreshold": 500
+          },
+          "issue_type": "refund",
+          "order_found": true,
+          "order_status": "delivered",
+          "shipping_status": "delivered",
+          "return_eligible": true,
+          "refund_eligible": true,
+          "shipping_delay_days": 0,
+          "shipping_delayed": false,
+          "shipping_exception": false,
+          "tracking_number_found": true,
+          "return_window_expired": false,
+          "damaged_goods": false,
+          "refund_amount": 2800,
+          "high_risk_refund": true,
+          "missing_required_info": false,
+          "requires_human": true,
+          "handoff_reason": "high_risk_refund",
+          "escalation_id": "ESC-EC-RFD-HIGH"
+        },
+        "change": {
+          "addedKeys": [
+            "escalation_id"
+          ],
+          "changedKeys": [],
+          "removedKeys": []
+        },
+        "complete": true
+      }
+    ]
+  },
+  "compareHint": {
+    "summary": {
+      "runId": "6747663c-8024-4460-9237-789953008a8c",
+      "agent": "ecommerce_support_agent",
+      "status": "handoff",
+      "finalEventType": "handoff.requested",
+      "finalState": "handoff_human",
+      "statePath": [
+        "triage",
+        "fetch_order",
+        "handoff_human"
+      ],
+      "actionSequence": [
+        "classify_issue",
+        "lookup_order",
+        "escalate_human"
+      ],
+      "contextKeys": [
+        "damaged_goods",
+        "escalation_id",
+        "handoff_reason",
+        "high_risk_refund",
+        "issue_type",
+        "missing_required_info",
+        "order_found",
+        "order_status",
+        "refund_amount",
+        "refund_eligible",
+        "requires_human",
+        "return_eligible",
+        "return_window_expired",
+        "shipping_delay_days",
+        "shipping_delayed",
+        "shipping_exception",
+        "shipping_status",
+        "tracking_number_found"
+      ],
+      "eventCount": 17
+    }
+  },
+  "handoffOrErrorSummary": {
+    "handoff": true,
+    "failed": false
+  },
+  "governanceSummary": {
+    "environment": "dev",
+    "policyErrorCodes": [],
+    "handoffReasonCodes": [
+      "state_handoff"
+    ]
+  },
+  "approvalSummary": {
+    "decisionCount": 0,
+    "statuses": []
+  },
+  "humanReviewSummary": {
+    "requestCount": 1,
+    "sources": [
+      "runtime"
+    ],
+    "latestRequest": {
+      "reasonCode": "state_handoff",
+      "source": "runtime",
+      "requestedAt": "2026-03-21T03:26:51.588Z",
+      "summary": "Handoff requested because state 'handoff_human' is marked as handoff."
+    }
+  }
+}

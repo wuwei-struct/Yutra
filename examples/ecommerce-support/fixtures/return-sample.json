@@ -1,0 +1,6 @@
+{
+  "orderId": "EC-RET-ELIGIBLE",
+  "returnStatus": "eligible",
+  "returnWindowDays": 7,
+  "category": "standard"
+}

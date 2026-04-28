@@ -1,0 +1,9 @@
+﻿{
+  "returnWindowDays": 10,
+  "refundAutoApproveBeforeShipment": true,
+  "delayedShipmentThresholdDays": 2,
+  "allowPartialRefund": true,
+  "highRiskAmountThreshold": 1500,
+  "requireHumanForDamagedGoods": true,
+  "requireHumanForRefundAfterDelivery": true
+}

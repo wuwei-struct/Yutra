@@ -37,7 +37,19 @@ const starterPacks = ["starters/minimal-agent-pack", "starters/support-pack"] as
 
 const expectedCertificationRefs: Record<string, string[]> = {
   "examples/it-helpdesk": ["it-helpdesk-happy", "it-helpdesk-zh"],
-  "examples/ecommerce-support": ["ecommerce-happy"],
+  "examples/ecommerce-support": [
+    "shipping-normal",
+    "shipping-delayed",
+    "shipping-exception",
+    "return-eligible",
+    "return-expired",
+    "return-damaged",
+    "refund-before-shipment",
+    "refund-after-delivery",
+    "refund-high-risk",
+    "handoff-missing-info",
+    "handoff-policy-required"
+  ],
   "examples/approval-agent": ["approval-approved", "approval-denied", "approval-handoff"]
 };
 
@@ -56,7 +68,7 @@ const runCases: Array<{
   {
     packDir: "examples/ecommerce-support",
     dsl: "agent.yutra.yaml",
-    input: "demo-inputs/case1.json",
+    input: "demo-inputs/shipping-case.json",
     expectedStatus: "completed"
   },
   {
@@ -74,7 +86,8 @@ const runCases: Array<{
 ];
 
 function readJson<T>(path: string): T {
-  return JSON.parse(readFileSync(path, "utf8")) as T;
+  const raw = readFileSync(path, "utf8").replace(/^\uFEFF/, "");
+  return JSON.parse(raw) as T;
 }
 
 async function loadActionRegistry(packDir: string): Promise<Record<string, unknown>> {
@@ -193,4 +206,3 @@ describe("P2-09 scenario packs and starter packs", () => {
     expect(readme.includes("starters/minimal-agent-pack")).toBe(true);
   });
 });
-

@@ -1,0 +1,7 @@
+{
+  "orderId": "EC-1001",
+  "status": "shipped",
+  "shippingStatus": "in_transit",
+  "returnEligible": true,
+  "refundEligible": true
+}

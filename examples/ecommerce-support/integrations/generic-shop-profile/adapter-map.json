@@ -1,0 +1,8 @@
+﻿{
+  "order": "adapters/real/order-adapter.real.example.mjs",
+  "shipping": "adapters/real/shipping-adapter.real.example.mjs",
+  "return": "adapters/real/return-adapter.real.example.mjs",
+  "refund": "adapters/real/refund-adapter.real.example.mjs",
+  "escalation": "adapters/real/escalation-adapter.real.example.mjs",
+  "channel": "adapters/real/channel-response-adapter.real.example.mjs"
+}

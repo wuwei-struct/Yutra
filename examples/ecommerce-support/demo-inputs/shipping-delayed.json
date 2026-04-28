@@ -1,0 +1,11 @@
+{
+  "message": "My package is delayed. Please check.",
+  "intent": "support_request",
+  "context": {
+    "order_id": "EC-SHIP-DELAY",
+    "user_id": "U-SHIPPING-DELAY",
+    "policy_params": {
+      "delayedShipmentThresholdDays": 2
+    }
+  }
+}

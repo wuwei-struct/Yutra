@@ -203,7 +203,7 @@ pnpm certify
 ## 已认证 Scenario Packs
 
 - `examples/it-helpdesk`（`it-helpdesk-pack`）
-- `examples/ecommerce-support`（`ecommerce-support-pack`）
+- `examples/ecommerce-support`（`ecommerce-support-pack`，P3-02 已形成业务深化交付包）
 - `examples/approval-agent`（`approval-agent-pack`）
 
 每个 pack 都包含 `pack.manifest.json`，用于描述入口 DSL、包含资源与认证场景引用。
@@ -241,6 +241,19 @@ Yutra 当前不是：
 - [DSL Authoring 指南](docs/dsl-authoring.md)
 - [Conformance 与 Golden Trace](docs/conformance.md)
 - [Scenario Packs 与 Starter Packs](docs/scenario-packs.md)
+- [E-commerce Pack 交付基线](docs/ecommerce-pack-delivery.md)
+- [E-commerce 客户接入清单](docs/ecommerce-client-onboarding-checklist.md)
+- [E-commerce 客户演示路径](docs/ecommerce-demo-path.md)
+- [E-commerce 演示脚本](docs/ecommerce-demo-script.md)
+- [E-commerce 范围清单](docs/ecommerce-scope-checklist.md)
+- [E-commerce 报价边界](docs/ecommerce-pricing-scope.md)
+- [E-commerce 交付排期模板](docs/ecommerce-delivery-plan-template.md)
+- [E-commerce 交付风险](docs/ecommerce-delivery-risks.md)
+- [E-commerce 交付物清单](docs/ecommerce-deliverables.md)
+- [E-commerce 提案骨架](docs/ecommerce-proposal-outline.md)
+- [E-commerce UAT 计划](docs/ecommerce-uat-plan.md)
+- [E-commerce 联调检查清单](docs/ecommerce-joint-debug-checklist.md)
+- [E-commerce 上线检查清单](docs/ecommerce-rollout-checklist.md)
 - [Execution Standard](docs/execution-standard.md)
 - [Tool Interface](docs/tool-interface.md)
 - [Knowledge Interface](docs/knowledge-interface.md)
@@ -252,3 +265,7 @@ Yutra 当前不是：
 - [Agent Collaboration Rules](AGENTS.md)
 - [Security](SECURITY.md)
 - [Support](SUPPORT.md)
+
+
+
+

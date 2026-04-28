@@ -75,7 +75,7 @@ pnpm --filter @yutra/viewer dev
 ## Certified Scenario Packs
 
 - `examples/it-helpdesk` (`it-helpdesk-pack`)
-- `examples/ecommerce-support` (`ecommerce-support-pack`)
+- `examples/ecommerce-support` (`ecommerce-support-pack`, business-depth delivery pack in P3-02)
 - `examples/approval-agent` (`approval-agent-pack`)
 
 Each pack includes a `pack.manifest.json` with entrypoints, included assets, and certification references.
@@ -126,6 +126,19 @@ Yutra is currently not:
 - [DSL Authoring Guide](docs/dsl-authoring.md)
 - [Conformance and Golden Trace](docs/conformance.md)
 - [Scenario Packs and Starters](docs/scenario-packs.md)
+- [E-commerce Pack Delivery Baseline](docs/ecommerce-pack-delivery.md)
+- [E-commerce Client Onboarding Checklist](docs/ecommerce-client-onboarding-checklist.md)
+- [E-commerce Demo Path](docs/ecommerce-demo-path.md)
+- [E-commerce Demo Script](docs/ecommerce-demo-script.md)
+- [E-commerce Scope Checklist](docs/ecommerce-scope-checklist.md)
+- [E-commerce Pricing Scope](docs/ecommerce-pricing-scope.md)
+- [E-commerce Delivery Plan Template](docs/ecommerce-delivery-plan-template.md)
+- [E-commerce Delivery Risks](docs/ecommerce-delivery-risks.md)
+- [E-commerce Deliverables](docs/ecommerce-deliverables.md)
+- [E-commerce Proposal Outline](docs/ecommerce-proposal-outline.md)
+- [E-commerce UAT Plan](docs/ecommerce-uat-plan.md)
+- [E-commerce Joint Debug Checklist](docs/ecommerce-joint-debug-checklist.md)
+- [E-commerce Rollout Checklist](docs/ecommerce-rollout-checklist.md)
 - [Execution Standard](docs/execution-standard.md)
 - [Tool Interface](docs/tool-interface.md)
 - [Knowledge Interface](docs/knowledge-interface.md)
@@ -137,3 +150,7 @@ Yutra is currently not:
 - [Agent Collaboration Rules](AGENTS.md)
 - [Security](SECURITY.md)
 - [Support](SUPPORT.md)
+
+
+
+

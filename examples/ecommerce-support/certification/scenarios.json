@@ -1,0 +1,72 @@
+{
+  "scenarios": [
+    {
+      "id": "shipping-normal",
+      "input": "demo-inputs/shipping-normal.json",
+      "expectedStatus": "completed",
+      "expectedFinalState": "resolved"
+    },
+    {
+      "id": "shipping-delayed",
+      "input": "demo-inputs/shipping-delayed.json",
+      "expectedStatus": "completed",
+      "expectedFinalState": "resolved"
+    },
+    {
+      "id": "shipping-exception",
+      "input": "demo-inputs/shipping-exception.json",
+      "expectedStatus": "handoff",
+      "expectedFinalState": "handoff_human"
+    },
+    {
+      "id": "return-eligible",
+      "input": "demo-inputs/return-eligible.json",
+      "expectedStatus": "completed",
+      "expectedFinalState": "resolved"
+    },
+    {
+      "id": "return-expired",
+      "input": "demo-inputs/return-expired.json",
+      "expectedStatus": "completed",
+      "expectedFinalState": "resolved"
+    },
+    {
+      "id": "return-damaged",
+      "input": "demo-inputs/return-damaged.json",
+      "expectedStatus": "handoff",
+      "expectedFinalState": "handoff_human"
+    },
+    {
+      "id": "refund-before-shipment",
+      "input": "demo-inputs/refund-before-shipment.json",
+      "expectedStatus": "completed",
+      "expectedFinalState": "resolved"
+    },
+    {
+      "id": "refund-after-delivery",
+      "input": "demo-inputs/refund-after-delivery.json",
+      "expectedStatus": "completed",
+      "expectedFinalState": "resolved"
+    },
+    {
+      "id": "refund-high-risk",
+      "input": "demo-inputs/refund-high-risk.json",
+      "expectedStatus": "handoff",
+      "expectedFinalState": "handoff_human"
+    },
+    {
+      "id": "handoff-missing-info",
+      "input": "demo-inputs/handoff-missing-info.json",
+      "expectedStatus": "handoff",
+      "expectedFinalState": "handoff_human"
+    },
+    {
+      "id": "handoff-policy-required",
+      "input": "demo-inputs/handoff-policy-required.json",
+      "policy": "policies/prod-like.example.json",
+      "environment": "prod-like",
+      "expectedStatus": "handoff",
+      "expectedFinalState": "triage"
+    }
+  ]
+}

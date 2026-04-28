@@ -1,0 +1,11 @@
+{
+  "message": "I need a high amount refund now.",
+  "intent": "support_request",
+  "context": {
+    "order_id": "EC-RFD-HIGH",
+    "user_id": "U-REFUND-HIGH-RISK",
+    "policy_params": {
+      "highRiskAmountThreshold": 500
+    }
+  }
+}

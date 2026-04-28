@@ -1,0 +1,8 @@
+{
+  "message": "Please start my refund request.",
+  "intent": "support_request",
+  "context": {
+    "order_id": "EC-1001",
+    "user_id": "U-REFUND-1"
+  }
+}

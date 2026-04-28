@@ -1,0 +1,12 @@
+{
+  "message": "I want to return this item.",
+  "intent": "support_request",
+  "context": {
+    "order_id": "EC-RET-ELIGIBLE",
+    "user_id": "U-RETURN-ELIGIBLE",
+    "policy_params": {
+      "returnWindowDays": 7,
+      "requireHumanForDamagedGoods": false
+    }
+  }
+}

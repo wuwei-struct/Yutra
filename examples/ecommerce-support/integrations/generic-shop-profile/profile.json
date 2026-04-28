@@ -1,0 +1,14 @@
+﻿{
+  "profile": "generic-shop-profile",
+  "environment": "demo",
+  "adapterMode": "real",
+  "adapterDryRun": true,
+  "channel": "webchat",
+  "requiredFields": [
+    "order_id",
+    "customer_id",
+    "message",
+    "context.order_id"
+  ],
+  "policyOverride": "./policy.override.json"
+}

@@ -40,12 +40,23 @@
   "approvalStatuses": [],
   "reviewSources": [],
   "contextChangedKeys": [
+    "damaged_goods",
+    "high_risk_refund",
     "issue_type",
+    "missing_required_info",
     "order_found",
+    "order_status",
     "policy_excerpt",
+    "refund_amount",
     "refund_eligible",
+    "requires_human",
     "return_eligible",
+    "return_window_expired",
+    "shipping_delay_days",
+    "shipping_delayed",
+    "shipping_exception",
     "shipping_note",
-    "shipping_status"
+    "shipping_status",
+    "tracking_number_found"
   ]
 }

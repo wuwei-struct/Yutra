@@ -1,0 +1,30 @@
+{
+  "name": "ecommerce-support-prod-like",
+  "version": "0.2.0",
+  "environment": "prod-like",
+  "parameters": {
+    "returnWindowDays": 7,
+    "refundAutoApproveBeforeShipment": false,
+    "delayedShipmentThresholdDays": 2,
+    "allowPartialRefund": false,
+    "highRiskAmountThreshold": 500,
+    "requireHumanForDamagedGoods": true,
+    "requireHumanForRefundAfterDelivery": true
+  },
+  "actionRules": [
+    {
+      "action": "create_refund_request",
+      "requireHandoff": true,
+      "reason": "Refund ticket creation requires manual approval in prod-like profile.",
+      "reasonCode": "refund_manual_review_required"
+    }
+  ],
+  "handoffRules": [
+    {
+      "action": "create_refund_request",
+      "state": "create_refund_request",
+      "reasonCode": "refund_manual_review_required",
+      "summaryTemplate": "Refund ticket creation is blocked by prod-like policy and requires manual reviewer confirmation."
+    }
+  ]
+}

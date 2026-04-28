@@ -1,0 +1,11 @@
+{
+  "message": "My shipping status looks abnormal.",
+  "intent": "support_request",
+  "context": {
+    "order_id": "EC-SHIP-EXCEPTION",
+    "user_id": "U-SHIPPING-EXCEPTION",
+    "policy_params": {
+      "delayedShipmentThresholdDays": 3
+    }
+  }
+}

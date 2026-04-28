@@ -1,0 +1,11 @@
+{
+  "message": "Where is my package now?",
+  "intent": "support_request",
+  "context": {
+    "order_id": "EC-SHIP-NORMAL",
+    "user_id": "U-SHIPPING-NORMAL",
+    "policy_params": {
+      "delayedShipmentThresholdDays": 3
+    }
+  }
+}

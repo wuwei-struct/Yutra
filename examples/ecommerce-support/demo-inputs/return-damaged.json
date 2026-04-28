@@ -1,0 +1,11 @@
+{
+  "message": "The product is damaged, I need return support.",
+  "intent": "support_request",
+  "context": {
+    "order_id": "EC-RET-DAMAGED",
+    "user_id": "U-RETURN-DAMAGED",
+    "policy_params": {
+      "requireHumanForDamagedGoods": true
+    }
+  }
+}

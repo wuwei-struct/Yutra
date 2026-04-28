@@ -1,33 +1,108 @@
-{
+﻿{
   "pack": "ecommerce-support-pack",
-  "version": "0.1.0",
+  "version": "0.4.0",
   "domain": "ecommerce-support",
-  "description": "Customer support SOP pack with knowledge + tool integration and handoff path.",
+  "description": "Customer-integration-ready ecommerce support pack with mock/real adapter layering.",
   "language": ["en"],
   "includes": {
     "dsl": ["agent.yutra.yaml"],
-    "knowledge": ["knowledge/faq.md", "knowledge/return-policy.md"],
+    "knowledge": [
+      "knowledge/faq.md",
+      "knowledge/return-policy.md",
+      "knowledge/refund-policy.md",
+      "knowledge/shipping-policy.md"
+    ],
     "tools": [
       "actions.mjs",
       "tools/lookup-order.mjs",
       "tools/check-shipping.mjs",
       "tools/create-return-ticket.mjs",
-      "tools/create-refund-ticket.mjs"
+      "tools/create-refund-ticket.mjs",
+      "tools/escalate-human.mjs",
+      "adapters/mode.mjs",
+      "adapters/mock/order-adapter.mjs",
+      "adapters/mock/shipping-adapter.mjs",
+      "adapters/mock/return-adapter.mjs",
+      "adapters/mock/refund-adapter.mjs",
+      "adapters/mock/escalation-adapter.mjs",
+      "adapters/mock/channel-response-adapter.mjs",
+      "adapters/real/order-adapter.real.example.mjs",
+      "adapters/real/shipping-adapter.real.example.mjs",
+      "adapters/real/return-adapter.real.example.mjs",
+      "adapters/real/refund-adapter.real.example.mjs",
+      "adapters/real/escalation-adapter.real.example.mjs",
+      "adapters/real/channel-response-adapter.real.example.mjs"
     ],
-    "inputs": ["demo-inputs/case1.json", "demo-inputs/case2.json"],
-    "certification": ["ecommerce-happy"],
-    "docs": ["README.md"]
+    "policy": [
+      "policies/default.demo.json",
+      "policies/prod-like.example.json"
+    ],
+    "inputs": [
+      "demo-inputs/shipping-normal.json",
+      "demo-inputs/shipping-delayed.json",
+      "demo-inputs/shipping-exception.json",
+      "demo-inputs/return-eligible.json",
+      "demo-inputs/return-expired.json",
+      "demo-inputs/return-damaged.json",
+      "demo-inputs/refund-before-shipment.json",
+      "demo-inputs/refund-after-delivery.json",
+      "demo-inputs/refund-high-risk.json",
+      "demo-inputs/handoff-missing-info.json",
+      "demo-inputs/handoff-policy-required.json"
+    ],
+    "certification": [
+      "shipping-normal",
+      "shipping-delayed",
+      "shipping-exception",
+      "return-eligible",
+      "return-expired",
+      "return-damaged",
+      "refund-before-shipment",
+      "refund-after-delivery",
+      "refund-high-risk",
+      "handoff-missing-info",
+      "handoff-policy-required"
+    ],
+    "docs": [
+      "README.md",
+      "DELIVERY.md",
+      "CONFIG.md",
+      "SOP.md",
+      "INTEGRATION.md",
+      ".env.example",
+      "integrations/generic-shop-profile/profile.json",
+      "integrations/generic-shop-profile/adapter-map.json",
+      "integrations/generic-shop-profile/policy.override.json",
+      "contracts/order-contract.md",
+      "contracts/shipping-contract.md",
+      "contracts/return-contract.md",
+      "contracts/refund-contract.md",
+      "contracts/escalation-contract.md",
+      "contracts/channel-contract.md",
+      "response-templates/shipping.md",
+      "response-templates/return.md",
+      "response-templates/refund.md",
+      "response-templates/handoff.md",
+      "certification/scenarios.json",
+      "certification/expected-outcomes.json"
+    ]
   },
   "entrypoints": {
     "canonical": "agent.yutra.yaml"
   },
   "capabilities": [
-    "sop_state_flow",
-    "knowledge_lookup",
-    "ticket_action_stub"
+    "shipping_inquiry_flow",
+    "return_request_flow",
+    "refund_request_flow",
+    "human_handoff",
+    "policy_profile_switch",
+    "response_template_layer",
+    "adapter_contracts"
   ],
   "constraints": [
-    "no_remote_knowledge_service",
-    "no_platform_backend"
+    "no_customer_service_saas_platform",
+    "no_multitenant_backend",
+    "no_remote_policy_center",
+    "no_oms_erp_crm_full_integration"
   ]
 }

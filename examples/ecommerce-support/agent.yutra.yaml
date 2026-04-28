@@ -29,6 +29,7 @@ actions:
   - name: check_refund_eligibility
   - name: create_refund_request
   - name: inform_policy
+  - name: escalate_human
 states:
   triage:
     actions:
@@ -41,6 +42,8 @@ states:
     transitions:
       - to: handoff_human
         when: ctx.order_found == false
+      - to: handoff_human
+        when: ctx.requires_human == true
       - to: answer_shipping
         when: ctx.issue_type == "shipping"
       - to: check_return_eligibility
@@ -52,11 +55,15 @@ states:
     actions:
       - check_shipping
     transitions:
+      - to: handoff_human
+        when: ctx.requires_human == true
       - to: resolved
   check_return_eligibility:
     actions:
       - check_return_eligibility
     transitions:
+      - to: handoff_human
+        when: ctx.requires_human == true
       - to: create_return_request
         when: ctx.return_eligible == true
       - to: inform_policy
@@ -69,6 +76,8 @@ states:
     actions:
       - check_refund_eligibility
     transitions:
+      - to: handoff_human
+        when: ctx.requires_human == true
       - to: create_refund_request
         when: ctx.refund_eligible == true
       - to: inform_policy
@@ -85,4 +94,6 @@ states:
   resolved:
     final: true
   handoff_human:
+    actions:
+      - escalate_human
     handoff: true

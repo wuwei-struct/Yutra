@@ -58,7 +58,7 @@ Each pack contains `pack.manifest.json`:
 ## Current Certified Scenario Packs
 
 - `examples/it-helpdesk`
-- `examples/ecommerce-support`
+- `examples/ecommerce-support` (delivery baseline docs: `DELIVERY.md`, `CONFIG.md`, `SOP.md`)
 - `examples/approval-agent`
 
 Run full certification:

@@ -1,0 +1,13 @@
+{
+  "message": "Please refund this order before shipment.",
+  "intent": "support_request",
+  "context": {
+    "order_id": "EC-RFD-BEFORE",
+    "user_id": "U-REFUND-BEFORE",
+    "policy_params": {
+      "refundAutoApproveBeforeShipment": true,
+      "requireHumanForRefundAfterDelivery": false,
+      "highRiskAmountThreshold": 1000
+    }
+  }
+}

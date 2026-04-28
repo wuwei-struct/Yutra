@@ -1,0 +1,8 @@
+{
+  "message": "I need to return this item.",
+  "intent": "support_request",
+  "context": {
+    "order_id": "EC-1002",
+    "user_id": "U-RETURN-1"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "message": "I want a refund after delivery.",
+  "intent": "support_request",
+  "context": {
+    "order_id": "EC-RFD-AFTER",
+    "user_id": "U-REFUND-AFTER",
+    "policy_params": {
+      "requireHumanForRefundAfterDelivery": false,
+      "highRiskAmountThreshold": 1000
+    }
+  }
+}
