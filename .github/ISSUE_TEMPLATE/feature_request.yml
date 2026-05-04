@@ -1,0 +1,33 @@
+name: Feature request
+description: Propose a scoped capability for Yutra.
+title: "[Feature] "
+labels: ["enhancement", "triage"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem statement
+      description: What problem are you trying to solve?
+    validations:
+      required: true
+  - type: textarea
+    id: proposed
+    attributes:
+      label: Proposed capability
+      description: Describe the minimal proposed capability.
+    validations:
+      required: true
+  - type: textarea
+    id: fit
+    attributes:
+      label: Why this belongs in Yutra
+      description: Explain alignment with execution standard/runtime scope.
+    validations:
+      required: true
+  - type: textarea
+    id: boundaries
+    attributes:
+      label: Why this is not marketplace/platform/SaaS scope
+      description: Confirm this does not expand to marketplace/remote registry/install/platform UI.
+    validations:
+      required: true

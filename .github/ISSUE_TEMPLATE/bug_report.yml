@@ -1,0 +1,59 @@
+name: Bug report
+description: Report a reproducible bug in Yutra runtime, DSL, CLI, or docs.
+title: "[Bug] "
+labels: ["bug", "triage"]
+body:
+  - type: input
+    id: version
+    attributes:
+      label: Yutra version or commit
+      placeholder: "v0.2.0-rc.1 or 701b6b2"
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Node / pnpm / OS
+      placeholder: "Node 22.x, pnpm 10.x, Windows 11"
+    validations:
+      required: true
+  - type: textarea
+    id: command
+    attributes:
+      label: Command executed
+      description: Paste the exact command.
+      placeholder: "pnpm exec yutra run ..."
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: dropdown
+    id: artifacts
+    attributes:
+      label: Can you provide trace/audit artifacts?
+      options:
+        - "Yes, I can provide sanitized artifacts"
+        - "No"
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Reproduction steps
+      description: Step-by-step minimal reproduction.
+      placeholder: |
+        1. ...
+        2. ...
+        3. ...
+    validations:
+      required: true

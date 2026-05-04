@@ -4,7 +4,7 @@
 
 ### Project Positioning
 
-Yutra is an Agent Execution Standard and Reference Runtime.
+Yutra is a Skill-based Agent Execution Standard and Reference Runtime.
 
 ### Core Discipline (historical order)
 
@@ -25,6 +25,28 @@ Yutra is an Agent Execution Standard and Reference Runtime.
 
 For OSS/packaging iterations, only do release-readiness, docs, scripts,
 metadata, and demo artifacts. No new core product capability.
+
+Explicitly out of scope:
+
+- marketplace
+- remote registry
+- install workflow
+- SaaS dashboard/platform UI
+- real customer API integration
+
+### Contributor Onboarding For Agents
+
+Before proposing or editing:
+
+1. Run `pnpm install`
+2. Run `pnpm verify`
+3. Run `pnpm certify` for conformance-sensitive changes
+
+When adding skill or pack artifacts:
+
+- Add/maintain docs and demo commands.
+- Keep skill as Action implementation unit (not Agent/State peer).
+- Keep trace event model unchanged unless explicitly designed.
 
 ### Quality Gate
 

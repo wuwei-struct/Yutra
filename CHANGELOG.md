@@ -15,6 +15,17 @@
   - `docs/skill-certification-summary.md`
   - `docs/release-notes-v0.2.0-rc.1.md`
 
+### Quick Commands
+
+```bash
+pnpm install
+pnpm verify
+pnpm certify
+pnpm exec yutra skill list --skills-dir examples/ecommerce-support/skills
+pnpm exec yutra skill inspect examples/ecommerce-support/skills/query-shipping --as-action
+pnpm exec yutra run examples/ecommerce-support/agent.skill.yutra.yaml --input examples/ecommerce-support/demo-inputs/shipping-case.json --skills-dir examples/ecommerce-support/skills
+```
+
 ### Intentionally Excluded
 
 - Marketplace and remote registry.

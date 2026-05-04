@@ -1,0 +1,45 @@
+name: Skill pack feedback
+description: Report behavior feedback for a skill pack path.
+title: "[Skill Pack] "
+labels: ["skill-pack", "triage"]
+body:
+  - type: input
+    id: pack_name
+    attributes:
+      label: Pack name
+      placeholder: "examples/ecommerce-support"
+    validations:
+      required: true
+  - type: input
+    id: skill_name
+    attributes:
+      label: Skill name
+      placeholder: "query_shipping_status"
+    validations:
+      required: true
+  - type: textarea
+    id: command
+    attributes:
+      label: Command run
+      description: Paste the exact command(s) used.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Trace/audit evidence
+      description: Provide sanitized trace/audit references or snippets.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected skill behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual skill behavior
+    validations:
+      required: true
