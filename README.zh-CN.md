@@ -5,11 +5,33 @@
 
 Yutra 是面向 Skill 型智能体的执行标准与参考运行时。
 
+Skill 让 AI 有能力，Yutra 让这些能力按规则执行、可追踪、可治理、可审计、可认证。
+
 ## 为什么是 Yutra
 
-- Agent workflow 需要可控、可复现的执行边界。
-- 纯 Prompt 编排难以治理与审计。
-- 团队需要证据链来回答“什么能力在什么状态下被调用”。
+现代智能体越来越多地由 Skill、工具、API、函数组合而成。  
+但只有能力本身还不够。
+
+团队仍然需要回答：
+
+- 调用了哪个 Skill？
+- 在 Agent 的哪个 State 中调用？
+- 受哪个 Guard 或 Policy 约束？
+- 输入和输出分别是什么？
+- 这次调用是被允许、拒绝、重试、移交还是审计？
+- 这次行为能否复现并通过认证？
+
+Yutra 提供的是 Skill 之上的执行层。
+
+## Yutra 提供什么
+
+- 用 DSL 定义 agent、state、action、transition、guard 与 context。
+- 提供确定性执行的 Reference Runtime。
+- 提供 Skill Core，用于本地 Skill 的加载、校验、检视、适配与执行。
+- 提供治理能力，包括 policy packs、allow / deny / handoff、审批与 HITL 契约。
+- 提供 Trace & Audit，支持回放、上下文差异、运行对比与审计包导出。
+- 提供认证能力，支持 golden traces 与一致性检查。
+- 提供场景 Packs，包括 IT Helpdesk、Approval Agent、Skill-based E-commerce Support。
 
 ## 快速开始
 
@@ -23,6 +45,8 @@ pnpm exec yutra run examples/it-helpdesk/agent.yutra.yaml --input examples/it-he
 
 ## Skill-based Demo
 
+这个 Demo 展示了如何把本地 Skill 适配为 Yutra Action，并在 trace / audit 约束下执行。
+
 ```bash
 pnpm exec yutra skill list --skills-dir examples/ecommerce-support/skills
 pnpm exec yutra skill validate examples/ecommerce-support/skills/query-shipping
@@ -34,13 +58,17 @@ pnpm exec yutra trace export <runId> --trace-file .yutra/traces/skill-based-ecom
 
 ## 核心概念
 
-- `Skill`：能力单元与实现来源。
-- `Action`：标准化调用契约。
-- `State`：执行场景与转移边界。
-- `Runtime`：确定性调度与执行器。
-- `Trace/Audit/Certification`：可验证证据链。
-
-Skill 不是 Agent/State 的平级对象。
+| 概念 | 含义 |
+|---|---|
+| Skill | 能力单元与实现来源 |
+| Action | 标准化调用契约 |
+| State | 执行上下文与状态转移边界 |
+| Guard | 运行时条件与决策门 |
+| Policy | 治理层，负责 allow / deny / handoff |
+| Runtime | 确定性执行引擎 |
+| Trace | 执行证据 |
+| Audit Bundle | 可移植的审阅产物 |
+| Certification | 稳定行为校验 |
 
 ## 架构
 
@@ -54,31 +82,73 @@ Skill / Tool / API / Function
   -> Trace / Audit / Certification
 ```
 
+Skill 不是顶层的 Agent 或 State 对象。  
+Skill 是 Yutra Action 背后的实现单元。
+
 ## Examples / Packs
 
-- `examples/it-helpdesk`
-- `examples/ecommerce-support`
-- `examples/approval-agent`
-- `starters/minimal-agent-pack`
-- `starters/support-pack`
+- `examples/it-helpdesk` - 基础的有状态支持流程。
+- `examples/ecommerce-support` - Skill-based 电商支持包。
+- `examples/approval-agent` - 审批与人机协同流程。
+- `starters/minimal-agent-pack` - 最小起步包。
+- `starters/support-pack` - 面向支持场景的起步包。
 
 ## Trace / Audit / Certification
+
+Yutra 会把执行证据记录为 trace events。
+
+你可以：
+
+- 回放一次运行
+- 查看上下文差异
+- 比较不同运行
+- 导出审计包
+- 用稳定 golden 投影做示例认证
 
 ```bash
 pnpm certify
 ```
 
-- 认证采用稳定投影比对，不依赖逐字节 trace 一致。
-- 认证摘要输出在 `.yutra/certification/summary.json`。
+认证摘要位置：`.yutra/certification/summary.json`。
 
 ## 非目标
 
 Yutra 当前不是：
-- marketplace
+- Skill marketplace
 - remote registry
 - install workflow
-- SaaS 平台 UI / 管理后台
-- LLM-first 控制逻辑重写
+- SaaS dashboard
+- 客服后端系统
+- BI / analytics 平台
+- LLM-first 编排框架
+- 真实客户 API 集成层
+
+## 文档导航
+
+### Start Here
+
+- [English README](./README.md)
+- [Skill-based Runtime](docs/skill-based-runtime.md)
+- [Skill-based Demo Path](docs/skill-based-demo-path.md)
+- [Release Notes v0.2.0-rc.1](docs/release-notes-v0.2.0-rc.1.md)
+
+### Concepts
+
+- [Conformance and Golden Trace](docs/conformance.md)
+- [Scenario Packs and Starter Packs](docs/scenario-packs.md)
+- [Skill Certification Summary](docs/skill-certification-summary.md)
+
+### E-commerce Pack
+
+- [E-commerce Skill Pack](docs/ecommerce-skill-pack.md)
+- [E-commerce Demo Path](docs/ecommerce-demo-path.md)
+- [E-commerce Proposal Outline](docs/ecommerce-proposal-outline.md)
+
+### Project
+
+- [Contributing](CONTRIBUTING.md)
+- [Security](SECURITY.md)
+- [Support](SUPPORT.md)
 
 ## Contributing
 
@@ -88,20 +158,3 @@ Yutra 当前不是：
 ## License
 
 MIT，见 [LICENSE](LICENSE)。
-
-## 文档导航
-
-- [English README](./README.md)
-- [Conformance 与 Golden Trace](docs/conformance.md)
-- [Scenario Packs 与 Starter Packs](docs/scenario-packs.md)
-- [Skill-based Runtime 说明](docs/skill-based-runtime.md)
-- [Skill-based Demo Path](docs/skill-based-demo-path.md)
-- [Skill 认证汇总](docs/skill-certification-summary.md)
-- [Release Notes v0.2.0-rc.1](docs/release-notes-v0.2.0-rc.1.md)
-- [GitHub 仓库设置建议](docs/github-repo-settings.md)
-- [E-commerce Skill Pack](docs/ecommerce-skill-pack.md)
-- [E-commerce Demo Path](docs/ecommerce-demo-path.md)
-- [E-commerce 提案骨架](docs/ecommerce-proposal-outline.md)
-- [Contributing](CONTRIBUTING.md)
-- [Security](SECURITY.md)
-- [Support](SUPPORT.md)
