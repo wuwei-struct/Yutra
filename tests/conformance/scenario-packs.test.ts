@@ -1,4 +1,4 @@
-﻿import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { describe, expect, it } from "vitest";
@@ -48,7 +48,14 @@ const expectedCertificationRefs: Record<string, string[]> = {
     "refund-after-delivery",
     "refund-high-risk",
     "handoff-missing-info",
-    "handoff-policy-required"
+    "handoff-policy-required",
+    "skill-shipping-path",
+    "skill-return-path",
+    "skill-refund-path",
+    "skill-handoff-path",
+    "skill-manifest-validation",
+    "skill-trace-projection",
+    "skill-governance-handoff"
   ],
   "examples/approval-agent": ["approval-approved", "approval-denied", "approval-handoff"]
 };

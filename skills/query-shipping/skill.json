@@ -1,0 +1,36 @@
+﻿{
+  "name": "query_shipping_status",
+  "version": "0.1.0",
+  "description": "Query shipping status by order id.",
+  "type": "tool",
+  "inputSchema": {
+    "type": "object",
+    "required": ["order_id"],
+    "properties": {
+      "order_id": {
+        "type": "string"
+      }
+    }
+  },
+  "outputSchema": {
+    "type": "object",
+    "properties": {
+      "status": {
+        "type": "string"
+      },
+      "carrier": {
+        "type": "string"
+      },
+      "estimatedDelivery": {
+        "type": "string"
+      }
+    }
+  },
+  "sideEffect": "read",
+  "riskLevel": "low",
+  "requiresApproval": false,
+  "entry": "scripts/run.mjs",
+  "tags": ["ecommerce", "shipping"],
+  "allowedEnvironments": ["dev", "demo", "prod-like"],
+  "maxCallsPerRun": 5
+}

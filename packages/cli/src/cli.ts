@@ -6,6 +6,8 @@ import { mkdir, writeFile } from "node:fs/promises";
 import { formatExplainOutput, inspectCanonicalization, loadAndValidateDslFile, loadDslFile } from "@yutra/dsl";
 import { executeRun } from "@yutra/runtime";
 import type { ActionRegistry } from "@yutra/runtime";
+import { createSkillRegistry, discoverSkills, loadSkillFromDir, skillToAction, validateLoadedSkill } from "@yutra/skill-core";
+import type { DiscoveredSkill } from "@yutra/skill-core";
 import * as TraceCore from "@yutra/trace";
 import { JsonlTraceStorage, TraceReader } from "@yutra/trace";
 import { getStringFlag, parseArgs } from "./args";
@@ -14,6 +16,7 @@ import { formatIssues, formatRunSummary, formatTraceTable, formatTraceTimeline, 
 import type { CliIO } from "./io";
 
 const DEFAULT_TRACE_FILE = ".yutra/traces/events.jsonl";
+const DEFAULT_SKILL_PATHS = ["skills", ".yutra/skills", "examples/ecommerce-support/skills"];
 
 function findWorkspaceRoot(start: string): string {
   let current = start;
@@ -49,12 +52,43 @@ function printHelp(io: CliIO): void {
   io.stdout("");
   io.stdout("Commands:");
   io.stdout("  yutra validate <file>");
-  io.stdout("  yutra run <file> [--input <json>] [--trace-file <jsonl>]");
+  io.stdout("  yutra run <file> [--input <json>] [--trace-file <jsonl>] [--skills-dir <path>]");
   io.stdout("  yutra dsl explain <file>");
   io.stdout("  yutra dsl inspect <file> [--json]");
+  io.stdout("  yutra skill list [--json] [--skills-dir <path>]");
+  io.stdout("  yutra skill inspect <nameOrPath> [--as-action] [--json] [--skills-dir <path>]");
+  io.stdout("  yutra skill validate <path> [--json]");
   io.stdout("  yutra trace list [--trace-file <jsonl>]");
   io.stdout("  yutra trace show <runId> [--trace-file <jsonl>] [--json]");
   io.stdout("  yutra trace export <runId> --out <json> [--trace-file <jsonl>]");
+}
+
+function resolveSkillsSearchPaths(flags: Record<string, string | boolean>): string[] {
+  const configured = getStringFlag(flags, "skills-dir");
+  if (!configured) {
+    return DEFAULT_SKILL_PATHS;
+  }
+  return configured
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+function toSkillListJson(discovered: DiscoveredSkill[]) {
+  return {
+    skills: discovered.map((skill) => ({
+      name: skill.name ?? null,
+      version: skill.version ?? null,
+      type: skill.manifest?.type ?? null,
+      sideEffect: skill.manifest?.sideEffect ?? null,
+      riskLevel: skill.manifest?.riskLevel ?? null,
+      requiresApproval: skill.manifest?.requiresApproval ?? null,
+      dir: skill.dir,
+      ok: skill.ok,
+      status: skill.ok ? "ok" : "invalid",
+      issues: skill.issues
+    }))
+  };
 }
 
 function createDefaultActionRegistry(actionNames: string[] = []) {
@@ -130,6 +164,7 @@ async function runRun(args: string[], flags: Record<string, string | boolean>, i
   const dslPath = resolveWorkspacePath(file);
   const inputPath = getStringFlag(flags, "input");
   const traceFile = resolveWorkspacePath(getStringFlag(flags, "trace-file") ?? DEFAULT_TRACE_FILE);
+  const skillSearchPaths = resolveSkillsSearchPaths(flags).map((path) => resolveWorkspacePath(path));
 
   let input: { text?: string; intent?: string; context?: Record<string, unknown> } | undefined;
   if (inputPath) {
@@ -153,17 +188,55 @@ async function runRun(args: string[], flags: Record<string, string | boolean>, i
     return EXIT_CODE_VALIDATION_FAILURE;
   }
 
+  let specForRun = loaded.spec;
+  if ((loaded.spec.actions ?? []).some((action) => action.implementation?.type === "skill")) {
+    const skillRegistry = createSkillRegistry({
+      paths: skillSearchPaths
+    });
+    const discovered = await skillRegistry.discover();
+    const index = new Map<string, string>();
+    for (const item of discovered) {
+      if (item.ok && item.name) {
+        index.set(item.name, item.dir);
+      }
+    }
+
+    specForRun = {
+      ...loaded.spec,
+      actions: (loaded.spec.actions ?? []).map((action) => {
+        if (action.implementation?.type !== "skill") {
+          return action;
+        }
+        const implementation = { ...(action.implementation as Record<string, unknown>) } as Record<string, unknown> & {
+          type: "skill";
+        };
+        if (typeof implementation.skillDir !== "string") {
+          const skillName = typeof implementation.skillName === "string" ? implementation.skillName : action.name;
+          const skillDir = index.get(skillName);
+          if (skillDir) {
+            implementation.skillDir = skillDir;
+          }
+        }
+        return {
+          ...action,
+          implementation: implementation as typeof action.implementation
+        };
+      })
+    };
+  }
+
   const exampleRegistry = await loadExampleActionRegistry(dslPath);
   const actionRegistry = (exampleRegistry ??
     createDefaultActionRegistry(loaded.spec.actions?.map((action) => action.name))) as ActionRegistry;
   const traceStorage = new JsonlTraceStorage(traceFile);
 
   const result = await executeRun({
-    spec: loaded.spec,
+    spec: specForRun,
     input,
     options: {
       actionRegistry,
-      traceStorage
+      traceStorage,
+      skillSearchPaths
     }
   });
 
@@ -352,6 +425,173 @@ async function runDslInspect(
   return EXIT_CODE_SUCCESS;
 }
 
+async function runSkillList(flags: Record<string, string | boolean>, io: CliIO): Promise<number> {
+  const paths = resolveSkillsSearchPaths(flags);
+  const discovered = await discoverSkills(paths, findWorkspaceRoot(process.cwd()));
+
+  if (flags.json === true) {
+    io.stdout(JSON.stringify(toSkillListJson(discovered), null, 2));
+    return EXIT_CODE_SUCCESS;
+  }
+
+  if (discovered.length === 0) {
+    io.stdout("No skills found.");
+    return EXIT_CODE_SUCCESS;
+  }
+
+  for (const skill of discovered) {
+    const status = skill.ok ? "ok" : `invalid(${skill.issues.filter((issue) => issue.severity === "error").length})`;
+    io.stdout(
+      `${skill.name ?? "-"} | ${skill.version ?? "-"} | ${skill.manifest?.type ?? "-"} | ${skill.manifest?.sideEffect ?? "-"} | ${
+        skill.manifest?.riskLevel ?? "-"
+      } | requiresApproval=${skill.manifest?.requiresApproval ?? false} | ${status} | ${skill.dir}`
+    );
+  }
+
+  return EXIT_CODE_SUCCESS;
+}
+
+async function runSkillInspect(
+  args: string[],
+  flags: Record<string, string | boolean>,
+  io: CliIO
+): Promise<number> {
+  const nameOrPath = args[0];
+  if (!nameOrPath) {
+    io.stderr("Missing required argument <nameOrPath>.");
+    return EXIT_CODE_GENERAL_FAILURE;
+  }
+
+  const registry = createSkillRegistry({
+    paths: resolveSkillsSearchPaths(flags),
+    baseDir: findWorkspaceRoot(process.cwd())
+  });
+
+  const loaded = existsSync(resolveWorkspacePath(nameOrPath))
+    ? await loadSkillFromDir(resolveWorkspacePath(nameOrPath))
+    : await registry.inspect(nameOrPath);
+  const validation = validateLoadedSkill(loaded);
+  const asAction = flags["as-action"] === true;
+
+  if (asAction) {
+    const action = skillToAction(loaded);
+    if (flags.json === true) {
+      io.stdout(JSON.stringify(action, null, 2));
+      return EXIT_CODE_SUCCESS;
+    }
+
+    io.stdout(`action.name: ${action.name}`);
+    io.stdout(`action.description: ${action.description ?? "-"}`);
+    io.stdout(`action.sideEffect: ${action.sideEffect ?? "none"}`);
+    io.stdout(`action.riskLevel: ${action.riskLevel ?? "low"}`);
+    io.stdout(`action.requiresApproval: ${action.requiresApproval ?? false}`);
+    io.stdout(`implementation.type: ${action.implementation.type}`);
+    io.stdout(`implementation.skillName: ${action.implementation.skillName}`);
+    io.stdout(`implementation.skillVersion: ${action.implementation.skillVersion ?? "-"}`);
+    io.stdout(`implementation.entry: ${action.implementation.entry ?? "-"}`);
+    io.stdout(`implementation.skillDir: ${action.implementation.skillDir ?? "-"}`);
+    return EXIT_CODE_SUCCESS;
+  }
+
+  if (flags.json === true) {
+    io.stdout(
+      JSON.stringify(
+        {
+          skill: {
+            dir: loaded.dir,
+            manifestPath: loaded.manifestPath,
+            readmePath: loaded.readmePath,
+            manifest: loaded.manifest,
+            files: loaded.files
+          },
+          validation
+        },
+        null,
+        2
+      )
+    );
+    return EXIT_CODE_SUCCESS;
+  }
+
+  io.stdout(`name: ${loaded.manifest.name}`);
+  io.stdout(`version: ${loaded.manifest.version}`);
+  io.stdout(`description: ${loaded.manifest.description ?? "-"}`);
+  io.stdout(`type: ${loaded.manifest.type}`);
+  io.stdout(`sideEffect: ${loaded.manifest.sideEffect ?? "none"}`);
+  io.stdout(`riskLevel: ${loaded.manifest.riskLevel ?? "low"}`);
+  io.stdout(`requiresApproval: ${loaded.manifest.requiresApproval ?? false}`);
+  io.stdout(`allowedEnvironments: ${(loaded.manifest.allowedEnvironments ?? []).join(",") || "-"}`);
+  io.stdout(`maxCallsPerRun: ${loaded.manifest.maxCallsPerRun ?? "-"}`);
+  io.stdout(`entry: ${loaded.manifest.entry ?? "-"}`);
+  io.stdout(`entryExists: ${loaded.files.entryExists}`);
+  io.stdout(`skillMarkdownExists: ${Boolean(loaded.readmePath)}`);
+  io.stdout(`references: ${loaded.files.references.join(",") || "-"}`);
+  io.stdout(`assets: ${loaded.files.assets.join(",") || "-"}`);
+  io.stdout(`tags: ${(loaded.manifest.tags ?? []).join(",") || "-"}`);
+  io.stdout(`validation: ${validation.ok ? "ok" : "failed"}`);
+  for (const item of validation.issues) {
+    io.stdout(`- [${item.severity}] ${item.code}: ${item.message}`);
+  }
+  return EXIT_CODE_SUCCESS;
+}
+
+async function runSkillValidate(
+  args: string[],
+  flags: Record<string, string | boolean>,
+  io: CliIO
+): Promise<number> {
+  const skillPath = args[0];
+  if (!skillPath) {
+    io.stderr("Missing required argument <path>.");
+    return EXIT_CODE_GENERAL_FAILURE;
+  }
+
+  try {
+    const loaded = await loadSkillFromDir(resolveWorkspacePath(skillPath));
+    const validation = validateLoadedSkill(loaded);
+    if (flags.json === true) {
+      io.stdout(JSON.stringify(validation, null, 2));
+    } else {
+      io.stdout(validation.ok ? "OK" : "FAILED");
+      const errors = validation.issues.filter((issue) => issue.severity === "error");
+      const warnings = validation.issues.filter((issue) => issue.severity === "warning");
+      io.stdout(`errors: ${errors.length}`);
+      for (const item of errors) {
+        io.stdout(`- [${item.code}] ${item.message}`);
+      }
+      io.stdout(`warnings: ${warnings.length}`);
+      for (const item of warnings) {
+        io.stdout(`- [${item.code}] ${item.message}`);
+      }
+    }
+
+    return validation.ok ? EXIT_CODE_SUCCESS : EXIT_CODE_VALIDATION_FAILURE;
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+    if (flags.json === true) {
+      io.stdout(
+        JSON.stringify(
+          {
+            ok: false,
+            issues: [
+              {
+                code: "SKILL_MANIFEST_INVALID",
+                message,
+                severity: "error"
+              }
+            ]
+          },
+          null,
+          2
+        )
+      );
+    } else {
+      io.stderr(`FAILED: ${message}`);
+    }
+    return EXIT_CODE_VALIDATION_FAILURE;
+  }
+}
+
 export async function runCli(argv: string[], io: CliIO): Promise<number> {
   const { positionals, flags } = parseArgs(argv);
   const [command, subcommand, ...rest] = positionals;
@@ -388,6 +628,18 @@ export async function runCli(argv: string[], io: CliIO): Promise<number> {
 
     if (command === "dsl" && subcommand === "inspect") {
       return runDslInspect(rest, flags, io);
+    }
+
+    if (command === "skill" && subcommand === "list") {
+      return runSkillList(flags, io);
+    }
+
+    if (command === "skill" && subcommand === "inspect") {
+      return runSkillInspect(rest, flags, io);
+    }
+
+    if (command === "skill" && subcommand === "validate") {
+      return runSkillValidate(rest, flags, io);
     }
 
     io.stderr(`Unknown command: ${positionals.join(" ")}`);

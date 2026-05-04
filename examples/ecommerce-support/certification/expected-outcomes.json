@@ -45,6 +45,34 @@
     "handoff-policy-required": {
       "status": "handoff",
       "mustIncludeStates": ["triage"]
+    },
+    "skill-shipping-path": {
+      "status": "completed",
+      "mustIncludeStates": ["triage", "fetch_order", "answer_shipping", "resolved"]
+    },
+    "skill-return-path": {
+      "status": "completed",
+      "mustIncludeStates": ["triage", "fetch_order", "check_return_eligibility", "create_return_request", "resolved"]
+    },
+    "skill-refund-path": {
+      "status": "completed",
+      "mustIncludeStates": ["triage", "fetch_order", "check_refund_eligibility", "create_refund_request", "resolved"]
+    },
+    "skill-handoff-path": {
+      "status": "handoff",
+      "mustIncludeStates": ["triage", "fetch_order", "handoff_human"]
+    },
+    "skill-manifest-validation": {
+      "status": "completed",
+      "mustIncludeStates": ["triage", "fetch_order", "answer_shipping", "resolved"]
+    },
+    "skill-trace-projection": {
+      "status": "completed",
+      "mustIncludeStates": ["triage", "fetch_order", "answer_shipping", "resolved"]
+    },
+    "skill-governance-handoff": {
+      "status": "handoff",
+      "mustIncludeStates": ["triage", "fetch_order", "handoff_human"]
     }
   }
 }

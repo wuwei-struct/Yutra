@@ -1,8 +1,9 @@
-import type { ActionSideEffect, AgentSpec } from "@yutra/spec";
+import type { ActionImplementationSpec, ActionRiskLevel, ActionSideEffect, AgentSpec } from "@yutra/spec";
 import { mergeContextPatch } from "./context-merge";
 import { ACTION_ERROR_CODES, RUNTIME_ERROR_CODES } from "./error-codes";
 import { createRuntimeError } from "./errors";
 import { buildIdempotencyKey, InMemoryIdempotencyStore } from "./idempotency";
+import { executeSkillAction, type SkillExecutionMetadata } from "./skill-action-executor";
 import type {
   ActionAttemptResultInfo,
   ActionAttemptStartInfo,
@@ -14,6 +15,7 @@ import type {
   IdempotencyStore,
   IdempotencyRecord,
   RetryPolicy,
+  RuntimeOptions,
   RuntimeRunContext
 } from "./types";
 
@@ -24,6 +26,8 @@ interface ActionExecutorOptions {
   contextMergePolicy?: ContextMergePolicy;
   idempotencyStore?: IdempotencyStore;
   spec?: AgentSpec;
+  skillRegistry?: RuntimeOptions["skillRegistry"];
+  skillSearchPaths?: string[];
 }
 
 interface ExecuteActionHooks {
@@ -38,8 +42,14 @@ export class ActionExecutor {
     Pick<RetryPolicy, "retryOn">;
   private readonly actionPolicies: Record<string, ActionExecutionPolicy>;
   private readonly actionSideEffects: Record<string, ActionSideEffect>;
+  private readonly actionRiskLevels: Record<string, ActionRiskLevel | undefined>;
+  private readonly actionRequiresApproval: Record<string, boolean | undefined>;
+  private readonly actionImplementations: Record<string, ActionImplementationSpec | undefined>;
+  private readonly actionDefinitions: Record<string, NonNullable<AgentSpec["actions"]>[number] | undefined>;
   private readonly contextMergePolicy: ContextMergePolicy;
   private readonly idempotencyStore: IdempotencyStore;
+  private readonly skillRegistry: ActionExecutorOptions["skillRegistry"];
+  private readonly skillSearchPaths: string[] | undefined;
 
   public constructor(actionRegistry: ActionRegistry = {}, options: ActionExecutorOptions = {}) {
     this.actionRegistry = actionRegistry;
@@ -50,9 +60,21 @@ export class ActionExecutor {
       retryOn: options.defaultRetryPolicy?.retryOn
     };
     this.actionPolicies = options.actionPolicies ?? {};
-    this.actionSideEffects = Object.fromEntries((options.spec?.actions ?? []).map((action) => [action.name, action.side_effect ?? "none"]));
+    this.actionDefinitions = Object.fromEntries((options.spec?.actions ?? []).map((action) => [action.name, action]));
+    this.actionSideEffects = Object.fromEntries(
+      (options.spec?.actions ?? []).map((action) => [action.name, action.side_effect ?? action.sideEffect ?? "none"])
+    );
+    this.actionRiskLevels = Object.fromEntries((options.spec?.actions ?? []).map((action) => [action.name, action.riskLevel]));
+    this.actionRequiresApproval = Object.fromEntries(
+      (options.spec?.actions ?? []).map((action) => [action.name, action.requiresApproval])
+    );
+    this.actionImplementations = Object.fromEntries(
+      (options.spec?.actions ?? []).map((action) => [action.name, action.implementation])
+    );
     this.contextMergePolicy = options.contextMergePolicy ?? { strategy: "shallow", allowNull: false };
     this.idempotencyStore = options.idempotencyStore ?? new InMemoryIdempotencyStore();
+    this.skillRegistry = options.skillRegistry;
+    this.skillSearchPaths = options.skillSearchPaths;
   }
 
   public async executeAction(
@@ -60,15 +82,27 @@ export class ActionExecutor {
     ctx: RuntimeRunContext,
     hooks: ExecuteActionHooks = {}
   ): Promise<ActionExecutionResult> {
+    const actionDefinition = this.actionDefinitions[actionName];
     const handler = this.actionRegistry[actionName];
     const policy = this.actionPolicies[actionName] ?? {};
+    const implementation = (policy.implementation ?? this.actionImplementations[actionName]) as
+      | ActionImplementationSpec
+      | undefined;
+    const implementationType = implementation?.type;
+    const isSkillAction = implementationType === "skill";
+    const implementationSkillName =
+      typeof implementation?.skillName === "string" ? implementation.skillName : isSkillAction ? actionName : undefined;
+    const implementationSkillVersion = typeof implementation?.skillVersion === "string" ? implementation.skillVersion : undefined;
+    const implementationSkillEntry = typeof implementation?.entry === "string" ? implementation.entry : undefined;
     const retryPolicy = {
       maxAttempts: policy.retryPolicy?.maxAttempts ?? this.defaultRetryPolicy.maxAttempts,
       backoffMs: policy.retryPolicy?.backoffMs ?? this.defaultRetryPolicy.backoffMs,
       retryOn: policy.retryPolicy?.retryOn ?? this.defaultRetryPolicy.retryOn
     };
     const timeoutMs = policy.timeoutMs ?? this.defaultTimeoutMs;
-    const sideEffect = policy.sideEffect ?? this.actionSideEffects[actionName] ?? "none";
+    let sideEffect = policy.sideEffect ?? this.actionSideEffects[actionName] ?? "none";
+    const riskLevel = policy.riskLevel ?? this.actionRiskLevels[actionName];
+    const requiresApproval = policy.requiresApproval ?? this.actionRequiresApproval[actionName];
     const explicitIdempotencyKey = policy.idempotencyKey;
     const useIdempotency = sideEffect === "write" || sideEffect === "external";
     const idempotencyKey = buildIdempotencyKey({
@@ -121,7 +155,13 @@ export class ActionExecutor {
           sideEffect,
           idempotencyKey,
           idempotencyHit: true,
-          resumedRun: ctx.isResumed
+          resumedRun: ctx.isResumed,
+          implementationType,
+          skillName: implementationSkillName,
+          skillVersion: implementationSkillVersion,
+          skillEntry: implementationSkillEntry,
+          riskLevel,
+          requiresApproval
         });
         await hooks.onAttemptResult?.({
           actionName,
@@ -141,7 +181,13 @@ export class ActionExecutor {
           finalAttempt: true,
           idempotencyKey,
           idempotencyHit: true,
-          resumedRun: ctx.isResumed
+          resumedRun: ctx.isResumed,
+          implementationType,
+          skillName: implementationSkillName,
+          skillVersion: implementationSkillVersion,
+          skillEntry: implementationSkillEntry,
+          riskLevel,
+          requiresApproval
         });
 
         return {
@@ -167,7 +213,7 @@ export class ActionExecutor {
       }
     }
 
-    if (!handler) {
+    if (!handler && !isSkillAction) {
       const error = createRuntimeError(
         RUNTIME_ERROR_CODES.ACTION_NOT_FOUND,
         `Action '${actionName}' is not registered.`,
@@ -203,7 +249,13 @@ export class ActionExecutor {
         sideEffect,
         idempotencyKey,
         idempotencyHit: false,
-        resumedRun: ctx.isResumed
+        resumedRun: ctx.isResumed,
+        implementationType,
+        skillName: implementationSkillName,
+        skillVersion: implementationSkillVersion,
+        skillEntry: implementationSkillEntry,
+        riskLevel,
+        requiresApproval
       });
       await hooks.onAttemptResult?.({
         actionName,
@@ -218,16 +270,23 @@ export class ActionExecutor {
         finalAttempt: true,
         idempotencyKey,
         idempotencyHit: false,
-        resumedRun: ctx.isResumed
+        resumedRun: ctx.isResumed,
+        implementationType,
+        skillName: implementationSkillName,
+        skillVersion: implementationSkillVersion,
+        skillEntry: implementationSkillEntry,
+        riskLevel,
+        requiresApproval
       });
       return failure;
     }
 
-    const perAttemptExternalCalls = sideEffect === "external" ? 1 : 0;
     let accumulatedExternalCalls = 0;
     let lastFailure: ActionExecutionResult | undefined;
     for (let attempt = 1; attempt <= retryPolicy.maxAttempts; attempt += 1) {
-      accumulatedExternalCalls += perAttemptExternalCalls;
+      if (sideEffect === "external") {
+        accumulatedExternalCalls += 1;
+      }
       await hooks.onAttemptStart?.({
         actionName,
         attempt,
@@ -236,13 +295,56 @@ export class ActionExecutor {
         sideEffect,
         idempotencyKey,
         idempotencyHit: false,
-        resumedRun: ctx.isResumed
+        resumedRun: ctx.isResumed,
+        implementationType,
+        skillName: implementationSkillName,
+        skillVersion: implementationSkillVersion,
+        skillEntry: implementationSkillEntry,
+        riskLevel,
+        requiresApproval,
+        inputValidated: isSkillAction ? false : undefined
       });
 
       const startedAt = Date.now();
       let rawResult: ActionHandlerResult;
+      let skillDetails: SkillExecutionMetadata | undefined;
       try {
-        rawResult = await this.withTimeout(handler(ctx), timeoutMs);
+        if (isSkillAction) {
+          const skillResult = await this.withTimeout(
+            executeSkillAction({
+              actionName,
+              ctx,
+              actionPolicy: policy,
+              actionDefinition,
+              runtimeOptions: {
+                skillRegistry: this.skillRegistry,
+                skillSearchPaths: this.skillSearchPaths
+              }
+            }),
+            timeoutMs
+          );
+          skillDetails = skillResult.details;
+          sideEffect = skillDetails.sideEffect ?? sideEffect;
+          rawResult = skillResult.ok
+            ? {
+                ok: true,
+                output: skillResult.output,
+                contextPatch: skillResult.contextPatch,
+                meta: skillResult.meta
+              }
+            : {
+                ok: false,
+                error: {
+                  code: skillResult.error?.code ?? RUNTIME_ERROR_CODES.SKILL_EXECUTION_FAILED,
+                  message: skillResult.error?.message ?? "Skill action failed.",
+                  retryable: false,
+                  details: skillResult.error?.details
+                },
+                meta: skillResult.meta
+              };
+        } else {
+          rawResult = await this.withTimeout(handler!(ctx), timeoutMs);
+        }
       } catch (error) {
         const runtimeError = this.classifyExecutionException(actionName, ctx, error);
         const retryable = this.shouldRetry(runtimeError, retryPolicy);
@@ -275,7 +377,15 @@ export class ActionExecutor {
           finalAttempt,
           idempotencyKey,
           idempotencyHit: false,
-          resumedRun: ctx.isResumed
+          resumedRun: ctx.isResumed,
+          implementationType,
+          skillName: skillDetails?.skillName ?? implementationSkillName,
+          skillVersion: skillDetails?.skillVersion ?? implementationSkillVersion,
+          skillEntry: skillDetails?.skillEntry ?? implementationSkillEntry,
+          riskLevel: skillDetails?.riskLevel ?? riskLevel,
+          requiresApproval: skillDetails?.requiresApproval ?? requiresApproval,
+          inputValidated: skillDetails?.inputValidated,
+          outputValidated: skillDetails?.outputValidated
         });
 
         if (finalAttempt) {
@@ -315,12 +425,12 @@ export class ActionExecutor {
           finalAttempt,
           durationMs,
           timeoutMs,
-            retryable,
-            sideEffect,
-            externalCallCount: accumulatedExternalCalls,
-            idempotencyKey,
-            idempotencyHit: false
-          };
+          retryable,
+          sideEffect,
+          externalCallCount: accumulatedExternalCalls,
+          idempotencyKey,
+          idempotencyHit: false
+        };
 
         await hooks.onAttemptResult?.({
           actionName,
@@ -336,7 +446,15 @@ export class ActionExecutor {
           finalAttempt,
           idempotencyKey,
           idempotencyHit: false,
-          resumedRun: ctx.isResumed
+          resumedRun: ctx.isResumed,
+          implementationType,
+          skillName: skillDetails?.skillName ?? implementationSkillName,
+          skillVersion: skillDetails?.skillVersion ?? implementationSkillVersion,
+          skillEntry: skillDetails?.skillEntry ?? implementationSkillEntry,
+          riskLevel: skillDetails?.riskLevel ?? riskLevel,
+          requiresApproval: skillDetails?.requiresApproval ?? requiresApproval,
+          inputValidated: skillDetails?.inputValidated,
+          outputValidated: skillDetails?.outputValidated
         });
 
         if (finalAttempt) {
@@ -367,7 +485,15 @@ export class ActionExecutor {
               finalAttempt: true,
               idempotencyKey,
               idempotencyHit: false,
-              resumedRun: ctx.isResumed
+              resumedRun: ctx.isResumed,
+              implementationType,
+              skillName: skillDetails?.skillName ?? implementationSkillName,
+              skillVersion: skillDetails?.skillVersion ?? implementationSkillVersion,
+              skillEntry: skillDetails?.skillEntry ?? implementationSkillEntry,
+              riskLevel: skillDetails?.riskLevel ?? riskLevel,
+              requiresApproval: skillDetails?.requiresApproval ?? requiresApproval,
+              inputValidated: skillDetails?.inputValidated,
+              outputValidated: skillDetails?.outputValidated
             });
             return {
               actionName,
@@ -415,7 +541,15 @@ export class ActionExecutor {
           finalAttempt: true,
           idempotencyKey,
           idempotencyHit: false,
-          resumedRun: ctx.isResumed
+          resumedRun: ctx.isResumed,
+          implementationType,
+          skillName: skillDetails?.skillName ?? implementationSkillName,
+          skillVersion: skillDetails?.skillVersion ?? implementationSkillVersion,
+          skillEntry: skillDetails?.skillEntry ?? implementationSkillEntry,
+          riskLevel: skillDetails?.riskLevel ?? riskLevel,
+          requiresApproval: skillDetails?.requiresApproval ?? requiresApproval,
+          inputValidated: skillDetails?.inputValidated,
+          outputValidated: skillDetails?.outputValidated
         });
         return {
           actionName,
@@ -469,7 +603,15 @@ export class ActionExecutor {
         finalAttempt: true,
         idempotencyKey: effectiveIdempotencyKey,
         idempotencyHit: false,
-        resumedRun: ctx.isResumed
+        resumedRun: ctx.isResumed,
+        implementationType,
+        skillName: skillDetails?.skillName ?? implementationSkillName,
+        skillVersion: skillDetails?.skillVersion ?? implementationSkillVersion,
+        skillEntry: skillDetails?.skillEntry ?? implementationSkillEntry,
+        riskLevel: skillDetails?.riskLevel ?? riskLevel,
+        requiresApproval: skillDetails?.requiresApproval ?? requiresApproval,
+        inputValidated: skillDetails?.inputValidated,
+        outputValidated: skillDetails?.outputValidated
       });
 
       return {

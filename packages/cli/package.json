@@ -25,6 +25,7 @@
                     "lint":  "eslint src test --max-warnings=0"
                 },
     "dependencies":  {
+                         "@yutra/skill-core":  "workspace:*",
                          "@yutra/dsl":  "workspace:*",
                          "@yutra/runtime":  "workspace:*",
                          "@yutra/trace":  "workspace:*"

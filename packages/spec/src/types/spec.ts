@@ -36,6 +36,12 @@ export interface StateSpec {
 }
 
 export type ActionSideEffect = "none" | "read" | "write" | "external";
+export type ActionRiskLevel = "low" | "medium" | "high";
+
+export interface ActionImplementationSpec {
+  type: "function" | "tool" | "skill";
+  [key: string]: unknown;
+}
 
 export interface ActionSpec {
   name: string;
@@ -43,6 +49,13 @@ export interface ActionSpec {
   input?: Record<string, unknown>;
   output?: Record<string, unknown>;
   side_effect?: ActionSideEffect;
+  inputSchema?: Record<string, unknown>;
+  outputSchema?: Record<string, unknown>;
+  sideEffect?: ActionSideEffect;
+  riskLevel?: ActionRiskLevel;
+  requiresApproval?: boolean;
+  implementation?: ActionImplementationSpec;
+  metadata?: Record<string, unknown>;
 }
 
 export interface GuardSpec {

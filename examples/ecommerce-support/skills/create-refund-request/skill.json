@@ -1,0 +1,46 @@
+{
+  "name": "create_refund_request",
+  "version": "0.1.0",
+  "description": "Create ecommerce refund request via refund adapter.",
+  "type": "tool",
+  "inputSchema": {
+    "type": "object",
+    "required": ["order_id"],
+    "properties": {
+      "order_id": {
+        "type": "string"
+      },
+      "amount": {
+        "type": "number"
+      },
+      "reason": {
+        "type": "string"
+      }
+    }
+  },
+  "outputSchema": {
+    "type": "object",
+    "required": ["refund_request_id", "refund_status", "reason_code", "next_step"],
+    "properties": {
+      "refund_request_id": {
+        "type": "string"
+      },
+      "refund_status": {
+        "type": "string"
+      },
+      "reason_code": {
+        "type": "string"
+      },
+      "next_step": {
+        "type": "string"
+      }
+    }
+  },
+  "sideEffect": "write",
+  "riskLevel": "high",
+  "requiresApproval": true,
+  "entry": "scripts/run.mjs",
+  "tags": ["ecommerce", "refund"],
+  "allowedEnvironments": ["dev", "demo", "prod-like"],
+  "maxCallsPerRun": 2
+}

@@ -1,0 +1,24 @@
+agent: skill-runtime-agent
+version: 0.1.0
+initial_state: check_shipping
+context:
+  fields:
+    order_id:
+      type: string
+      default: ORDER-001
+states:
+  check_shipping:
+    actions:
+      - query_shipping_status
+    transitions:
+      - to: completed
+  completed:
+    final: true
+actions:
+  - name: query_shipping_status
+    sideEffect: read
+    riskLevel: low
+    requiresApproval: false
+    implementation:
+      type: skill
+      skillName: query_shipping_status

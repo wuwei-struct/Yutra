@@ -1,11 +1,11 @@
-﻿{
+{
   "pack": "ecommerce-support-pack",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "domain": "ecommerce-support",
-  "description": "Customer-integration-ready ecommerce support pack with mock/real adapter layering.",
+  "description": "Customer-integration-ready ecommerce support pack with adapter/tool baseline and skill-based variant.",
   "language": ["en"],
   "includes": {
-    "dsl": ["agent.yutra.yaml"],
+    "dsl": ["agent.yutra.yaml", "agent.skill.yutra.yaml"],
     "knowledge": [
       "knowledge/faq.md",
       "knowledge/return-policy.md",
@@ -32,6 +32,23 @@
       "adapters/real/refund-adapter.real.example.mjs",
       "adapters/real/escalation-adapter.real.example.mjs",
       "adapters/real/channel-response-adapter.real.example.mjs"
+    ],
+    "skills": [
+      "skills/query-order/skill.json",
+      "skills/query-order/SKILL.md",
+      "skills/query-order/scripts/run.mjs",
+      "skills/query-shipping/skill.json",
+      "skills/query-shipping/SKILL.md",
+      "skills/query-shipping/scripts/run.mjs",
+      "skills/create-return-request/skill.json",
+      "skills/create-return-request/SKILL.md",
+      "skills/create-return-request/scripts/run.mjs",
+      "skills/create-refund-request/skill.json",
+      "skills/create-refund-request/SKILL.md",
+      "skills/create-refund-request/scripts/run.mjs",
+      "skills/create-support-ticket/skill.json",
+      "skills/create-support-ticket/SKILL.md",
+      "skills/create-support-ticket/scripts/run.mjs"
     ],
     "policy": [
       "policies/default.demo.json",
@@ -61,7 +78,14 @@
       "refund-after-delivery",
       "refund-high-risk",
       "handoff-missing-info",
-      "handoff-policy-required"
+      "handoff-policy-required",
+      "skill-shipping-path",
+      "skill-return-path",
+      "skill-refund-path",
+      "skill-handoff-path",
+      "skill-manifest-validation",
+      "skill-trace-projection",
+      "skill-governance-handoff"
     ],
     "docs": [
       "README.md",
@@ -88,13 +112,15 @@
     ]
   },
   "entrypoints": {
-    "canonical": "agent.yutra.yaml"
+    "canonical": "agent.yutra.yaml",
+    "skill": "agent.skill.yutra.yaml"
   },
   "capabilities": [
     "shipping_inquiry_flow",
     "return_request_flow",
     "refund_request_flow",
     "human_handoff",
+    "skill_based_ecommerce_support",
     "policy_profile_switch",
     "response_template_layer",
     "adapter_contracts"

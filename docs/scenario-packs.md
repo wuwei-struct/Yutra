@@ -93,3 +93,11 @@ Use starter flow:
 - No remote registry
 - No multi-tenant pack management
 - No new runtime/trace core features in this pack stage
+
+## Skill Core Relation (P4-01)
+
+Skill is now introduced as an Action-backend implementation unit.
+It is not a Scenario Pack replacement and not a runtime control layer.
+
+See:
+- `docs/skill-core.md`

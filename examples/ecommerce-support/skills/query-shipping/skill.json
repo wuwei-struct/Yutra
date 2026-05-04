@@ -1,0 +1,57 @@
+{
+  "name": "query_shipping_status",
+  "version": "0.1.0",
+  "description": "Query shipping status by order signals or tracking number.",
+  "type": "tool",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "order_id": {
+        "type": "string"
+      },
+      "tracking_no": {
+        "type": "string"
+      },
+      "shipment_status": {
+        "type": "string"
+      },
+      "delayed_days": {
+        "type": "number"
+      }
+    }
+  },
+  "outputSchema": {
+    "type": "object",
+    "required": ["tracking_no", "shipping_status", "carrier", "is_delayed", "is_exception", "latest_event"],
+    "properties": {
+      "tracking_no": {
+        "type": "string"
+      },
+      "shipping_status": {
+        "type": "string"
+      },
+      "carrier": {
+        "type": "string"
+      },
+      "is_delayed": {
+        "type": "boolean"
+      },
+      "is_exception": {
+        "type": "boolean"
+      },
+      "latest_event": {
+        "type": "string"
+      },
+      "estimated_delivery_at": {
+        "type": "string"
+      }
+    }
+  },
+  "sideEffect": "read",
+  "riskLevel": "low",
+  "requiresApproval": false,
+  "entry": "scripts/run.mjs",
+  "tags": ["ecommerce", "shipping"],
+  "allowedEnvironments": ["dev", "demo", "prod-like"],
+  "maxCallsPerRun": 10
+}

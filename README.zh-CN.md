@@ -1,15 +1,16 @@
-﻿[![English](https://img.shields.io/badge/Language-English-blue)](./README.md)
+[![English](https://img.shields.io/badge/Language-English-blue)](./README.md)
 [![简体中文](https://img.shields.io/badge/语言-简体中文-red)](./README.zh-CN.md)
 
 # Yutra
 
-Yutra 是一个 Agent 执行标准与参考运行时。
+Yutra 是面向 Skill 型智能体的执行标准与参考运行时。
 
 ## Yutra 是什么
 
 Yutra 提供一套 execution-first 的工程闭环：
 - 用标准定义可维护的执行结构；
 - 用 DSL 做加载与校验；
+- 用 Skill 到 Action 的元数据适配层做桥接；
 - 用参考运行时执行状态机；
 - 用 Trace 输出结构化执行过程。
 
@@ -178,9 +179,26 @@ pnpm exec yutra validate examples/it-helpdesk/agent.yutra.yaml
 pnpm exec yutra validate examples/it-helpdesk/agent.zh-CN.yutra.yaml
 pnpm exec yutra dsl explain examples/it-helpdesk/agent.zh-CN.yutra.yaml
 pnpm exec yutra dsl inspect examples/it-helpdesk/agent.zh-CN.yutra.yaml --json
+pnpm exec yutra skill list
+pnpm exec yutra skill inspect query_shipping_status
+pnpm exec yutra skill inspect skills/query-shipping --as-action
+pnpm exec yutra skill validate skills/query-shipping
+pnpm exec yutra skill list --skills-dir examples/ecommerce-support/skills
+pnpm exec yutra run examples/ecommerce-support/agent.skill.yutra.yaml --input examples/ecommerce-support/demo-inputs/shipping-case.json --skills-dir examples/ecommerce-support/skills
 pnpm exec yutra run examples/it-helpdesk/agent.zh-CN.yutra.yaml --input examples/it-helpdesk/demo-inputs/case1.json
 pnpm exec yutra trace list --trace-file .yutra/traces/events.jsonl
 pnpm --filter @yutra/viewer dev
+```
+
+## Skill Demo
+
+```bash
+pnpm exec yutra skill list --skills-dir examples/ecommerce-support/skills
+pnpm exec yutra skill validate examples/ecommerce-support/skills/query-shipping
+pnpm exec yutra skill inspect examples/ecommerce-support/skills/query-shipping --as-action
+pnpm exec yutra run examples/ecommerce-support/agent.skill.yutra.yaml --input examples/ecommerce-support/demo-inputs/shipping-case.json --skills-dir examples/ecommerce-support/skills --trace-file .yutra/traces/skill-based-ecommerce.jsonl
+pnpm exec yutra run examples/ecommerce-support/agent.skill.yutra.yaml --input examples/ecommerce-support/demo-inputs/handoff-case.json --skills-dir examples/ecommerce-support/skills --trace-file .yutra/traces/skill-based-ecommerce.jsonl
+pnpm exec yutra trace export <runId> --trace-file .yutra/traces/skill-based-ecommerce.jsonl --out demo-artifacts/skill-based-ecommerce-handoff.json
 ```
 
 ## 一致性与 Golden Trace
@@ -234,6 +252,7 @@ Yutra 当前不是：
 - 聊天 SaaS 壳子
 - 多租户后台
 - LLM-first orchestration system
+- Skill marketplace / 远程 skill store
 
 ## 文档导航
 
@@ -241,6 +260,14 @@ Yutra 当前不是：
 - [DSL Authoring 指南](docs/dsl-authoring.md)
 - [Conformance 与 Golden Trace](docs/conformance.md)
 - [Scenario Packs 与 Starter Packs](docs/scenario-packs.md)
+- [Skill Core 说明](docs/skill-core.md)
+- [Skill-based Agent 说明](docs/skill-based-agent.md)
+- [Skill-based Runtime 说明](docs/skill-based-runtime.md)
+- [Skill-based Demo Path](docs/skill-based-demo-path.md)
+- [Skill 认证汇总](docs/skill-certification-summary.md)
+- [Skill-based Runtime 里程碑说明](docs/release-notes-skill-based-runtime.md)
+- [Release Notes v0.2.0-rc.1](docs/release-notes-v0.2.0-rc.1.md)
+- [E-commerce Skill Pack](docs/ecommerce-skill-pack.md)
 - [E-commerce Pack 交付基线](docs/ecommerce-pack-delivery.md)
 - [E-commerce 客户接入清单](docs/ecommerce-client-onboarding-checklist.md)
 - [E-commerce 客户演示路径](docs/ecommerce-demo-path.md)
@@ -265,7 +292,4 @@ Yutra 当前不是：
 - [Agent Collaboration Rules](AGENTS.md)
 - [Security](SECURITY.md)
 - [Support](SUPPORT.md)
-
-
-
 

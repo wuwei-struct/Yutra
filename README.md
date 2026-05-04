@@ -1,15 +1,16 @@
-﻿[![English](https://img.shields.io/badge/Language-English-blue)](./README.md)
+[![English](https://img.shields.io/badge/Language-English-blue)](./README.md)
 [![简体中文](https://img.shields.io/badge/语言-简体中文-red)](./README.zh-CN.md)
 
 # Yutra
 
-Yutra is an Agent Execution Standard and Reference Runtime.
+Yutra is a Skill-based Agent Execution Standard and Reference Runtime.
 
 ## What Yutra Is
 
 Yutra is an execution-first stack for deterministic agent flows:
 - a stable execution standard,
 - a DSL loader/validator,
+- a skill-to-action metadata adapter,
 - a reference runtime,
 - and structured trace output.
 
@@ -61,9 +62,26 @@ pnpm verify
 pnpm certify
 pnpm exec yutra validate examples/it-helpdesk/agent.yutra.yaml
 pnpm exec yutra validate examples/it-helpdesk/agent.zh-CN.yutra.yaml
+pnpm exec yutra skill list
+pnpm exec yutra skill inspect query_shipping_status
+pnpm exec yutra skill inspect skills/query-shipping --as-action
+pnpm exec yutra skill validate skills/query-shipping
+pnpm exec yutra skill list --skills-dir examples/ecommerce-support/skills
+pnpm exec yutra run examples/ecommerce-support/agent.skill.yutra.yaml --input examples/ecommerce-support/demo-inputs/shipping-case.json --skills-dir examples/ecommerce-support/skills
 pnpm exec yutra run examples/it-helpdesk/agent.yutra.yaml --input examples/it-helpdesk/demo-inputs/case1.json
 pnpm exec yutra trace list --trace-file .yutra/traces/events.jsonl
 pnpm --filter @yutra/viewer dev
+```
+
+## Skill Demo
+
+```bash
+pnpm exec yutra skill list --skills-dir examples/ecommerce-support/skills
+pnpm exec yutra skill validate examples/ecommerce-support/skills/query-shipping
+pnpm exec yutra skill inspect examples/ecommerce-support/skills/query-shipping --as-action
+pnpm exec yutra run examples/ecommerce-support/agent.skill.yutra.yaml --input examples/ecommerce-support/demo-inputs/shipping-case.json --skills-dir examples/ecommerce-support/skills --trace-file .yutra/traces/skill-based-ecommerce.jsonl
+pnpm exec yutra run examples/ecommerce-support/agent.skill.yutra.yaml --input examples/ecommerce-support/demo-inputs/handoff-case.json --skills-dir examples/ecommerce-support/skills --trace-file .yutra/traces/skill-based-ecommerce.jsonl
+pnpm exec yutra trace export <runId> --trace-file .yutra/traces/skill-based-ecommerce.jsonl --out demo-artifacts/skill-based-ecommerce-handoff.json
 ```
 
 ## Examples Matrix
@@ -118,7 +136,8 @@ Yutra is currently not:
 - a visual workflow platform,
 - a chat SaaS shell,
 - a multi-tenant admin backend,
-- an LLM-first orchestration system.
+- an LLM-first orchestration system,
+- a skill marketplace/remote skill store.
 
 ## Documentation Map
 
@@ -126,6 +145,14 @@ Yutra is currently not:
 - [DSL Authoring Guide](docs/dsl-authoring.md)
 - [Conformance and Golden Trace](docs/conformance.md)
 - [Scenario Packs and Starters](docs/scenario-packs.md)
+- [Skill Core](docs/skill-core.md)
+- [Skill-based Agent](docs/skill-based-agent.md)
+- [Skill-based Runtime](docs/skill-based-runtime.md)
+- [Skill-based Demo Path](docs/skill-based-demo-path.md)
+- [Skill Certification Summary](docs/skill-certification-summary.md)
+- [Skill-based Runtime Release Notes](docs/release-notes-skill-based-runtime.md)
+- [Release Notes v0.2.0-rc.1](docs/release-notes-v0.2.0-rc.1.md)
+- [E-commerce Skill Pack](docs/ecommerce-skill-pack.md)
 - [E-commerce Pack Delivery Baseline](docs/ecommerce-pack-delivery.md)
 - [E-commerce Client Onboarding Checklist](docs/ecommerce-client-onboarding-checklist.md)
 - [E-commerce Demo Path](docs/ecommerce-demo-path.md)

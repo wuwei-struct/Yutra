@@ -1,9 +1,12 @@
-import { mkdtemp, rm } from "node:fs/promises";
+import { mkdtemp, rm, mkdir, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { dirname, join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { runCli } from "../src/cli";
+
+const workspaceRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
 
 function createMemoryIO() {
   const stdout: string[] = [];
@@ -278,6 +281,201 @@ describe("@yutra/cli", () => {
     expect(exportIO.stdout.some((line) => line.includes("audit_bundle:"))).toBe(true);
     const parsed = JSON.parse(readFileSync(outFile, "utf8")) as { meta: { runId: string } };
     expect(parsed.meta.runId).toBe(runId);
+    await rm(dir, { recursive: true, force: true });
+  });
+
+  it("yutra skill list works", async () => {
+    const { io, stdout } = createMemoryIO();
+    const code = await runCli(["skill", "list"], io);
+    expect(code).toBe(0);
+    expect(stdout.some((line) => line.includes("query_shipping_status"))).toBe(true);
+  });
+
+  it("yutra skill list --json returns stable JSON", async () => {
+    const { io, stdout } = createMemoryIO();
+    const code = await runCli(["skill", "list", "--json"], io);
+    expect(code).toBe(0);
+    const parsed = JSON.parse(stdout.join("\n")) as {
+      skills: Array<{ name: string; version: string; type: string; dir: string; ok: boolean }>;
+    };
+    expect(Array.isArray(parsed.skills)).toBe(true);
+    expect(parsed.skills.some((item) => item.name === "query_shipping_status" && item.ok)).toBe(true);
+  });
+
+  it("yutra skill inspect query_shipping_status works with scoped skills-dir", async () => {
+    const { io, stdout } = createMemoryIO();
+    const code = await runCli(["skill", "inspect", "query_shipping_status", "--skills-dir", "skills"], io);
+    expect(code).toBe(0);
+    expect(stdout.some((line) => line.includes("name: query_shipping_status"))).toBe(true);
+  });
+
+  it("yutra skill inspect skills/query-shipping works", async () => {
+    const { io, stdout } = createMemoryIO();
+    const code = await runCli(["skill", "inspect", "skills/query-shipping"], io);
+    expect(code).toBe(0);
+    expect(stdout.some((line) => line.includes("entryExists: true"))).toBe(true);
+  });
+
+  it("yutra skill inspect skills/query-shipping --as-action works", async () => {
+    const { io, stdout } = createMemoryIO();
+    const code = await runCli(["skill", "inspect", "skills/query-shipping", "--as-action"], io);
+    expect(code).toBe(0);
+    expect(stdout.some((line) => line.includes("action.name: query_shipping_status"))).toBe(true);
+    expect(stdout.some((line) => line.includes("implementation.type: skill"))).toBe(true);
+    expect(stdout.some((line) => line.includes("implementation.entry: scripts/run.mjs"))).toBe(true);
+  });
+
+  it("yutra skill inspect skills/query-shipping --as-action --json returns stable JSON", async () => {
+    const { io, stdout } = createMemoryIO();
+    const code = await runCli(["skill", "inspect", "skills/query-shipping", "--as-action", "--json"], io);
+    expect(code).toBe(0);
+    const parsed = JSON.parse(stdout.join("\n")) as {
+      name: string;
+      sideEffect: string;
+      riskLevel: string;
+      requiresApproval: boolean;
+      implementation: { type: string; skillName: string; entry: string };
+    };
+    expect(parsed.name).toBe("query_shipping_status");
+    expect(parsed.sideEffect).toBe("read");
+    expect(parsed.riskLevel).toBe("low");
+    expect(parsed.requiresApproval).toBe(false);
+    expect(parsed.implementation.type).toBe("skill");
+    expect(parsed.implementation.skillName).toBe("query_shipping_status");
+    expect(parsed.implementation.entry).toBe("scripts/run.mjs");
+  });
+
+  it("yutra skill validate skills/query-shipping exits 0", async () => {
+    const { io, stdout } = createMemoryIO();
+    const code = await runCli(["skill", "validate", "skills/query-shipping"], io);
+    expect(code).toBe(0);
+    expect(stdout.some((line) => line.includes("OK"))).toBe(true);
+  });
+
+  it("yutra skill list --skills-dir examples/ecommerce-support/skills works", async () => {
+    const { io, stdout } = createMemoryIO();
+    const code = await runCli(["skill", "list", "--skills-dir", "examples/ecommerce-support/skills"], io);
+    expect(code).toBe(0);
+    expect(stdout.some((line) => line.includes("query_order"))).toBe(true);
+    expect(stdout.some((line) => line.includes("create_support_ticket"))).toBe(true);
+  });
+
+  it("yutra skill inspect ecommerce query-shipping --as-action --json works", async () => {
+    const { io, stdout } = createMemoryIO();
+    const code = await runCli(
+      [
+        "skill",
+        "inspect",
+        "examples/ecommerce-support/skills/query-shipping",
+        "--as-action",
+        "--json"
+      ],
+      io
+    );
+    expect(code).toBe(0);
+    const parsed = JSON.parse(stdout.join("\n")) as {
+      name: string;
+      implementation: { type: string; skillName: string };
+      sideEffect: string;
+    };
+    expect(parsed.name).toBe("query_shipping_status");
+    expect(parsed.implementation.type).toBe("skill");
+    expect(parsed.implementation.skillName).toBe("query_shipping_status");
+    expect(parsed.sideEffect).toBe("read");
+  });
+
+  it("CLI run supports skill-based ecommerce agent with --skills-dir and trace export", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "yutra-cli-ecom-skill-"));
+    const traceFile = join(dir, "events.jsonl");
+    const outFile = join(dir, "audit.json");
+    const previousCwd = process.cwd();
+    process.chdir(workspaceRoot);
+    try {
+      const runIO = createMemoryIO();
+      const shippingCode = await runCli(
+        [
+          "run",
+          "examples/ecommerce-support/agent.skill.yutra.yaml",
+          "--input",
+          "examples/ecommerce-support/demo-inputs/shipping-case.json",
+          "--skills-dir",
+          "examples/ecommerce-support/skills",
+          "--trace-file",
+          traceFile
+        ],
+        runIO.io
+      );
+      expect(shippingCode).toBe(0);
+      expect(runIO.stdout.some((line) => line.includes("status: completed"))).toBe(true);
+
+      const runId = runIO.stdout.find((line) => line.startsWith("runId: "))?.replace("runId: ", "");
+      expect(runId).toBeTruthy();
+      const exportIO = createMemoryIO();
+      const exportCode = await runCli(["trace", "export", runId ?? "", "--trace-file", traceFile, "--out", outFile], exportIO.io);
+      expect(exportCode).toBe(0);
+      expect(exportIO.stdout.some((line) => line.includes("audit_bundle:"))).toBe(true);
+
+      const handoffIO = createMemoryIO();
+      const handoffCode = await runCli(
+        [
+          "run",
+          "examples/ecommerce-support/agent.skill.yutra.yaml",
+          "--input",
+          "examples/ecommerce-support/demo-inputs/refund-high-risk.json",
+          "--skills-dir",
+          "examples/ecommerce-support/skills",
+          "--trace-file",
+          traceFile
+        ],
+        handoffIO.io
+      );
+      expect(handoffCode).toBe(0);
+      expect(handoffIO.stdout.some((line) => line.includes("status: handoff"))).toBe(true);
+    } finally {
+      process.chdir(previousCwd);
+    }
+    await rm(dir, { recursive: true, force: true });
+  });
+
+  it("invalid skill validate exits non-zero", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "yutra-cli-skill-invalid-"));
+    await mkdir(join(dir, "bad-skill"), { recursive: true });
+    await writeFile(
+      join(dir, "bad-skill", "skill.json"),
+      JSON.stringify({ name: "", version: "0.1.0", type: "unknown" }, null, 2),
+      "utf8"
+    );
+
+    const { io } = createMemoryIO();
+    const code = await runCli(["skill", "validate", join(dir, "bad-skill")], io);
+    expect(code).not.toBe(0);
+    await rm(dir, { recursive: true, force: true });
+  });
+
+  it("SKILL.md missing appears as warning, not failure", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "yutra-cli-skill-missing-md-"));
+    const skillDir = join(dir, "no-md-skill");
+    await mkdir(join(skillDir, "scripts"), { recursive: true });
+    await writeFile(
+      join(skillDir, "skill.json"),
+      JSON.stringify(
+        {
+          name: "no_md_skill",
+          version: "0.1.0",
+          type: "function",
+          entry: "scripts/run.mjs"
+        },
+        null,
+        2
+      ),
+      "utf8"
+    );
+    await writeFile(join(skillDir, "scripts/run.mjs"), "export async function run(){ return { ok: true }; }", "utf8");
+
+    const { io, stdout } = createMemoryIO();
+    const code = await runCli(["skill", "validate", skillDir], io);
+    expect(code).toBe(0);
+    expect(stdout.some((line) => line.includes("warnings: 1"))).toBe(true);
     await rm(dir, { recursive: true, force: true });
   });
 });

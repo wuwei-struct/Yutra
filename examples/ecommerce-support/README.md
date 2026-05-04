@@ -1,4 +1,4 @@
-﻿# E-commerce Support Pack
+# E-commerce Support Pack
 
 ## Pack positioning
 
@@ -47,6 +47,18 @@ Contracts:
 Tools remain runtime glue only:
 - `tools/*.mjs`
 
+## Skill-based variant (P4-05)
+
+Skill-based agent entrypoint:
+- `agent.skill.yutra.yaml`
+
+Skill pack directory:
+- `skills/query-order`
+- `skills/query-shipping`
+- `skills/create-return-request`
+- `skills/create-refund-request`
+- `skills/create-support-ticket`
+
 ## Integration profile sample
 
 - `integrations/generic-shop-profile/profile.json`
@@ -70,6 +82,9 @@ pnpm yutra validate examples/ecommerce-support/agent.yutra.yaml
 pnpm yutra run examples/ecommerce-support/agent.yutra.yaml --input examples/ecommerce-support/demo-inputs/shipping-case.json
 pnpm yutra run examples/ecommerce-support/agent.yutra.yaml --input examples/ecommerce-support/demo-inputs/refund-case.json
 pnpm yutra run examples/ecommerce-support/agent.yutra.yaml --input examples/ecommerce-support/demo-inputs/handoff-case.json
+
+pnpm yutra run examples/ecommerce-support/agent.skill.yutra.yaml --input examples/ecommerce-support/demo-inputs/shipping-case.json --skills-dir examples/ecommerce-support/skills
+pnpm yutra run examples/ecommerce-support/agent.skill.yutra.yaml --input examples/ecommerce-support/demo-inputs/refund-high-risk.json --skills-dir examples/ecommerce-support/skills
 ```
 
 Mock/real switch examples:
@@ -90,6 +105,23 @@ $env:YUTRA_ECOM_ADAPTER_MODE='real'; $env:YUTRA_ECOM_ADAPTER_DRY_RUN='true'; pnp
 - `INTEGRATION.md`
 - `certification/scenarios.json`
 - `certification/expected-outcomes.json`
+- `docs/ecommerce-skill-pack.md`
+- `docs/skill-based-runtime.md`
+- `docs/skill-based-demo-path.md`
+- `docs/skill-certification-summary.md`
+- `docs/release-notes-skill-based-runtime.md`
+
+Skill commands:
+
+```bash
+pnpm exec yutra skill list --skills-dir examples/ecommerce-support/skills
+pnpm exec yutra skill validate examples/ecommerce-support/skills/query-shipping
+pnpm exec yutra skill inspect examples/ecommerce-support/skills/query-shipping --as-action
+```
+
+Boundary note:
+- Skill is behind Action execution contract, not a peer object of Agent/State.
+- No marketplace / remote registry / install workflow in this pack.
 
 Commercial delivery assets:
 - `docs/ecommerce-demo-path.md`

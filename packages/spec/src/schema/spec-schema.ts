@@ -38,13 +38,26 @@ export const stateSpecSchema = z.object({
 });
 
 export const actionSideEffectSchema = z.enum(["none", "read", "write", "external"]);
+export const actionRiskLevelSchema = z.enum(["low", "medium", "high"]);
+export const actionImplementationSchema = z
+  .object({
+    type: z.enum(["function", "tool", "skill"])
+  })
+  .catchall(z.unknown());
 
 export const actionSpecSchema = z.object({
   name: z.string().min(1),
   description: z.string().optional(),
   input: z.record(z.string(), z.unknown()).optional(),
   output: z.record(z.string(), z.unknown()).optional(),
-  side_effect: actionSideEffectSchema.optional()
+  side_effect: actionSideEffectSchema.optional(),
+  inputSchema: z.record(z.string(), z.unknown()).optional(),
+  outputSchema: z.record(z.string(), z.unknown()).optional(),
+  sideEffect: actionSideEffectSchema.optional(),
+  riskLevel: actionRiskLevelSchema.optional(),
+  requiresApproval: z.boolean().optional(),
+  implementation: actionImplementationSchema.optional(),
+  metadata: z.record(z.string(), z.unknown()).optional()
 });
 
 export const guardSpecSchema = z.object({

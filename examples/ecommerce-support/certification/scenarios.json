@@ -67,6 +67,57 @@
       "environment": "prod-like",
       "expectedStatus": "handoff",
       "expectedFinalState": "triage"
+    },
+    {
+      "id": "skill-shipping-path",
+      "input": "demo-inputs/shipping-case.json",
+      "dsl": "agent.skill.yutra.yaml",
+      "expectedStatus": "completed",
+      "expectedFinalState": "resolved"
+    },
+    {
+      "id": "skill-return-path",
+      "input": "demo-inputs/return-case.json",
+      "dsl": "agent.skill.yutra.yaml",
+      "expectedStatus": "completed",
+      "expectedFinalState": "resolved"
+    },
+    {
+      "id": "skill-refund-path",
+      "input": "demo-inputs/refund-case.json",
+      "dsl": "agent.skill.yutra.yaml",
+      "expectedStatus": "completed",
+      "expectedFinalState": "resolved"
+    },
+    {
+      "id": "skill-handoff-path",
+      "input": "demo-inputs/refund-high-risk.json",
+      "dsl": "agent.skill.yutra.yaml",
+      "expectedStatus": "handoff",
+      "expectedFinalState": "handoff_human"
+    },
+    {
+      "id": "skill-manifest-validation",
+      "input": "demo-inputs/shipping-case.json",
+      "dsl": "agent.skill.yutra.yaml",
+      "expectedStatus": "completed",
+      "expectedFinalState": "resolved"
+    },
+    {
+      "id": "skill-trace-projection",
+      "input": "demo-inputs/shipping-case.json",
+      "dsl": "agent.skill.yutra.yaml",
+      "expectedStatus": "completed",
+      "expectedFinalState": "resolved"
+    },
+    {
+      "id": "skill-governance-handoff",
+      "input": "demo-inputs/refund-high-risk.json",
+      "dsl": "agent.skill.yutra.yaml",
+      "policy": "policies/prod-like.example.json",
+      "environment": "prod-like",
+      "expectedStatus": "handoff",
+      "expectedFinalState": "handoff_human"
     }
   ]
 }

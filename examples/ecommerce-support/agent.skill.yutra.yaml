@@ -1,0 +1,134 @@
+agent: ecommerce-support-agent-skill
+version: 0.1.0
+intents:
+  - name: support_request
+    entry_state: triage
+context:
+  fields:
+    order_id:
+      type: string
+      required: true
+    issue_type:
+      type: string
+    order_found:
+      type: boolean
+    return_eligible:
+      type: boolean
+    refund_eligible:
+      type: boolean
+    requires_human:
+      type: boolean
+      default: false
+initial_state: triage
+actions:
+  - name: classify_issue
+  - name: lookup_order
+    sideEffect: read
+    riskLevel: low
+    requiresApproval: false
+    implementation:
+      type: skill
+      skillName: query_order
+      skillDir: examples/ecommerce-support/skills/query-order
+  - name: check_shipping
+    sideEffect: read
+    riskLevel: low
+    requiresApproval: false
+    implementation:
+      type: skill
+      skillName: query_shipping_status
+      skillDir: examples/ecommerce-support/skills/query-shipping
+  - name: check_return_eligibility
+  - name: create_return_request
+    sideEffect: write
+    riskLevel: medium
+    requiresApproval: false
+    implementation:
+      type: skill
+      skillName: create_return_request
+      skillDir: examples/ecommerce-support/skills/create-return-request
+  - name: check_refund_eligibility
+  - name: create_refund_request
+    sideEffect: write
+    riskLevel: high
+    requiresApproval: true
+    implementation:
+      type: skill
+      skillName: create_refund_request
+      skillDir: examples/ecommerce-support/skills/create-refund-request
+  - name: inform_policy
+  - name: escalate_human
+    sideEffect: external
+    riskLevel: medium
+    requiresApproval: false
+    implementation:
+      type: skill
+      skillName: create_support_ticket
+      skillDir: examples/ecommerce-support/skills/create-support-ticket
+states:
+  triage:
+    actions:
+      - classify_issue
+    transitions:
+      - to: fetch_order
+  fetch_order:
+    actions:
+      - lookup_order
+    transitions:
+      - to: handoff_human
+        when: ctx.order_found == false
+      - to: handoff_human
+        when: ctx.requires_human == true
+      - to: answer_shipping
+        when: ctx.issue_type == "shipping"
+      - to: check_return_eligibility
+        when: ctx.issue_type == "return"
+      - to: check_refund_eligibility
+        when: ctx.issue_type == "refund"
+      - to: inform_policy
+  answer_shipping:
+    actions:
+      - check_shipping
+    transitions:
+      - to: handoff_human
+        when: ctx.requires_human == true
+      - to: resolved
+  check_return_eligibility:
+    actions:
+      - check_return_eligibility
+    transitions:
+      - to: handoff_human
+        when: ctx.requires_human == true
+      - to: create_return_request
+        when: ctx.return_eligible == true
+      - to: inform_policy
+  create_return_request:
+    actions:
+      - create_return_request
+    transitions:
+      - to: resolved
+  check_refund_eligibility:
+    actions:
+      - check_refund_eligibility
+    transitions:
+      - to: handoff_human
+        when: ctx.requires_human == true
+      - to: create_refund_request
+        when: ctx.refund_eligible == true
+      - to: inform_policy
+  create_refund_request:
+    actions:
+      - create_refund_request
+    transitions:
+      - to: resolved
+  inform_policy:
+    actions:
+      - inform_policy
+    transitions:
+      - to: resolved
+  resolved:
+    final: true
+  handoff_human:
+    actions:
+      - escalate_human
+    handoff: true

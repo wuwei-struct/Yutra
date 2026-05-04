@@ -1,0 +1,87 @@
+{
+  "name": "query_order",
+  "version": "0.1.0",
+  "description": "Query ecommerce order base information by order_id or customer_id+order_id.",
+  "type": "tool",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "order_id": {
+        "type": "string"
+      },
+      "customer_id": {
+        "type": "string"
+      },
+      "policy_params": {
+        "type": "object"
+      },
+      "adapter_mode": {
+        "type": "string"
+      },
+      "adapter_dry_run": {
+        "type": "boolean"
+      },
+      "environment": {
+        "type": "string"
+      }
+    }
+  },
+  "outputSchema": {
+    "type": "object",
+    "required": ["order_id", "customer_id", "status", "shipment_status", "payment_status", "items", "amount", "currency"],
+    "properties": {
+      "order_id": {
+        "type": "string"
+      },
+      "customer_id": {
+        "type": "string"
+      },
+      "status": {
+        "type": "string"
+      },
+      "shipment_status": {
+        "type": "string"
+      },
+      "payment_status": {
+        "type": "string"
+      },
+      "items": {
+        "type": "array"
+      },
+      "amount": {
+        "type": "number"
+      },
+      "currency": {
+        "type": "string"
+      },
+      "tracking_number": {
+        "type": "string"
+      },
+      "delayed_days": {
+        "type": "number"
+      },
+      "return_window_expired": {
+        "type": "boolean"
+      },
+      "high_risk_refund": {
+        "type": "boolean"
+      },
+      "missing_required_info": {
+        "type": "boolean"
+      },
+      "requires_human": {
+        "type": "boolean"
+      },
+      "handoff_reason": {
+        "type": "string"
+      }
+    }
+  },
+  "sideEffect": "read",
+  "riskLevel": "low",
+  "requiresApproval": false,
+  "entry": "scripts/run.mjs",
+  "tags": ["ecommerce", "order"],
+  "allowedEnvironments": ["dev", "demo", "prod-like"],
+  "maxCallsPerRun": 10
+}

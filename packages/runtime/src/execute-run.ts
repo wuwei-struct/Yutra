@@ -66,7 +66,8 @@ function resolveActionSideEffect(
   if (policySideEffect) {
     return policySideEffect;
   }
-  return spec.actions?.find((action) => action.name === actionName)?.side_effect ?? "none";
+  const action = spec.actions?.find((item) => item.name === actionName);
+  return action?.side_effect ?? action?.sideEffect ?? "none";
 }
 
 function extractApprovalSummary(context: Record<string, unknown>) {
@@ -385,7 +386,9 @@ export async function executeRun(args: ExecuteRunArgs): Promise<RuntimeResult> {
     actionPolicies: options.actionPolicies,
     contextMergePolicy: options.contextMergePolicy,
     idempotencyStore,
-    spec
+    spec,
+    skillRegistry: options.skillRegistry,
+    skillSearchPaths: options.skillSearchPaths
   });
   const transitionResolver = new TransitionResolver(guardEvaluator);
 
@@ -637,9 +640,17 @@ export async function executeRun(args: ExecuteRunArgs): Promise<RuntimeResult> {
               attempt: info.attempt,
               maxAttempts: info.maxAttempts,
               timeoutMs: info.timeoutMs,
+              sideEffect: info.sideEffect,
               idempotencyKey: info.idempotencyKey,
               idempotencyHit: info.idempotencyHit,
-              resumedRun: info.resumedRun
+              resumedRun: info.resumedRun,
+              implementationType: info.implementationType,
+              skillName: info.skillName,
+              skillVersion: info.skillVersion,
+              skillEntry: info.skillEntry,
+              riskLevel: info.riskLevel,
+              requiresApproval: info.requiresApproval,
+              inputValidated: info.inputValidated
             }
           });
         },
@@ -658,6 +669,14 @@ export async function executeRun(args: ExecuteRunArgs): Promise<RuntimeResult> {
                 idempotencyKey: info.idempotencyKey,
                 idempotencyHit: info.idempotencyHit,
                 resumedRun: info.resumedRun,
+                implementationType: info.implementationType,
+                skillName: info.skillName,
+                skillVersion: info.skillVersion,
+                skillEntry: info.skillEntry,
+                riskLevel: info.riskLevel,
+                requiresApproval: info.requiresApproval,
+                inputValidated: info.inputValidated,
+                outputValidated: info.outputValidated,
                 meta: info.meta
               }
             });
@@ -676,6 +695,14 @@ export async function executeRun(args: ExecuteRunArgs): Promise<RuntimeResult> {
               idempotencyKey: info.idempotencyKey,
               idempotencyHit: info.idempotencyHit,
               resumedRun: info.resumedRun,
+              implementationType: info.implementationType,
+              skillName: info.skillName,
+              skillVersion: info.skillVersion,
+              skillEntry: info.skillEntry,
+              riskLevel: info.riskLevel,
+              requiresApproval: info.requiresApproval,
+              inputValidated: info.inputValidated,
+              outputValidated: info.outputValidated,
               error: info.error
                 ? {
                     code: info.error.code,

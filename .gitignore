@@ -3,3 +3,7 @@ dist/
 coverage/
 .pnpm-store/
 *.tsbuildinfo
+.env
+.env.*
+.yutra/traces/*
+.yutra/audit/*

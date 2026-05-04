@@ -4,8 +4,11 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import { describe, expect, it } from "vitest";
 import { loadAndValidateDslFile } from "../../packages/dsl/src/index";
 import { loadAndExecuteDslFile } from "../../packages/runtime/src/load-and-execute";
+import type { ActionRegistry } from "../../packages/runtime/src/types";
+import type { TraceEvent } from "../../packages/spec/src";
 import { buildAuditBundle } from "../../packages/trace/src/audit-bundle";
 import { MemoryTraceStorage } from "../../packages/trace/src/memory-storage";
+import { createSkillRegistry, skillToAction, validateLoadedSkill } from "../../packages/skill-core/src";
 
 type ScenarioDefinition = {
   id: string;
@@ -27,12 +30,118 @@ function readJson<T>(filePath: string): T {
 async function loadActionRegistry() {
   const actionsPath = resolve(packDir, "actions.mjs");
   const mod = (await import(pathToFileURL(actionsPath).href)) as {
-    actionRegistry?: Record<string, unknown>;
+    actionRegistry?: ActionRegistry;
   };
-  return mod.actionRegistry ?? {};
+  return mod.actionRegistry ?? ({} as ActionRegistry);
 }
 
 describe("P3-02 ecommerce business-depth certification", () => {
+  it("all ecommerce skills validate and can be inspected as action", async () => {
+    const skillRegistry = createSkillRegistry({
+      paths: [resolve(packDir, "skills")],
+      baseDir: workspaceRoot
+    });
+    const discovered = await skillRegistry.list();
+    expect(discovered.length).toBeGreaterThanOrEqual(5);
+
+    const requiredSkillNames = [
+      "query_order",
+      "query_shipping_status",
+      "create_return_request",
+      "create_refund_request",
+      "create_support_ticket"
+    ];
+    for (const name of requiredSkillNames) {
+      const loaded = await skillRegistry.inspect(name);
+      const validation = validateLoadedSkill(loaded);
+      expect(validation.ok).toBe(true);
+      const actionLike = skillToAction(loaded);
+      expect(actionLike.implementation.type).toBe("skill");
+      expect(actionLike.implementation.skillName).toBe(name);
+    }
+  });
+
+  it("skill-based shipping path is certified and trace includes implementationType=skill", async () => {
+    const actionRegistry = await loadActionRegistry();
+    const input = readJson<Record<string, unknown>>(resolve(packDir, "demo-inputs", "shipping-case.json"));
+    const result = await loadAndExecuteDslFile(
+      resolve(packDir, "agent.skill.yutra.yaml"),
+      {
+        actionRegistry,
+        skillSearchPaths: [resolve(packDir, "skills")]
+      },
+      input
+    );
+    expect(result.status).toBe("completed");
+    const started = (result.traceEvents ?? []).find((event) => event.type === "action.started" && event.action === "check_shipping");
+    expect((started?.payload as Record<string, unknown> | undefined)?.implementationType).toBe("skill");
+  });
+
+  it("skill-based return/refund/handoff paths are certified", async () => {
+    const actionRegistry = await loadActionRegistry();
+    const cases = [
+      { file: "return-case.json", expected: "completed" },
+      { file: "refund-case.json", expected: "completed" },
+      { file: "refund-high-risk.json", expected: "handoff" }
+    ] as const;
+
+    for (const item of cases) {
+      const input = readJson<Record<string, unknown>>(resolve(packDir, "demo-inputs", item.file));
+      const result = await loadAndExecuteDslFile(
+        resolve(packDir, "agent.skill.yutra.yaml"),
+        {
+          actionRegistry,
+          skillSearchPaths: [resolve(packDir, "skills")]
+        },
+        input
+      );
+      expect(result.status).toBe(item.expected);
+    }
+  });
+
+  it("skill governance metadata is visible for refund path", async () => {
+    const actionRegistry = await loadActionRegistry();
+    const input = readJson<Record<string, unknown>>(resolve(packDir, "demo-inputs", "refund-before-shipment.json"));
+    const result = await loadAndExecuteDslFile(
+      resolve(packDir, "agent.skill.yutra.yaml"),
+      {
+        actionRegistry,
+        skillSearchPaths: [resolve(packDir, "skills")]
+      },
+      input
+    );
+    expect(result.status).toBe("completed");
+    const started = (result.traceEvents ?? []).find(
+      (event) => event.type === "action.started" && event.action === "create_refund_request"
+    );
+    const payload = (started?.payload ?? {}) as Record<string, unknown>;
+    expect(payload.implementationType).toBe("skill");
+    expect(payload.riskLevel).toBe("high");
+    expect(payload.requiresApproval).toBe(true);
+  });
+
+  it("skill-based run can export audit bundle with skill evidence", async () => {
+    const actionRegistry = await loadActionRegistry();
+    const traceStorage = new MemoryTraceStorage();
+    const input = readJson<Record<string, unknown>>(resolve(packDir, "demo-inputs", "shipping-case.json"));
+    const result = await loadAndExecuteDslFile(
+      resolve(packDir, "agent.skill.yutra.yaml"),
+      {
+        actionRegistry,
+        traceStorage,
+        skillSearchPaths: [resolve(packDir, "skills")]
+      },
+      input
+    );
+    expect(result.status).toBe("completed");
+    const audit = await buildAuditBundle(traceStorage, result.runId);
+    expect(
+      (audit.traceEvents as TraceEvent[]).some(
+        (event) => (event.payload as Record<string, unknown> | undefined)?.implementationType === "skill"
+      )
+    ).toBe(true);
+  });
+
   it("ecommerce pack manifest is valid and delivery docs exist", () => {
     const manifestPath = resolve(packDir, "pack.manifest.json");
     expect(existsSync(manifestPath)).toBe(true);
@@ -192,6 +301,10 @@ describe("P3-02 ecommerce business-depth certification", () => {
     const result = loadAndValidateDslFile(resolve(packDir, "agent.yutra.yaml"));
     expect(result.validation.valid).toBe(true);
   });
-});
 
+  it("skill-based ecommerce entrypoint remains valid", () => {
+    const result = loadAndValidateDslFile(resolve(packDir, "agent.skill.yutra.yaml"));
+    expect(result.validation.valid).toBe(true);
+  });
+});
 

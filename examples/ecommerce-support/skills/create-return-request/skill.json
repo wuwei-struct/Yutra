@@ -1,0 +1,46 @@
+{
+  "name": "create_return_request",
+  "version": "0.1.0",
+  "description": "Create ecommerce return request via return adapter.",
+  "type": "tool",
+  "inputSchema": {
+    "type": "object",
+    "required": ["order_id"],
+    "properties": {
+      "order_id": {
+        "type": "string"
+      },
+      "reason": {
+        "type": "string"
+      },
+      "items": {
+        "type": "array"
+      }
+    }
+  },
+  "outputSchema": {
+    "type": "object",
+    "required": ["request_id", "eligible", "reason_code", "next_step"],
+    "properties": {
+      "request_id": {
+        "type": "string"
+      },
+      "eligible": {
+        "type": "boolean"
+      },
+      "reason_code": {
+        "type": "string"
+      },
+      "next_step": {
+        "type": "string"
+      }
+    }
+  },
+  "sideEffect": "write",
+  "riskLevel": "medium",
+  "requiresApproval": false,
+  "entry": "scripts/run.mjs",
+  "tags": ["ecommerce", "return"],
+  "allowedEnvironments": ["dev", "demo", "prod-like"],
+  "maxCallsPerRun": 3
+}

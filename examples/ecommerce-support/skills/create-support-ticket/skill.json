@@ -1,0 +1,51 @@
+{
+  "name": "create_support_ticket",
+  "version": "0.1.0",
+  "description": "Create support escalation ticket for handoff.",
+  "type": "tool",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "reasonCode": {
+        "type": "string"
+      },
+      "summary": {
+        "type": "string"
+      },
+      "order_id": {
+        "type": "string"
+      },
+      "priority": {
+        "type": "string"
+      }
+    }
+  },
+  "outputSchema": {
+    "type": "object",
+    "required": ["ticket_id", "queue", "priority", "handoff_status", "next_step"],
+    "properties": {
+      "ticket_id": {
+        "type": "string"
+      },
+      "queue": {
+        "type": "string"
+      },
+      "priority": {
+        "type": "string"
+      },
+      "handoff_status": {
+        "type": "string"
+      },
+      "next_step": {
+        "type": "string"
+      }
+    }
+  },
+  "sideEffect": "external",
+  "riskLevel": "medium",
+  "requiresApproval": false,
+  "entry": "scripts/run.mjs",
+  "tags": ["ecommerce", "handoff"],
+  "allowedEnvironments": ["dev", "demo", "prod-like"],
+  "maxCallsPerRun": 2
+}

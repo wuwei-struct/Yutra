@@ -1,6 +1,7 @@
-import type { ActionSideEffect, AgentSpec, StateSpec } from "@yutra/spec";
+import type { ActionImplementationSpec, ActionRiskLevel, ActionSideEffect, AgentSpec, StateSpec } from "@yutra/spec";
 import type { TraceEvent } from "@yutra/spec";
 import type { TraceRecorder, TraceStorage } from "@yutra/trace";
+import type { SkillRegistry } from "@yutra/skill-core";
 
 export type RuntimeStatus = "completed" | "failed" | "handoff" | "stuck";
 
@@ -56,6 +57,8 @@ export interface RuntimeOptions {
   policyPack?: PolicyPack;
   intentResolver?: IntentResolver;
   actionRegistry?: ActionRegistry;
+  skillSearchPaths?: string[];
+  skillRegistry?: Pick<SkillRegistry, "get" | "inspect" | "list">;
   traceRecorder?: TraceRecorder;
   traceStorage?: TraceStorage;
 }
@@ -144,6 +147,10 @@ export interface ActionExecutionPolicy {
   timeoutMs?: number;
   retryPolicy?: RetryPolicy;
   sideEffect?: ActionSideEffect;
+  riskLevel?: ActionRiskLevel;
+  requiresApproval?: boolean;
+  implementation?: ActionImplementationSpec;
+  metadata?: Record<string, unknown>;
   idempotencyKey?: string;
 }
 
@@ -156,6 +163,13 @@ export interface ActionAttemptStartInfo {
   idempotencyKey: string;
   idempotencyHit: boolean;
   resumedRun?: boolean;
+  implementationType?: "function" | "tool" | "skill";
+  skillName?: string;
+  skillVersion?: string;
+  skillEntry?: string;
+  riskLevel?: ActionRiskLevel;
+  requiresApproval?: boolean;
+  inputValidated?: boolean;
 }
 
 export interface ActionAttemptResultInfo {
@@ -175,6 +189,14 @@ export interface ActionAttemptResultInfo {
   durationMs: number;
   retryable: boolean;
   finalAttempt: boolean;
+  implementationType?: "function" | "tool" | "skill";
+  skillName?: string;
+  skillVersion?: string;
+  skillEntry?: string;
+  riskLevel?: ActionRiskLevel;
+  requiresApproval?: boolean;
+  inputValidated?: boolean;
+  outputValidated?: boolean;
 }
 
 export interface ResolvedTransition {

@@ -11,6 +11,7 @@ export * from "./policy-evaluator";
 export * from "./handoff-contract";
 export * from "./guard-evaluator";
 export * from "./action-executor";
+export * from "./skill-action-executor";
 export * from "./transition-resolver";
 export * from "./state-engine";
 export * from "./execute-run";
