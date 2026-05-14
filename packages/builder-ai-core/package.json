@@ -1,0 +1,36 @@
+{
+  "name": "@yutra/builder-ai-core",
+  "version": "0.1.0-rc.1",
+  "private": false,
+  "description": "Yutra builder AI draft core: tags/brief to flow draft contract and form conversion",
+  "type": "module",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "pnpm --filter @yutra/builder-core build && tsup src/index.ts --format esm --dts",
+    "test": "pnpm --filter @yutra/builder-core build && vitest run --passWithNoTests",
+    "lint": "eslint src test --max-warnings=0"
+  },
+  "dependencies": {
+    "@yutra/builder-core": "workspace:*",
+    "zod": "^3.24.2"
+  },
+  "license": "MIT",
+  "author": "Yutra Contributors",
+  "keywords": [
+    "yutra",
+    "builder",
+    "ai-draft",
+    "flow-draft"
+  ]
+}

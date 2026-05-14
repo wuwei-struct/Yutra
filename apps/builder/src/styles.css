@@ -1,0 +1,167 @@
+:root {
+  font-family: Inter, "Segoe UI", Arial, sans-serif;
+}
+
+body {
+  margin: 0;
+  color: #0f172a;
+  background: #f8fafc;
+}
+
+.builder-page {
+  padding: 16px;
+}
+
+.builder-header h1 {
+  margin: 0 0 6px;
+  font-size: 24px;
+}
+
+.builder-header p {
+  margin: 0 0 16px;
+  color: #334155;
+}
+
+.builder-layout {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 1fr 1fr;
+}
+
+.left-panel,
+.right-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.panel-section,
+.preview {
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 12px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.checkbox-item {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.card {
+  margin-top: 8px;
+  padding: 8px;
+  background: #f1f5f9;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.tab {
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  border-radius: 6px;
+  padding: 6px 10px;
+}
+
+.tab.active {
+  background: #dbeafe;
+  border-color: #60a5fa;
+}
+
+.tab-panel pre {
+  background: #0f172a;
+  color: #e2e8f0;
+  padding: 10px;
+  border-radius: 6px;
+  overflow: auto;
+  max-height: 520px;
+}
+
+.panel-section pre {
+  background: #0f172a;
+  color: #e2e8f0;
+  padding: 10px;
+  border-radius: 6px;
+  overflow: auto;
+  max-height: 320px;
+}
+
+textarea {
+  font-family: Consolas, "Courier New", monospace;
+}
+
+.hint {
+  color: #475569;
+  font-size: 13px;
+}
+
+.warning-text {
+  color: #92400e;
+  font-size: 13px;
+}
+
+.ok-text {
+  color: #166534;
+}
+
+.error-text {
+  color: #b91c1c;
+}
+
+.issue {
+  margin-top: 8px;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+}
+
+.issue-warning {
+  background: #fef3c7;
+}
+
+.issue-error {
+  background: #fee2e2;
+}
+
+.timeline-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 300px;
+  overflow: auto;
+}
+
+.timeline-item {
+  text-align: left;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  background: #f8fafc;
+  padding: 8px;
+  display: grid;
+  gap: 4px;
+}
+
+.timeline-item.active {
+  border-color: #2563eb;
+  background: #dbeafe;
+}

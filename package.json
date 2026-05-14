@@ -16,6 +16,11 @@
     "demo:approval": "pnpm exec yutra run examples/approval-agent/agent.yutra.yaml --input examples/approval-agent/demo-inputs/case1.json --trace-file demo-artifacts/approval-agent-completed.jsonl && pnpm exec yutra run examples/approval-agent/agent.yutra.yaml --input examples/approval-agent/demo-inputs/case2.json --trace-file demo-artifacts/approval-agent-handoff.jsonl",
     "viewer:dev": "pnpm --filter @yutra/viewer dev",
     "viewer:build": "pnpm --filter @yutra/viewer build",
+    "builder:dev": "pnpm --filter @yutra/builder dev",
+    "builder:build": "pnpm --filter @yutra/builder build",
+    "builder:test": "pnpm --filter @yutra/builder test",
+    "builder:runner": "pnpm --filter @yutra/builder-runner dev",
+    "builder:runner:test": "pnpm --filter @yutra/builder-runner test",
     "certify": "vitest run tests/conformance"
   },
   "devDependencies": {

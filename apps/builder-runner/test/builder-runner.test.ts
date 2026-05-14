@@ -1,0 +1,239 @@
+import { afterEach, describe, expect, it } from "vitest";
+import { createBuilderRunnerServer } from "../src/server";
+import type { BuilderRunPreviewRequest } from "../src/types";
+
+const baseForm: BuilderRunPreviewRequest["form"] = {
+  agentName: "电商售后客服",
+  version: "0.1.0",
+  templateId: "ecommerce-support",
+  selectedIntentIds: ["shipping_query", "refund_request", "handoff"],
+  selectedSkillNames: ["query_order", "query_shipping_status", "create_refund_request", "create_support_ticket"],
+  responseStyle: "service_oriented",
+  language: "zh-CN",
+  rules: {
+    delayedShipmentThresholdHours: 48,
+    returnWindowDays: 7,
+    highRiskAmountThreshold: 100,
+    requireHumanForRefundAfterDelivery: true,
+    requireHumanForDamagedGoods: true
+  }
+};
+
+const startedServers: Array<{ close: () => Promise<void> }> = [];
+
+async function startServer() {
+  const server = createBuilderRunnerServer();
+  await new Promise<void>((resolve) => {
+    server.listen(0, "127.0.0.1", () => resolve());
+  });
+  const address = server.address();
+  if (!address || typeof address === "string") {
+    throw new Error("Failed to bind builder runner test server.");
+  }
+  startedServers.push({
+    close: () =>
+      new Promise<void>((resolveClose, rejectClose) => {
+        server.close((err) => (err ? rejectClose(err) : resolveClose()));
+      })
+  });
+  return `http://127.0.0.1:${address.port}`;
+}
+
+afterEach(async () => {
+  while (startedServers.length > 0) {
+    const item = startedServers.pop();
+    if (item) {
+      await item.close();
+    }
+  }
+});
+
+describe("@yutra/builder-runner", () => {
+  it("GET /health returns ok", async () => {
+    const baseUrl = await startServer();
+    const res = await fetch(`${baseUrl}/health`);
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as { ok: boolean; service: string };
+    expect(body.ok).toBe(true);
+    expect(body.service).toBe("yutra-builder-runner");
+  });
+
+  it("POST /run-preview with default shipping form returns completed", async () => {
+    const baseUrl = await startServer();
+    const res = await fetch(`${baseUrl}/run-preview`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        form: baseForm,
+        input: {
+          context: {
+            issue_type: "shipping_query",
+            order_id: "ORDER-1001"
+          }
+        }
+      })
+    });
+    const body = (await res.json()) as { ok: boolean; run?: { status: string } };
+    expect(res.status).toBe(200);
+    expect(body.ok).toBe(true);
+    expect(body.run?.status).toBe("completed");
+  });
+
+  it("POST /run-preview with invalid form returns structured error", async () => {
+    const baseUrl = await startServer();
+    const res = await fetch(`${baseUrl}/run-preview`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        form: {
+          ...baseForm,
+          selectedSkillNames: []
+        },
+        input: {
+          context: {
+            issue_type: "shipping_query",
+            order_id: "ORDER-1001"
+          }
+        }
+      })
+    });
+    const body = (await res.json()) as { ok: boolean; error?: { code: string }; validation?: { ok: boolean } };
+    expect(res.status).toBe(400);
+    expect(body.ok).toBe(false);
+    expect(body.error?.code).toBe("BUILDER_FORM_INVALID");
+    expect(body.validation?.ok).toBe(false);
+  });
+
+  it("POST /run-preview returns trace events and traceJsonl and auditBundle", async () => {
+    const baseUrl = await startServer();
+    const res = await fetch(`${baseUrl}/run-preview`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        form: baseForm,
+        input: {
+          context: {
+            issue_type: "shipping_query",
+            order_id: "ORDER-1001"
+          }
+        }
+      })
+    });
+    const body = (await res.json()) as {
+      ok: boolean;
+      events?: Array<{ type: string }>;
+      traceJsonl?: string;
+      auditBundle?: { meta?: { runId?: string } };
+    };
+    expect(body.ok).toBe(true);
+    expect((body.events ?? []).length).toBeGreaterThan(0);
+    expect(body.traceJsonl).toContain("\"type\"");
+    expect(body.auditBundle?.meta?.runId).toBeTruthy();
+  });
+
+  it("handoff sample includes handoff evidence", async () => {
+    const baseUrl = await startServer();
+    const res = await fetch(`${baseUrl}/run-preview`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        form: baseForm,
+        input: {
+          context: {
+            issue_type: "handoff",
+            order_id: "ORDER-NEEDS-HUMAN",
+            risk_level: "high"
+          }
+        }
+      })
+    });
+    const body = (await res.json()) as {
+      ok: boolean;
+      run?: { status?: string };
+      events?: Array<{ type: string }>;
+    };
+    expect(body.ok).toBe(true);
+    expect(body.run?.status === "handoff" || (body.events ?? []).some((event) => event.type === "handoff.requested")).toBe(true);
+  });
+
+  it("POST /ai-draft-preview mock returns draft", async () => {
+    const baseUrl = await startServer();
+    const res = await fetch(`${baseUrl}/ai-draft-preview`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        providerMode: "mock",
+        tags: {
+          scenario: "ecommerce_support",
+          capabilities: ["query_order", "query_shipping_status"],
+          strategies: ["full_trace_audit"],
+          language: "zh-CN"
+        },
+        brief: {
+          text: "物流超过48小时未更新需要标记延迟。",
+          locale: "zh-CN"
+        }
+      })
+    });
+    const body = (await res.json()) as { ok: boolean; draft?: { source?: { type?: string } }; meta?: { providerMode?: string } };
+    expect(res.status).toBe(200);
+    expect(body.ok).toBe(true);
+    expect(body.draft?.source?.type).toBe("mock");
+    expect(body.meta?.providerMode).toBe("mock");
+  });
+
+  it("POST /ai-draft-preview invalid brief returns structured error", async () => {
+    const baseUrl = await startServer();
+    const res = await fetch(`${baseUrl}/ai-draft-preview`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        providerMode: "mock",
+        tags: {
+          scenario: "ecommerce_support",
+          capabilities: ["query_order"],
+          strategies: [],
+          language: "zh-CN"
+        },
+        brief: {
+          text: "   ",
+          locale: "zh-CN"
+        }
+      })
+    });
+    const body = (await res.json()) as { ok: boolean; error?: { code?: string }; issues?: Array<{ code: string }> };
+    expect(res.status).toBe(400);
+    expect(body.ok).toBe(false);
+    expect(body.error?.code).toBe("AI_DRAFT_BRIEF_INVALID");
+    expect((body.issues ?? []).some((item) => item.code === "AI_DRAFT_BRIEF_INVALID")).toBe(true);
+  });
+
+  it("POST /ai-draft-preview real without config returns structured error", async () => {
+    const prev = process.env.YUTRA_BUILDER_AI_PROVIDER;
+    process.env.YUTRA_BUILDER_AI_PROVIDER = "mock";
+    const baseUrl = await startServer();
+    const res = await fetch(`${baseUrl}/ai-draft-preview`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        providerMode: "real",
+        tags: {
+          scenario: "ecommerce_support",
+          capabilities: ["query_order"],
+          strategies: [],
+          language: "zh-CN"
+        },
+        brief: {
+          text: "请生成草案",
+          locale: "zh-CN"
+        }
+      })
+    });
+    const body = (await res.json()) as { ok: boolean; error?: { code?: string; message?: string }; meta?: Record<string, unknown> };
+    process.env.YUTRA_BUILDER_AI_PROVIDER = prev;
+    expect(res.status).toBe(400);
+    expect(body.ok).toBe(false);
+    expect(body.error?.code).toBe("AI_DRAFT_REAL_PROVIDER_DISABLED");
+    expect(JSON.stringify(body)).not.toContain("YUTRA_BUILDER_AI_API_KEY");
+  });
+});

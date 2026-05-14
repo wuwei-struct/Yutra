@@ -1,0 +1,35 @@
+{
+  "name": "@yutra/builder-runner",
+  "version": "0.1.0-rc.1",
+  "private": false,
+  "description": "Local runner for Yutra Builder run-preview and trace demo",
+  "type": "module",
+  "main": "dist/server.js",
+  "module": "dist/server.js",
+  "types": "dist/server.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/server.d.ts",
+      "import": "./dist/server.js"
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "dev": "tsx src/server.ts",
+    "build": "pnpm --filter @yutra/builder-ai-core build && tsup src/server.ts --format esm --dts",
+    "test": "pnpm --filter @yutra/builder-ai-core build && vitest run --passWithNoTests",
+    "lint": "eslint src test --max-warnings=0"
+  },
+  "dependencies": {
+    "@yutra/builder-ai-core": "workspace:*",
+    "@yutra/builder-core": "workspace:*",
+    "@yutra/runtime": "workspace:*",
+    "@yutra/trace": "workspace:*"
+  },
+  "devDependencies": {
+    "tsx": "^4.20.6"
+  },
+  "license": "MIT",
+  "author": "Yutra Contributors",
+  "keywords": ["yutra", "builder", "runner", "trace"]
+}

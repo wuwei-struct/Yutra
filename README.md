@@ -8,6 +8,13 @@ Yutra is a Skill-based Agent Execution Standard and Reference Runtime.
 Skill gives AI capabilities.  
 Yutra makes those capabilities executable, governed, traceable, auditable, and certifiable.
 
+Builder Core now exists as `@yutra/builder-core` for form-to-spec and Chinese DSL draft generation.
+Basic Builder UI now exists as a local prototype at `apps/builder` (not SaaS, not multi-tenant).
+Basic Builder UI now supports local Run Preview + Trace through `apps/builder-runner`.
+AI Draft Core now exists as `@yutra/builder-ai-core` with local mock provider only (no real LLM yet).
+Builder UI now supports AI Draft Assistant (manual apply required, runtime preview remains manual).
+Builder Runner now supports optional real provider draft preview path (`/ai-draft-preview`) with strict FlowDraft-only boundary.
+
 ## Why Yutra
 
 Modern agents are increasingly built from Skills, tools, APIs, and functions.  
@@ -133,6 +140,11 @@ Yutra is currently not:
 ### Start Here
 
 - [中文 README](./README.zh-CN.md)
+- [Builder Core](docs/builder-core.md)
+- [Builder UI (Local Prototype)](docs/builder-ui.md)
+- [Builder Run + Trace](docs/builder-run-trace.md)
+- [Builder AI Core](docs/builder-ai-core.md)
+- [Builder Real LLM Provider](docs/builder-real-llm-provider.md)
 - [Skill-based Runtime](docs/skill-based-runtime.md)
 - [Skill-based Demo Path](docs/skill-based-demo-path.md)
 - [Release Notes v0.2.0-rc.1](docs/release-notes-v0.2.0-rc.1.md)

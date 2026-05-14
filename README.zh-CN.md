@@ -1,4 +1,4 @@
-﻿[![English](https://img.shields.io/badge/Language-English-blue)](./README.md)
+[![English](https://img.shields.io/badge/Language-English-blue)](./README.md)
 [![简体中文](https://img.shields.io/badge/语言-简体中文-red)](./README.zh-CN.md)
 
 # Yutra
@@ -6,6 +6,13 @@
 Yutra 是面向 Skill 型智能体的执行标准与参考运行时。
 
 Skill 让 AI 有能力，Yutra 让这些能力按规则执行、可追踪、可治理、可审计、可认证。
+
+Builder Core 已提供 `@yutra/builder-core`，用于把表单配置生成 AgentSpec 与中文 DSL 草案。
+Basic Builder UI 已提供本地原型 `apps/builder`（非 SaaS、非多租户）。
+Basic Builder UI 现已支持通过 `apps/builder-runner` 做本地 Run Preview + Trace。
+AI Draft Core 已提供 `@yutra/builder-ai-core`，当前仅支持本地 mock provider（尚未接入真实 LLM）。
+Builder UI 现已支持 AI Draft Assistant（需人工确认 Apply，Runtime 仍需手动 Run Preview）。
+Builder Runner 现已支持可选 real provider 草案预览接口（`/ai-draft-preview`），并保持 FlowDraft-only 边界。
 
 ## 为什么是 Yutra
 
@@ -128,6 +135,11 @@ Yutra 当前不是：
 ### Start Here
 
 - [English README](./README.md)
+- [Builder Core](docs/builder-core.md)
+- [Builder UI（本地原型）](docs/builder-ui.md)
+- [Builder Run + Trace](docs/builder-run-trace.md)
+- [Builder AI Core](docs/builder-ai-core.md)
+- [Builder Real LLM Provider](docs/builder-real-llm-provider.md)
 - [Skill-based Runtime](docs/skill-based-runtime.md)
 - [Skill-based Demo Path](docs/skill-based-demo-path.md)
 - [Release Notes v0.2.0-rc.1](docs/release-notes-v0.2.0-rc.1.md)
