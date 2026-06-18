@@ -1,0 +1,38 @@
+{
+  "name": "@yutra/rule-compiler",
+  "version": "0.1.0-rc.1",
+  "private": false,
+  "description": "Yutra deterministic Rule Compiler for Pack Config artifacts",
+  "type": "module",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --dts",
+    "test": "vitest run --passWithNoTests",
+    "lint": "eslint src --max-warnings=0"
+  },
+  "dependencies": {
+    "@yutra/archetype-core": "workspace:*",
+    "@yutra/dsl": "workspace:*",
+    "@yutra/pack-config-core": "workspace:*"
+  },
+  "license": "MIT",
+  "author": "Yutra Contributors",
+  "keywords": [
+    "yutra",
+    "rule-compiler",
+    "pack-config",
+    "artifacts",
+    "deterministic"
+  ]
+}

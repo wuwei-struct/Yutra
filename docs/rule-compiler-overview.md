@@ -101,15 +101,27 @@ exceptionStrategy = <retry | deny | handoff>
 -> boundary-path trace expectation
 ```
 
-## Current Boundary
+## Current Implementation Boundary
 
-P6-01 only defines the compiler direction.
+`@yutra/rule-compiler` now provides the first core implementation for the public `request-resolution` demo/mock compiler.
 
-It does not implement:
+It can generate:
 
-- compiler package
+- `agent.yutra.yaml`
+- `policy.yaml`
+- `adapter.config.json`
+- `templates.json`
+- `test-cases.json`
+- `trace.expectation.json`
+
+It still does not implement:
+
 - compiler CLI
-- config schema
-- asset generator
+- artifact export to disk
 - Studio compiler integration
+- Runtime integration
+- customer SOP
+- real adapters
 - runtime semantic changes
+
+See [Rule Compiler Core](rule-compiler-core.md).

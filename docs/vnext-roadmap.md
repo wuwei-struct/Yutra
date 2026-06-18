@@ -70,6 +70,8 @@ Field types:
 
 Goal: compile Pack Config into executable and certifiable assets.
 
+Current status: `@yutra/rule-compiler` provides the first request-resolution basic compiler for public demo/mock artifacts. It does not connect Runtime or Studio.
+
 Scope:
 
 - config -> `agent.yutra.yaml`

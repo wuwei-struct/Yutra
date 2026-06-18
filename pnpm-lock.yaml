@@ -29,6 +29,12 @@ importers:
       '@yutra/knowledge-core':
         specifier: workspace:*
         version: link:packages/knowledge-core
+      '@yutra/pack-config-core':
+        specifier: workspace:*
+        version: link:packages/pack-config-core
+      '@yutra/rule-compiler':
+        specifier: workspace:*
+        version: link:packages/rule-compiler
       '@yutra/tool-core':
         specifier: workspace:*
         version: link:packages/tool-core
@@ -179,6 +185,18 @@ importers:
       zod:
         specifier: ^3.24.2
         version: 3.25.76
+
+  packages/rule-compiler:
+    dependencies:
+      '@yutra/archetype-core':
+        specifier: workspace:*
+        version: link:../archetype-core
+      '@yutra/dsl':
+        specifier: workspace:*
+        version: link:../dsl
+      '@yutra/pack-config-core':
+        specifier: workspace:*
+        version: link:../pack-config-core
 
   packages/runtime:
     dependencies:

@@ -140,6 +140,7 @@ Start here:
 - [Business Rule Config](docs/business-rule-config.md)
 - [Pack Config Core](docs/pack-config-core.md)
 - [Rule Compiler Overview](docs/rule-compiler-overview.md)
+- [Rule Compiler Core](docs/rule-compiler-core.md)
 - [Creator Workbench](docs/creator-workbench.md)
 - [vNext Roadmap](docs/vnext-roadmap.md)
 
@@ -259,6 +260,7 @@ Yutra is currently not:
 - [Business Rule Configuration](docs/business-rule-config.md)
 - [Pack Config Core](docs/pack-config-core.md)
 - [Rule Compiler Overview](docs/rule-compiler-overview.md)
+- [Rule Compiler Core](docs/rule-compiler-core.md)
 - [Creator Workbench](docs/creator-workbench.md)
 - [vNext Roadmap](docs/vnext-roadmap.md)
 
