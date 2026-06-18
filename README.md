@@ -3,12 +3,12 @@
 
 # Yutra
 
-Yutra is a Skill-based Agent Execution Standard, Runtime, and Builder.
+Yutra is a Skill-based Agent Execution Standard, Runtime, Studio, and early Agent Creation Layer.
 
 Yutra is evolving toward an Agent Creation Layer:
 Archetype Library + Business Rule Configuration + Rule Compiler + Creator Workbench.
 
-Current status and vNext direction are intentionally separate: the Skill-based Runtime and Studio exist today; the Agent Creation Layer is the next-stage direction documented in this repository.
+Current status and vNext direction are intentionally separate: the Skill-based Runtime, Studio, and early creation-layer primitives exist today; the fuller Agent Creation Layer is the next-stage direction documented in this repository.
 
 Skill gives AI capabilities.  
 Yutra makes those capabilities executable, governed, traceable, auditable, and certifiable.
@@ -19,6 +19,23 @@ Yutra Studio supports AI Draft, editable DSL inspect, AgentSpec preview, Run Pre
 AI Draft Core now exists as `@yutra/builder-ai-core` with local mock provider only (no real LLM yet).
 Builder UI now supports AI Draft Assistant (manual apply required, runtime preview remains manual).
 Builder Runner now supports optional real provider draft preview path (`/ai-draft-preview`) with strict FlowDraft-only boundary.
+
+Implemented today:
+
+- DSL / Canonical IR
+- Reference Runtime
+- Trace / Audit / Certification
+- Skill Core / Skill Runtime
+- CLI
+- Yutra Studio
+- AI Draft
+- DSL Inspect / Run Preview
+- Archetype Core
+- Pack Config Core
+- Rule Compiler Core
+- Rule Compiler CLI
+- Creator Workbench Compile Preview
+- Compiled DSL manual bridge
 
 ## Why Yutra
 
@@ -90,6 +107,8 @@ pnpm verify
 pnpm certify
 pnpm exec yutra validate examples/it-helpdesk/agent.yutra.yaml
 pnpm exec yutra run examples/it-helpdesk/agent.yutra.yaml --input examples/it-helpdesk/demo-inputs/case1.json
+pnpm exec yutra compile examples/request-resolution-ecommerce-basic/pack.config.json --out .tmp/compiled-request-resolution --dry-run
+pnpm exec yutra compile examples/request-resolution-ecommerce-basic/pack.config.json --out .tmp/compiled-request-resolution --force
 pnpm builder:runner
 pnpm builder:dev
 ```
@@ -135,6 +154,7 @@ Archetype Library
 The goal is to let users configure business rules instead of writing DSL directly. The DSL remains the deterministic intermediate layer behind the scenes.
 
 The vNext direction keeps Runtime execution-first. Customers should configure business rules; Yutra should generate DSL, policy, templates, tests, and trace expectations behind the scenes.
+LLMs may draft configuration, but they must not bypass the Compiler, Runtime, Trace, Audit, or Certification path.
 
 Start here:
 
@@ -153,6 +173,8 @@ Local demo/mock artifact export:
 
 ```bash
 pnpm exec yutra compile examples/request-resolution-ecommerce-basic/pack.config.json --out .tmp/compiled-request-resolution
+pnpm exec yutra compile examples/request-resolution-ecommerce-basic/pack.config.json --out .tmp/compiled-request-resolution --dry-run
+pnpm exec yutra compile examples/request-resolution-ecommerce-basic/pack.config.json --out .tmp/compiled-request-resolution --force
 ```
 
 This exports compiler artifacts only. It does not run Runtime or publish an Agent.
