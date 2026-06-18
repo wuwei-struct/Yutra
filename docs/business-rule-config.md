@@ -6,6 +6,10 @@ It is not a generic form. It is a structured representation of business decision
 
 This document describes vNext direction. Pack Config schema and UI schema are not implemented in this iteration.
 
+`@yutra/pack-config-core` now provides the first public Pack Config contract, provenance model, validation, fingerprint, and demo-only sample config. Rule Compiler and UI schema are still not implemented.
+
+See [Pack Config Core](pack-config-core.md).
+
 ## Why This Layer Exists
 
 Yutra already has DSL and Runtime. However, most customers should not need to understand Agent, Intent, State, Action, Guard, and Transition before they can configure a business agent.

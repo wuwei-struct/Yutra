@@ -1,0 +1,37 @@
+{
+  "name": "@yutra/pack-config-core",
+  "version": "0.1.0-rc.1",
+  "private": false,
+  "description": "Yutra Pack Config contract, provenance, validation, and explain helpers",
+  "type": "module",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --dts",
+    "test": "vitest run --passWithNoTests",
+    "lint": "eslint src --max-warnings=0"
+  },
+  "dependencies": {
+    "@yutra/archetype-core": "workspace:*",
+    "zod": "^3.24.2"
+  },
+  "license": "MIT",
+  "author": "Yutra Contributors",
+  "keywords": [
+    "yutra",
+    "pack-config",
+    "business-rules",
+    "contract",
+    "governance"
+  ]
+}

@@ -45,6 +45,8 @@ Non-goal:
 
 Goal: define Pack Config as the customer-facing configuration model.
 
+Current status: `@yutra/pack-config-core` provides the first Pack Config contract, field provenance, validation, publish gate, fingerprint, and demo-only request-resolution sample. Rule Compiler is still not implemented.
+
 Scope:
 
 - Pack Config schema

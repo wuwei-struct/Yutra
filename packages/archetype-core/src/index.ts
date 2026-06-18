@@ -18,7 +18,14 @@ export {
 } from "./composition-contract";
 export type { ArchetypeIssue, ArchetypeIssueCode, ArchetypeValidationResult } from "./errors";
 export type { ArchetypeId, CrossCuttingArchetypeId, MainArchetypeId } from "./ids";
-export { ALL_ARCHETYPE_IDS, CROSS_CUTTING_ARCHETYPE_IDS, MAIN_ARCHETYPE_IDS } from "./ids";
+export {
+  ALL_ARCHETYPE_IDS,
+  CROSS_CUTTING_ARCHETYPE_IDS,
+  MAIN_ARCHETYPE_IDS,
+  isArchetypeId,
+  isCrossCuttingArchetypeId,
+  isMainArchetypeId
+} from "./ids";
 export type { SideEffectLevel } from "./side-effect";
 export { SIDE_EFFECT_LEVELS, compareSideEffectLevel, isSideEffectAtLeast } from "./side-effect";
 export type { ArchetypeKind, ArchetypeManifest, PublicExposure } from "./types";
