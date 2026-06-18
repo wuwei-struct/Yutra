@@ -40,6 +40,8 @@ describe("P4-08 open source repository polish", () => {
     const readme = read(resolve(workspaceRoot, "README.md"));
     const readmeZh = read(resolve(workspaceRoot, "README.zh-CN.md"));
     expect(readme.includes("## Quick Start")).toBe(true);
+    expect(readme.includes("## Open Source Boundary")).toBe(true);
+    expect(readme.includes("## vNext Direction")).toBe(true);
     expect(readme.includes("## Skill-based Demo")).toBe(true);
     expect(readme.includes("## Trace, Audit, Certification")).toBe(true);
     expect(readme.includes("## Non-goals")).toBe(true);
@@ -47,6 +49,8 @@ describe("P4-08 open source repository polish", () => {
     expect(readme.includes("[![简体中文]")).toBe(true);
 
     expect(readmeZh.includes("## 快速开始")).toBe(true);
+    expect(readmeZh.includes("## 开源边界")).toBe(true);
+    expect(readmeZh.includes("## 下一阶段方向")).toBe(true);
     expect(readmeZh.includes("## Skill-based Demo")).toBe(true);
     expect(readmeZh.includes("## Trace / Audit / Certification")).toBe(true);
     expect(readmeZh.includes("## 非目标")).toBe(true);
@@ -91,6 +95,25 @@ describe("P4-08 open source repository polish", () => {
 
     for (const line of [".env", ".env.*", ".yutra/traces/*", ".yutra/audit/*"]) {
       expect(ignore.includes(line)).toBe(true);
+    }
+  });
+
+  it("open source boundary doc and README non-goals clarify OSS/commercial split", () => {
+    const boundary = read(resolve(workspaceRoot, "docs/open-source-boundary.md"));
+    const readme = read(resolve(workspaceRoot, "README.md"));
+    const readmeZh = read(resolve(workspaceRoot, "README.zh-CN.md"));
+
+    expect(existsSync(resolve(workspaceRoot, "docs/open-source-boundary.md"))).toBe(true);
+    expect(boundary.includes("Open-source Core")).toBe(true);
+    expect(boundary.includes("Future Commercial or Private Layer")).toBe(true);
+    expect(boundary.includes("MIT")).toBe(true);
+    expect(boundary.includes("not legal advice")).toBe(true);
+
+    for (const phrase of ["marketplace", "remote skill registry", "multi-tenant SaaS", "real customer API integration package"]) {
+      expect(readme.includes(phrase)).toBe(true);
+    }
+    for (const phrase of ["Marketplace", "远程 Skill Registry", "多租户 SaaS", "真实客户 API 接入包"]) {
+      expect(readmeZh.includes(phrase)).toBe(true);
     }
   });
 });

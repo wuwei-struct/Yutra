@@ -27,16 +27,19 @@ import {
   strategyTagOptions,
   toggleTag
 } from "../lib/ai-draft-state";
+import { useI18n } from "../i18n";
 
 interface AiDraftPanelProps {
   currentForm: BuilderFormConfig;
   template: AgentTemplateConfig;
   onApplyDraft: (form: BuilderFormConfig) => void;
+  defaultOpen?: boolean;
 }
 
 export function AiDraftPanel(props: AiDraftPanelProps) {
   const { currentForm, template, onApplyDraft } = props;
-  const [open, setOpen] = useState<boolean>(false);
+  const { t } = useI18n();
+  const [open, setOpen] = useState<boolean>(props.defaultOpen ?? false);
   const [state, setState] = useState<AiDraftUiState>(defaultAiDraftState);
 
   const warningList = useMemo(() => {
@@ -153,10 +156,10 @@ export function AiDraftPanel(props: AiDraftPanelProps) {
     <section className="panel-section" aria-label="AI Draft Assistant">
       <div className="tabs">
         <button type="button" onClick={() => setOpen((prev) => !prev)}>
-          {open ? "Hide AI Draft Assistant" : "Show AI Draft Assistant"}
+          {open ? t("draft.hideAssistant") : t("draft.showAssistant")}
         </button>
       </div>
-      {!open ? <p className="hint">AI Draft is optional. Manual config remains available.</p> : null}
+      {!open ? <p className="hint">{t("draft.optional")}</p> : null}
       {open ? (
         <>
           <ScenarioTagSelector
@@ -180,27 +183,24 @@ export function AiDraftPanel(props: AiDraftPanelProps) {
           />
           <NaturalLanguageBriefEditor value={state.briefText} onChange={(briefText) => setState((prev) => ({ ...prev, briefText }))} />
           <section className="panel-section" aria-label="Provider Mode">
-            <h4>Provider Mode</h4>
+            <h4>{t("draft.providerMode")}</h4>
             <label className="field">
-              <span>Draft Provider</span>
+              <span>{t("draft.provider")}</span>
               <select
                 aria-label="AI Draft Provider Mode"
                 value={state.providerMode}
                 onChange={(event) => setState((prev) => ({ ...prev, providerMode: event.target.value as "mock" | "real" }))}
               >
-                <option value="mock">Mock Draft Provider</option>
-                <option value="real">Real LLM Provider</option>
+                <option value="mock">{t("draft.mockProvider")}</option>
+                <option value="real">{t("draft.realProvider")}</option>
               </select>
             </label>
             {state.providerMode === "real" ? (
-              <p className="hint">
-                Real mode needs builder-runner and env config: YUTRA_BUILDER_AI_PROVIDER=real, YUTRA_BUILDER_AI_BASE_URL,
-                YUTRA_BUILDER_AI_MODEL, YUTRA_BUILDER_AI_API_KEY. Do not input API key in browser.
-              </p>
+              <p className="hint">{t("draft.realProviderHint")}</p>
             ) : null}
           </section>
           <button type="button" aria-label="Generate Draft" disabled={state.generating} onClick={() => void onGenerateDraft()}>
-            {state.generating ? "Generating..." : "Generate Draft"}
+            {state.generating ? t("draft.generating") : t("draft.generate")}
           </button>
           {state.errorMessage ? <p className="error-text">{state.errorMessage}</p> : null}
           <FlowDraftPreview draft={state.draft} />

@@ -1,7 +1,8 @@
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from "node:http";
 import { runBuilderPreview } from "./run-preview";
 import { buildAiDraftPreview } from "./ai-draft-preview";
-import type { AiDraftPreviewRequest, BuilderRunPreviewRequest } from "./types";
+import { inspectDslText } from "./dsl-inspect";
+import type { AiDraftPreviewRequest, BuilderDslInspectRequest, BuilderRunPreviewRequest } from "./types";
 import { sanitizeErrorMessage } from "./response-formatters";
 
 const DEFAULT_PORT = 8788;
@@ -52,6 +53,26 @@ async function handleRunPreview(req: IncomingMessage, res: ServerResponse): Prom
   }
 }
 
+async function handleDslInspect(req: IncomingMessage, res: ServerResponse): Promise<void> {
+  try {
+    const request = await readJsonBody<BuilderDslInspectRequest>(req);
+    const result = inspectDslText(request);
+    sendJson(res, result.ok ? 200 : 400, result);
+  } catch (error) {
+    sendJson(res, 400, {
+      ok: false,
+      error: {
+        code: "DSL_INSPECT_BAD_REQUEST",
+        message: sanitizeErrorMessage(error instanceof Error ? error.message : "Invalid DSL inspect request.")
+      },
+      validation: {
+        ok: false,
+        issues: []
+      }
+    });
+  }
+}
+
 async function handleAiDraftPreview(req: IncomingMessage, res: ServerResponse): Promise<void> {
   try {
     const request = await readJsonBody<AiDraftPreviewRequest>(req);
@@ -96,6 +117,11 @@ function requestHandler(req: IncomingMessage, res: ServerResponse): void {
 
   if (method === "POST" && path === "/run-preview") {
     void handleRunPreview(req, res);
+    return;
+  }
+
+  if (method === "POST" && path === "/dsl/inspect") {
+    void handleDslInspect(req, res);
     return;
   }
 

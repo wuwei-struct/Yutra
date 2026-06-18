@@ -1,8 +1,9 @@
 import { afterEach, describe, expect, it } from "vitest";
+import type { BuilderFormConfig } from "@yutra/builder-core";
+import { agentSpecToChineseDsl, ecommerceSupportTemplate, formConfigToAgentSpec } from "@yutra/builder-core";
 import { createBuilderRunnerServer } from "../src/server";
-import type { BuilderRunPreviewRequest } from "../src/types";
 
-const baseForm: BuilderRunPreviewRequest["form"] = {
+const baseForm: BuilderFormConfig = {
   agentName: "电商售后客服",
   version: "0.1.0",
   templateId: "ecommerce-support",
@@ -20,6 +21,10 @@ const baseForm: BuilderRunPreviewRequest["form"] = {
 };
 
 const startedServers: Array<{ close: () => Promise<void> }> = [];
+
+function buildValidDsl(): string {
+  return agentSpecToChineseDsl(formConfigToAgentSpec(baseForm, ecommerceSupportTemplate));
+}
 
 async function startServer() {
   const server = createBuilderRunnerServer();
@@ -58,6 +63,43 @@ describe("@yutra/builder-runner", () => {
     expect(body.service).toBe("yutra-builder-runner");
   });
 
+  it("POST /dsl/inspect valid YAML returns normalized canonical summary", async () => {
+    const baseUrl = await startServer();
+    const res = await fetch(`${baseUrl}/dsl/inspect`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ dslText: buildValidDsl(), format: "yaml" })
+    });
+    const body = (await res.json()) as {
+      ok: boolean;
+      normalized?: unknown;
+      canonical?: { agent?: string };
+      summary?: { states?: number; skillActions?: number };
+      explain?: string;
+    };
+    expect(res.status).toBe(200);
+    expect(body.ok).toBe(true);
+    expect(body.canonical?.agent).toBe("generated_agent");
+    expect(body.summary?.states).toBeGreaterThan(0);
+    expect(body.summary?.skillActions).toBeGreaterThan(0);
+    expect(body.explain).toContain("=== Canonical IR Summary ===");
+  });
+
+  it("POST /dsl/inspect invalid YAML returns structured error", async () => {
+    const baseUrl = await startServer();
+    const res = await fetch(`${baseUrl}/dsl/inspect`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ dslText: "智能体: [", format: "yaml" })
+    });
+    const body = (await res.json()) as { ok: boolean; error?: { code?: string }; validation?: { ok?: boolean; issues?: unknown[] } };
+    expect(res.status).toBe(400);
+    expect(body.ok).toBe(false);
+    expect(body.error?.code).toBe("DSL_PARSE_ERROR");
+    expect(body.validation?.ok).toBe(false);
+    expect((body.validation?.issues ?? []).length).toBeGreaterThan(0);
+  });
+
   it("POST /run-preview with default shipping form returns completed", async () => {
     const baseUrl = await startServer();
     const res = await fetch(`${baseUrl}/run-preview`, {
@@ -77,6 +119,75 @@ describe("@yutra/builder-runner", () => {
     expect(res.status).toBe(200);
     expect(body.ok).toBe(true);
     expect(body.run?.status).toBe("completed");
+  });
+
+  it("POST /run-preview sourceMode=builder still works", async () => {
+    const baseUrl = await startServer();
+    const res = await fetch(`${baseUrl}/run-preview`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        sourceMode: "builder",
+        form: baseForm,
+        input: {
+          context: {
+            issue_type: "shipping_query",
+            order_id: "ORDER-1001"
+          }
+        }
+      })
+    });
+    const body = (await res.json()) as { ok: boolean; run?: { status: string } };
+    expect(res.status).toBe(200);
+    expect(body.ok).toBe(true);
+    expect(body.run?.status).toBe("completed");
+  });
+
+  it("POST /run-preview sourceMode=dsl works and preserves skill trace metadata", async () => {
+    const baseUrl = await startServer();
+    const res = await fetch(`${baseUrl}/run-preview`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        sourceMode: "dsl",
+        dslText: buildValidDsl(),
+        format: "yaml",
+        input: {
+          context: {
+            issue_type: "shipping_query",
+            order_id: "ORDER-1001"
+          }
+        }
+      })
+    });
+    const body = (await res.json()) as {
+      ok: boolean;
+      run?: { status: string };
+      events?: Array<{ payload?: Record<string, unknown> }>;
+    };
+    expect(res.status).toBe(200);
+    expect(body.ok).toBe(true);
+    expect(body.run?.status).toBe("completed");
+    expect((body.events ?? []).some((event) => event.payload?.implementationType === "skill")).toBe(true);
+  });
+
+  it("POST /run-preview sourceMode=dsl invalid DSL does not execute Runtime", async () => {
+    const baseUrl = await startServer();
+    const res = await fetch(`${baseUrl}/run-preview`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        sourceMode: "dsl",
+        dslText: "智能体: [",
+        format: "yaml",
+        input: { context: { issue_type: "shipping_query" } }
+      })
+    });
+    const body = (await res.json()) as { ok: boolean; error?: { code?: string }; events?: unknown[] };
+    expect(res.status).toBe(400);
+    expect(body.ok).toBe(false);
+    expect(body.error?.code).toBe("DSL_PARSE_ERROR");
+    expect(body.events).toEqual([]);
   });
 
   it("POST /run-preview with invalid form returns structured error", async () => {
@@ -170,7 +281,7 @@ describe("@yutra/builder-runner", () => {
           language: "zh-CN"
         },
         brief: {
-          text: "物流超过48小时未更新需要标记延迟。",
+          text: "物流超过48小时未更新，需要标记延迟。",
           locale: "zh-CN"
         }
       })
@@ -224,7 +335,7 @@ describe("@yutra/builder-runner", () => {
           language: "zh-CN"
         },
         brief: {
-          text: "请生成草案",
+          text: "请生成草案。",
           locale: "zh-CN"
         }
       })

@@ -23,6 +23,7 @@
   "dependencies": {
     "@yutra/builder-ai-core": "workspace:*",
     "@yutra/builder-core": "workspace:*",
+    "@yutra/dsl": "workspace:*",
     "@yutra/runtime": "workspace:*",
     "@yutra/trace": "workspace:*"
   },

@@ -105,6 +105,9 @@ importers:
       '@yutra/builder-core':
         specifier: workspace:*
         version: link:../../packages/builder-core
+      '@yutra/dsl':
+        specifier: workspace:*
+        version: link:../../packages/dsl
       '@yutra/runtime':
         specifier: workspace:*
         version: link:../../packages/runtime
@@ -115,6 +118,12 @@ importers:
       tsx:
         specifier: ^4.20.6
         version: 4.21.0
+
+  packages/archetype-core:
+    dependencies:
+      zod:
+        specifier: ^3.24.2
+        version: 3.25.76
 
   packages/builder-ai-core:
     dependencies:

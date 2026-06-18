@@ -4,13 +4,14 @@ import {
   builderFormSchema,
   ecommerceSupportTemplate,
   formConfigToAgentSpec,
-  validateGeneratedSpec,
-  type BuilderValidationResult
+  validateGeneratedSpec
 } from "@yutra/builder-core";
 import { executeRun } from "@yutra/runtime";
 import { MemoryTraceStorage, buildAuditBundle } from "@yutra/trace";
 import type { RuntimeInput } from "@yutra/runtime";
-import type { BuilderRunPreviewRequest, BuilderRunPreviewResponse } from "./types";
+import type { AgentSpec } from "@yutra/spec";
+import type { BuilderRunPreviewRequest, BuilderRunPreviewResponse, BuilderRunnerValidationResult } from "./types";
+import { inspectDslText } from "./dsl-inspect";
 import { buildTimeline, sanitizeErrorMessage, toTraceJsonl } from "./response-formatters";
 
 const DEFAULT_SKILLS_DIR = "examples/ecommerce-support/skills";
@@ -35,7 +36,7 @@ function resolveSkillsDir(pathLike?: string): string {
   return resolve(root, raw);
 }
 
-function validationFailedResult(validation: BuilderValidationResult, code: string, message: string): BuilderRunPreviewResponse {
+function validationFailedResult(validation: BuilderRunnerValidationResult, code: string, message: string): BuilderRunPreviewResponse {
   return {
     ok: false,
     error: { code, message },
@@ -87,6 +88,20 @@ function normalizeSpecForRuntime<T extends object>(spec: T): T {
 }
 
 export async function runBuilderPreview(request: BuilderRunPreviewRequest): Promise<BuilderRunPreviewResponse> {
+  let spec: AgentSpec;
+  let validation: BuilderRunnerValidationResult;
+
+  if (request.sourceMode === "dsl") {
+    const inspect = inspectDslText({ dslText: request.dslText, format: request.format ?? "yaml" });
+    if (!inspect.ok) {
+      return validationFailedResult(inspect.validation, inspect.error.code, inspect.error.message);
+    }
+    if (!inspect.validation.ok) {
+      return validationFailedResult(inspect.validation, "DSL_VALIDATION_FAILED", "DSL validation failed.");
+    }
+    spec = normalizeSpecForRuntime(structuredClone(inspect.canonical as AgentSpec));
+    validation = inspect.validation;
+  } else {
   const parsedForm = builderFormSchema.safeParse(request.form);
   if (!parsedForm.success) {
     return validationFailedResult(
@@ -104,7 +119,6 @@ export async function runBuilderPreview(request: BuilderRunPreviewRequest): Prom
     );
   }
 
-  let spec;
   try {
     spec = normalizeSpecForRuntime(formConfigToAgentSpec(parsedForm.data, ecommerceSupportTemplate));
   } catch (error) {
@@ -115,9 +129,10 @@ export async function runBuilderPreview(request: BuilderRunPreviewRequest): Prom
     );
   }
 
-  const validation = validateGeneratedSpec(spec);
+  validation = validateGeneratedSpec(spec);
   if (!validation.ok) {
     return validationFailedResult(validation, "BUILDER_SPEC_INVALID", "Generated AgentSpec validation failed.");
+  }
   }
 
   try {

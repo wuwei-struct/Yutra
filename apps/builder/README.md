@@ -1,30 +1,18 @@
-# Basic Agent Builder UI (Local Prototype)
+# Yutra Studio (Local Prototype)
 
-This app is a local single-user Builder UI prototype for Yutra.
+`apps/builder` is now the first Yutra Studio shell.
 
-It demonstrates:
-
-- template selection (`ecommerce-support`)
-- basic agent form input
-- intent / skill selection
-- rules configuration
-- AgentSpec JSON preview
-- Chinese DSL draft preview
-- generated spec validation preview
-- local Run Preview through builder-runner
-- local trace timeline and audit bundle preview/download
-- AI Draft Assistant (tags + brief -> FlowDraft -> Apply)
-- AI Draft Provider Mode (mock default, optional real provider via builder-runner)
+Yutra Studio is a local single-user Agent Editor Workbench that organizes existing Builder Core, AI Draft, DSL preview, Run Preview, Trace, and Audit capabilities into one workspace.
 
 ## Run
 
-Terminal 1 (Runner):
+Terminal 1:
 
 ```bash
 pnpm builder:runner
 ```
 
-Terminal 2 (UI):
+Terminal 2:
 
 ```bash
 pnpm builder:dev
@@ -42,22 +30,26 @@ pnpm --filter @yutra/builder build
 pnpm --filter @yutra/builder test
 ```
 
-## Scope
+## Workbench Layout
 
-- Local prototype only
-- Runtime preview through local runner only
-- No trace viewer integration
-- AI Draft uses local mock provider only
-- Real provider mode is optional and goes through builder-runner `/ai-draft-preview`
-- API key is never entered in browser
-- AI Draft generates FlowDraft (draft), not final executable DSL
-- Apply Draft requires human confirmation
-- Runtime execution remains manual via Run Preview
-- No persistence/database
-- No SaaS/multi-tenant/login
-- No cloud backend
+- Sidebar: local navigation shell.
+- Top bar: draft status, local save placeholder, publish placeholder.
+- Main left: AI Draft Assistant and structured Builder config.
+- Main center: DSL editor buffer, AgentSpec JSON, visual flow beta.
+- Main right: validation, DSL normalized view, canonical IR, structure overview.
+- Bottom left: run input and local runner options.
+- Bottom center: embedded trace timeline and run result views.
+- Bottom right: selected event detail and audit summary/download.
 
-## Roadmap
+## Current Boundaries
 
-- P5-03: Builder Run + Trace
-- P5-04: AI Assisted Draft
+- Local prototype only.
+- No login, database, persistence, publishing, or multi-tenant features.
+- AI Draft never auto-runs runtime.
+- Runtime preview still goes through local builder-runner.
+- DSL editing supports Validate DSL, Inspect DSL, and Apply DSL as Run Source.
+- Source mode can be `Builder Source` or `DSL Source`.
+- DSL Source runs through `DSL -> normalized -> canonical AgentSpec -> Runtime Preview`.
+- DSL Source does not backfill the BuilderFormConfig form fields.
+- Studio supports English / 中文 UI switching from the top bar.
+- The language switch only changes UI labels; DSL text, Trace event type strings, payload raw fields, and canonical IR remain unchanged.

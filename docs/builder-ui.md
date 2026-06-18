@@ -1,84 +1,64 @@
-# Builder UI (P5-04B)
+# Builder UI / Yutra Studio (P5-06)
 
 ## Position
 
-`apps/builder` is a local single-user Basic Agent Builder UI prototype.
+`apps/builder` is the Yutra Studio local workbench prototype.
 
-It focuses on:
-
-- business configuration input
-- generated AgentSpec preview
-- generated Chinese DSL draft preview
-- generated validation preview
-- local run preview execution
-- local trace timeline and audit preview
-- local AI Draft assistant (FlowDraft generation + apply preview)
+It uses existing Builder Core, Builder AI Core, Builder Runner, Runtime, Trace, and Audit capabilities. The UI reorganizes them into an Agent Editor Workbench; it does not add new runtime semantics.
 
 ## Page Structure
 
-- Header: Yutra Agent Builder
-- Left panel:
-  - AI Draft Assistant
-  - TemplateSelector
-  - AgentBasicsForm
-  - IntentSelector
-  - SkillSelector
-  - RulesForm
-- Right panel:
-  - AgentSpec JSON
-  - Chinese DSL
-  - Validation
-  - Run Preview
-  - Trace timeline + event detail
-  - Audit bundle
-  - Copy/download buttons
+- Sidebar navigation shell
+- Top operation bar
+- Main workspace:
+  - Natural Language Draft / AI Draft Assistant
+  - DSL Editor / AgentSpec JSON / Visual Flow Beta
+  - Inspect panel
+- Bottom workbench:
+  - Run debug input and environment controls
+  - Trace timeline and run result views
+  - Event detail and audit summary
 
 ## Current Capabilities
 
-- Select `ecommerce-support` template
-- Edit basic fields (`agentName`, `version`, `responseStyle`, `language`)
-- Select intents and skills
-- Configure basic ecommerce rules
-- Generate preview data through `@yutra/builder-core`
-- Call local `@yutra/builder-runner` for runtime preview
-- Show run summary, trace timeline, and audit JSON
-- Download trace JSONL and audit JSON locally
-- Generate FlowDraft from tags + natural language brief (mock provider)
-- Preview draft explanation and apply diff
-- Apply draft manually into BuilderFormConfig
+- Generate FlowDraft from tags and natural language brief.
+- Apply draft manually into BuilderFormConfig.
+- Validate and inspect editable DSL through local builder-runner.
+- Apply inspected DSL as Run Preview source.
+- Preview generated DSL and canonical AgentSpec.
+- Show validation, normalized structure, canonical IR, and structure counts.
+- Run local preview via builder-runner.
+- Inspect trace timeline and selected event payload.
+- Download trace JSONL and audit JSON.
+- Switch Studio UI labels between English and 中文.
 
-## Boundaries
+Localization is intentionally UI-only. It does not translate DSL content, AgentSpec JSON keys, Trace event type values, payload raw fields, action names, state ids, skill names, file paths, code blocks, or command lines.
 
-- No direct runtime execution in browser (runtime is called via local runner)
-- Not trace viewer
-- Not real LLM integration (mock provider only)
-- Not auto runtime execution from AI draft
-- Not persistence/database/file writing
-- Not SaaS/login/multi-tenant
+## Important Boundary
 
-## AI Draft Assistant Notes
+DSL editing now has two source modes:
 
-- AI Draft uses `@yutra/builder-ai-core` directly
-- Flow: tags + brief -> FlowDraft -> explain/validate -> draft form diff -> manual apply
-- Apply updates current BuilderFormConfig; AgentSpec/DSL/Validation refresh automatically
-- Runtime is still manual through Run Preview button
+- Builder Source:
 
-## Provider Mode (P5-04C)
+```text
+BuilderFormConfig -> AgentSpec -> builder-runner -> runtime -> trace/audit
+```
 
-AI Draft Assistant now has Provider Mode:
+- DSL Source:
 
-- `Mock Draft Provider` (default)
-- `Real LLM Provider` (optional)
+```text
+DSL text -> /dsl/inspect -> normalized -> canonical AgentSpec -> builder-runner -> runtime -> trace/audit
+```
 
-Behavior:
+Applying DSL Source does not backfill the BuilderFormConfig form fields. Full DSL-to-form roundtrip remains out of scope.
 
-- Mock mode keeps local deterministic draft generation.
-- Real mode calls builder-runner `POST /ai-draft-preview`.
-- Browser never asks for API key input.
-- Runner unavailable shows friendly hint to start `pnpm builder:runner`.
+## Non-goals
 
-Safety boundary remains unchanged:
-
-- no auto apply
-- no auto runtime run
-- no direct final DSL generation from provider output
+- No login.
+- No database.
+- No real save/publish.
+- No multi-tenant backend.
+- No drag-and-drop flow editor.
+- No marketplace or remote registry.
+- No full AST editor.
+- No DSL-to-BuilderFormConfig reverse mapper.

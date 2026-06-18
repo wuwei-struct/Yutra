@@ -1,9 +1,15 @@
-import type { BuilderIssue } from "@yutra/builder-core";
 import { formatIssuePath } from "../lib/formatters";
+
+interface ValidationIssue {
+  code: string;
+  message: string;
+  severity: "error" | "warning";
+  path?: string[];
+}
 
 interface ValidationPanelProps {
   ok: boolean;
-  issues: BuilderIssue[];
+  issues: ValidationIssue[];
   uiWarnings: string[];
 }
 

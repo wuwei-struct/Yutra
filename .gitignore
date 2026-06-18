@@ -7,3 +7,4 @@ coverage/
 .env.*
 .yutra/traces/*
 .yutra/audit/*
+.yutra/*.log

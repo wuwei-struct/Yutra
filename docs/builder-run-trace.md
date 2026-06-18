@@ -2,7 +2,9 @@
 
 ## Flow
 
-Builder UI (`apps/builder`) calls local Builder Runner (`apps/builder-runner`):
+Yutra Studio (`apps/builder`) calls local Builder Runner (`apps/builder-runner`).
+
+Builder Source flow:
 
 1. `formConfigToAgentSpec()`
 2. `validateGeneratedSpec()`
@@ -17,6 +19,15 @@ AI Draft Assistant relation:
 - user must manually apply draft
 - runtime execution is still manual by clicking Run Preview
 - real provider mode (if enabled) is handled by `/ai-draft-preview`, still no runtime execution
+
+DSL Source flow:
+
+1. user edits DSL text
+2. Studio calls `/dsl/inspect`
+3. builder-runner parses, normalizes, canonicalizes, and validates DSL
+4. user applies DSL as run source
+5. `/run-preview` receives `sourceMode=dsl`
+6. canonical AgentSpec executes through the same Runtime Preview path
 
 ## Start
 
@@ -55,3 +66,5 @@ From UI:
 - AI draft preview is supported, but runtime execution is always manual
 - No persistence or remote storage
 - No Trace Viewer replacement (minimal embedded trace panel only)
+- DSL Source can run after successful inspect
+- DSL Source does not rewrite BuilderFormConfig form fields

@@ -1,6 +1,6 @@
 # Builder Runner (Local)
 
-`@yutra/builder-runner` is a local Node service for Builder Run Preview.
+`@yutra/builder-runner` is a local Node service for Yutra Studio run preview, DSL inspect, trace, and audit demo flows.
 
 It is for local development/demo only, not a SaaS backend.
 
@@ -22,14 +22,53 @@ Returns:
 { "ok": true, "service": "yutra-builder-runner" }
 ```
 
+### POST /dsl/inspect
+
+Receives `dslText + format`, then:
+
+1. parses YAML or JSON DSL
+2. runs structural normalize and name canonicalization via `@yutra/dsl`
+3. validates the canonical AgentSpec
+4. returns raw, normalized, canonical IR, explain text, validation issues, and summary
+
+This endpoint does not execute Runtime and does not write files.
+
 ### POST /run-preview
 
-Receives `form + input + options`, then:
+Supports Builder Source:
+
+```json
+{
+  "sourceMode": "builder",
+  "form": {},
+  "input": {}
+}
+```
+
+and DSL Source:
+
+```json
+{
+  "sourceMode": "dsl",
+  "dslText": "agent: ecommerce_support\ninitial_state: triage\nstates:\n  triage:\n    final: true",
+  "format": "yaml",
+  "input": {}
+}
+```
+
+Builder Source flow:
 
 1. generates AgentSpec via `@yutra/builder-core`
 2. validates generated spec
 3. executes local runtime preview
 4. returns trace events, timeline, trace JSONL, and audit bundle
+
+DSL Source flow:
+
+1. parses and inspects DSL via `@yutra/dsl`
+2. rejects invalid DSL before runtime execution
+3. executes the canonical AgentSpec when validation passes
+4. returns the same run preview / trace / audit shape
 
 ### POST /ai-draft-preview
 
@@ -41,39 +80,15 @@ Receives `providerMode + tags + brief + options`, then:
 
 This endpoint does not execute Runtime and does not apply draft automatically.
 
-Example request:
-
-```json
-{
-  "providerMode": "mock",
-  "tags": {
-    "scenario": "ecommerce_support",
-    "capabilities": ["query_order", "query_shipping_status"],
-    "strategies": ["full_trace_audit"],
-    "language": "zh-CN"
-  },
-  "brief": {
-    "text": "物流超过48小时未更新，标记延迟。",
-    "locale": "zh-CN"
-  }
-}
-```
-
-Real mode env (local only):
-
-- `YUTRA_BUILDER_AI_PROVIDER=real`
-- `YUTRA_BUILDER_AI_BASE_URL=...`
-- `YUTRA_BUILDER_AI_MODEL=...`
-- `YUTRA_BUILDER_AI_API_KEY=...`
-- `YUTRA_BUILDER_AI_TIMEOUT_MS=30000`
-
 ## Boundaries
 
 - local-only service
 - no login / no multi-tenant
 - no database / no remote persistence
 - no cloud deployment contract
-- no final DSL generation
+- no file writes from DSL inspect
 - no runtime execution from AI draft endpoint
+- no DSL-to-BuilderFormConfig backfill
 - no secret value returned to UI
 - no real customer API integration
+

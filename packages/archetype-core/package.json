@@ -1,0 +1,36 @@
+{
+  "name": "@yutra/archetype-core",
+  "version": "0.1.0-rc.1",
+  "private": false,
+  "description": "Yutra archetype manifest schema, builtin registry, and governance-ready validation",
+  "type": "module",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --dts",
+    "test": "vitest run --passWithNoTests",
+    "lint": "eslint src --max-warnings=0"
+  },
+  "dependencies": {
+    "zod": "^3.24.2"
+  },
+  "license": "MIT",
+  "author": "Yutra Contributors",
+  "keywords": [
+    "yutra",
+    "archetype",
+    "manifest",
+    "registry",
+    "governance"
+  ]
+}

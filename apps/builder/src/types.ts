@@ -1,4 +1,4 @@
-import type { BuilderFormConfig, BuilderIssue, BuilderValidationResult } from "@yutra/builder-core";
+import type { BuilderFormConfig, BuilderIssue } from "@yutra/builder-core";
 import type { AiDraftIssue, AiDraftValidationResult, FlowDraft, FlowDraftScenario, NaturalLanguageBrief, TagSelection } from "@yutra/builder-ai-core";
 
 export interface EcommerceRuleInputs {
@@ -37,12 +37,67 @@ export interface BuilderRunnerRequestInput {
   text?: string;
 }
 
-export interface BuilderRunPreviewRequest {
-  form: BuilderFormConfig;
-  input?: BuilderRunnerRequestInput;
-  options?: {
-    skillsDir?: string;
-    trace?: boolean;
+export interface BuilderRunnerIssue {
+  code: string;
+  message: string;
+  severity: "error" | "warning";
+  path?: string[];
+  hint?: string;
+}
+
+export interface BuilderRunnerValidationResult {
+  ok: boolean;
+  issues: BuilderRunnerIssue[];
+}
+
+export type BuilderRunPreviewRequest =
+  | {
+      sourceMode?: "builder";
+      form: BuilderFormConfig;
+      input?: BuilderRunnerRequestInput;
+      options?: {
+        skillsDir?: string;
+        trace?: boolean;
+      };
+    }
+  | {
+      sourceMode: "dsl";
+      dslText: string;
+      format?: "yaml" | "json";
+      input?: BuilderRunnerRequestInput;
+      options?: {
+        skillsDir?: string;
+        trace?: boolean;
+      };
+    };
+
+export interface BuilderDslInspectSummary {
+  agent: string;
+  states: number;
+  actions: number;
+  intents: number;
+  transitions: number;
+  handoffStates: number;
+  skillActions: number;
+}
+
+export interface BuilderDslInspectResponse {
+  ok: boolean;
+  format?: "yaml" | "json";
+  raw?: unknown;
+  normalized?: unknown;
+  canonical?: unknown;
+  validation: BuilderRunnerValidationResult;
+  explain?: string;
+  summary?: BuilderDslInspectSummary;
+  mappings?: {
+    fieldAliases: unknown[];
+    canonicalNames: unknown[];
+  };
+  warnings?: BuilderRunnerIssue[];
+  error?: {
+    code: string;
+    message: string;
   };
 }
 
@@ -52,7 +107,7 @@ export interface BuilderRunPreviewResponse {
     code: string;
     message: string;
   };
-  validation: BuilderValidationResult;
+  validation: BuilderRunnerValidationResult;
   run?: {
     runId: string;
     status: "completed" | "failed" | "handoff" | "stuck";

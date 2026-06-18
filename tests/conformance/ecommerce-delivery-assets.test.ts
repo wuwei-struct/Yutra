@@ -66,13 +66,17 @@ describe("P3-04 ecommerce delivery assets", () => {
     expect(deliverables.includes(".yutra/audit/")).toBe(true);
   });
 
-  it("README navigation includes ecommerce delivery docs", () => {
+  it("README navigation exposes only public ecommerce demo docs", () => {
     const readme = read(resolve(workspaceRoot, "README.md"));
     const readmeZh = read(resolve(workspaceRoot, "README.zh-CN.md"));
     expect(readme.includes("docs/ecommerce-demo-path.md")).toBe(true);
-    expect(readme.includes("docs/ecommerce-pricing-scope.md")).toBe(true);
     expect(readmeZh.includes("docs/ecommerce-demo-path.md")).toBe(true);
-    expect(readmeZh.includes("docs/ecommerce-proposal-outline.md")).toBe(true);
+    expect(readme.includes("docs/ecommerce-pricing-scope.md")).toBe(false);
+    expect(readme.includes("docs/ecommerce-proposal-outline.md")).toBe(false);
+    expect(readmeZh.includes("docs/ecommerce-pricing-scope.md")).toBe(false);
+    expect(readmeZh.includes("docs/ecommerce-proposal-outline.md")).toBe(false);
+    expect(readme.includes("private delivery repositories")).toBe(true);
+    expect(readmeZh.includes("私有交付仓库")).toBe(true);
   });
 
   it("delivery docs links resolve to real files or generated artifact locations", () => {

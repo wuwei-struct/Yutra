@@ -1,12 +1,14 @@
-// @vitest-environment jsdom
+﻿// @vitest-environment jsdom
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import * as aiDraftCore from "@yutra/builder-ai-core";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import App from "../src/App";
-import { runPreview } from "../src/lib/runner-client";
+import { I18nProvider, STUDIO_LOCALE_STORAGE_KEY, resolveInitialLocale } from "../src/i18n";
 import { generateDraftPreview } from "../src/lib/ai-draft-client";
+import { inspectDsl, runPreview } from "../src/lib/runner-client";
 
 vi.mock("../src/lib/runner-client", () => ({
+  inspectDsl: vi.fn(),
   runPreview: vi.fn()
 }));
 
@@ -17,420 +19,346 @@ vi.mock("../src/lib/ai-draft-client", () => ({
 afterEach(() => {
   cleanup();
   vi.clearAllMocks();
+  window.localStorage.clear();
 });
 
-describe("@yutra/builder UI", () => {
-  it("Builder app renders", () => {
-    render(<App />);
-    expect(screen.getByText("Yutra Agent Builder")).toBeTruthy();
+function renderStudio() {
+  return render(
+    <I18nProvider>
+      <App />
+    </I18nProvider>
+  );
+}
+
+function mockCompletedRun() {
+  vi.mocked(runPreview).mockResolvedValue({
+    ok: true,
+    validation: { ok: true, issues: [] },
+    run: {
+      runId: "studio-run-1",
+      status: "completed",
+      agent: "builder-agent",
+      initialState: "triage",
+      finalState: "resolved",
+      matchedIntent: "shipping_query",
+      steps: 2
+    },
+    events: [
+      { id: "event-1", type: "run.started", ts: "2026-01-01T00:00:00.000Z", payload: { input: { context: {} } } },
+      {
+        id: "event-2",
+        type: "action.succeeded",
+        ts: "2026-01-01T00:00:01.000Z",
+        state: "query_shipping",
+        action: "query_shipping_status",
+        payload: {
+          implementationType: "skill",
+          skillName: "query_shipping_status",
+          durationMs: 8,
+          output: { status: "in_transit" },
+          contextDelta: { shipping_status: "in_transit" }
+        }
+      }
+    ],
+    timeline: [
+      { index: 0, type: "run.started", state: "triage" },
+      {
+        index: 1,
+        type: "action.succeeded",
+        state: "query_shipping",
+        action: "query_shipping_status",
+        implementationType: "skill",
+        skillName: "query_shipping_status",
+        status: "ok"
+      }
+    ],
+    traceJsonl: "{\"type\":\"run.started\"}\n",
+    auditBundle: {
+      handoffOrErrorSummary: {
+        handoff: false,
+        failed: false
+      }
+    }
+  });
+}
+
+function mockDslInspectSuccess() {
+  vi.mocked(inspectDsl).mockResolvedValue({
+    ok: true,
+    format: "yaml",
+    raw: { ["\u667a\u80fd\u4f53"]: "\u7535\u5546\u552e\u540e\u5ba2\u670d" },
+    normalized: { agent: "\u7535\u5546\u552e\u540e\u5ba2\u670d" },
+    canonical: {
+      agent: "generated_agent",
+      initial_state: "triage",
+      states: { triage: { transitions: [{ to: "resolved" }] }, resolved: { final: true } },
+      actions: [{ name: "query_shipping_status", implementation: { type: "skill", skillName: "query_shipping_status" } }],
+      intents: [{ name: "shipping_query" }]
+    },
+    validation: { ok: true, issues: [] },
+    explain: "=== Canonical IR Summary ===\nagent: generated_agent",
+    summary: { agent: "generated_agent", states: 2, actions: 1, intents: 1, transitions: 1, handoffStates: 0, skillActions: 1 },
+    mappings: { fieldAliases: [{ from: "\u667a\u80fd\u4f53", to: "agent" }], canonicalNames: [] },
+    warnings: []
+  });
+}
+
+function mockDslInspectFailure() {
+  vi.mocked(inspectDsl).mockResolvedValue({
+    ok: false,
+    format: "yaml",
+    error: { code: "DSL_PARSE_ERROR", message: "Failed to parse YAML DSL source." },
+    validation: {
+      ok: false,
+      issues: [{ code: "DSL_PARSE_ERROR", message: "Failed to parse YAML DSL source.", severity: "error", path: ["agent"] }]
+    }
+  });
+}
+
+async function inspectAndApplyDsl() {
+  fireEvent.click(screen.getByRole("button", { name: "Inspect DSL" }));
+  await waitFor(() => expect((screen.getByRole("button", { name: "Apply DSL as Run Source" }) as HTMLButtonElement).disabled).toBe(false));
+  fireEvent.click(screen.getByRole("button", { name: "Apply DSL as Run Source" }));
+  await waitFor(() => expect(screen.getByText("DSL Source active")).toBeTruthy());
+}
+
+describe("@yutra/builder Studio UI", () => {
+  it("resolves zh-CN when browser language starts with zh", () => {
+    expect(resolveInitialLocale({ navigatorLanguage: "zh-CN" })).toBe("zh-CN");
+    expect(resolveInitialLocale({ navigatorLanguage: "zh-Hans" })).toBe("zh-CN");
   });
 
-  it("default ecommerce template is selected", () => {
-    render(<App />);
-    const select = screen.getByLabelText("Template") as HTMLSelectElement;
-    expect(select.value).toBe("ecommerce-support");
+  it("resolves en when browser language is not zh", () => {
+    expect(resolveInitialLocale({ navigatorLanguage: "en-US" })).toBe("en");
+    expect(resolveInitialLocale({ navigatorLanguage: "fr-FR" })).toBe("en");
   });
 
-  it("changing agent name updates generated JSON", () => {
-    render(<App />);
-    const input = screen.getByLabelText("Agent Name");
-    fireEvent.change(input, { target: { value: "My Custom Agent" } });
-    expect(screen.getByLabelText("AgentSpec JSON").textContent).toContain('"agent": "my-custom-agent"');
+  it("manual language switch updates TopBar and Sidebar labels", () => {
+    renderStudio();
+    fireEvent.change(screen.getByLabelText("Studio Language"), { target: { value: "zh-CN" } });
+    expect(screen.getByText("我的 Agent")).toBeTruthy();
+    expect(screen.getByText("草稿")).toBeTruthy();
+    expect(screen.getByText("预览 Agent")).toBeTruthy();
+
+    fireEvent.change(screen.getByLabelText("Studio Language"), { target: { value: "en" } });
+    expect(screen.getByText("My Agent")).toBeTruthy();
+    expect(screen.getByText("Draft")).toBeTruthy();
   });
 
-  it("selecting/deselecting skill updates generated spec", () => {
-    render(<App />);
-    const skillCheckbox = screen.getByLabelText("skill-query_shipping_status");
-    fireEvent.click(skillCheckbox);
-    expect(screen.getByLabelText("AgentSpec JSON").textContent).not.toContain("query_shipping_status");
+  it("selected locale persists to localStorage", () => {
+    renderStudio();
+    fireEvent.change(screen.getByLabelText("Studio Language"), { target: { value: "zh-CN" } });
+    expect(window.localStorage.getItem(STUDIO_LOCALE_STORAGE_KEY)).toBe("zh-CN");
   });
 
-  it("generated Chinese DSL is visible", () => {
-    render(<App />);
-    fireEvent.click(screen.getByText("中文 DSL"));
-    expect(screen.getByLabelText("Chinese DSL").textContent).toContain("智能体:");
+  it("stored zh-CN locale renders Chinese labels by default", () => {
+    window.localStorage.setItem(STUDIO_LOCALE_STORAGE_KEY, "zh-CN");
+    renderStudio();
+    expect(screen.getByText("我的 Agent")).toBeTruthy();
+    expect(screen.getByText("自然语言生成草案")).toBeTruthy();
   });
 
-  it("validation panel shows ok for default form", () => {
-    render(<App />);
-    fireEvent.click(screen.getByText("Validation"));
+  it("Chinese locale does not translate DSL text or trace event type values", async () => {
+    window.localStorage.setItem(STUDIO_LOCALE_STORAGE_KEY, "zh-CN");
+    mockCompletedRun();
+    renderStudio();
+    expect((screen.getByLabelText("DSL Editor Text") as HTMLTextAreaElement).value).toContain("智能体:");
+    fireEvent.click(screen.getByRole("button", { name: "运行预览" }));
+    await waitFor(() => {
+      expect(screen.getByLabelText("Trace Timeline").textContent).toContain("action.succeeded");
+      expect(screen.getByLabelText("Trace Timeline").textContent).toContain("query_shipping_status");
+    });
+  });
+
+  it("Studio shell renders", () => {
+    renderStudio();
+    expect(screen.getByText("Yutra Studio")).toBeTruthy();
+    expect(screen.getByLabelText("Agent Editor Workbench")).toBeTruthy();
+  });
+
+  it("Sidebar navigation renders", () => {
+    renderStudio();
+    expect(screen.getByLabelText("Studio Navigation")).toBeTruthy();
+    expect(screen.getByText("My Agent")).toBeTruthy();
+    expect(screen.getByText("Scenario Packs")).toBeTruthy();
+    fireEvent.click(screen.getByText("Dashboard"));
+    expect(screen.getByLabelText("Coming Soon")).toBeTruthy();
+  });
+
+  it("Top bar renders current agent title", () => {
+    renderStudio();
+    expect(screen.getByLabelText("Studio Top Bar").textContent).toContain("My Agent /");
+    expect(screen.getByText("Draft")).toBeTruthy();
+    expect(screen.getByText("Not persisted")).toBeTruthy();
+  });
+
+  it("Draft assistant panel renders", () => {
+    renderStudio();
+    expect(screen.getByLabelText("AI Draft Assistant")).toBeTruthy();
+    expect(screen.getByLabelText("AI Draft Brief")).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Generate Draft" })).toBeTruthy();
+  });
+
+  it("DSL editor tab renders generated DSL controls", () => {
+    renderStudio();
+    expect(screen.getByLabelText("DSL Editor Text")).toBeTruthy();
+    expect((screen.getByLabelText("DSL Editor Text") as HTMLTextAreaElement).value).toContain("\u667a\u80fd\u4f53:");
+    expect(screen.getByRole("button", { name: "Validate DSL" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Inspect DSL" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Apply DSL as Run Source" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Reset from Builder" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Copy DSL" })).toBeTruthy();
+  });
+
+  it("AgentSpec JSON tab renders", () => {
+    renderStudio();
+    fireEvent.click(screen.getByRole("button", { name: "AgentSpec JSON" }));
+    expect(screen.getByLabelText("AgentSpec JSON").textContent).toContain('"agent"');
+  });
+
+  it("inspect panel shows validation passed", () => {
+    renderStudio();
+    expect(screen.getByLabelText("Validation Panel")).toBeTruthy();
     expect(screen.getByText("passed")).toBeTruthy();
   });
 
-  it("invalid form state shows validation error", () => {
-    render(<App />);
-    const input = screen.getByLabelText("Agent Name");
-    fireEvent.change(input, { target: { value: "" } });
-    fireEvent.click(screen.getByText("Validation"));
-    expect(screen.getByText("failed")).toBeTruthy();
+  it("structure overview shows counts", () => {
+    renderStudio();
+    fireEvent.click(screen.getByRole("button", { name: "Overview" }));
+    expect(screen.getByLabelText("Structure Overview").textContent).toContain("states");
+    expect(screen.getByLabelText("Structure Overview").textContent).toContain("skill actions");
   });
 
-  it("copy buttons exist", () => {
-    render(<App />);
-    expect(screen.getByText("Copy AgentSpec JSON")).toBeTruthy();
-    fireEvent.click(screen.getByText("中文 DSL"));
-    expect(screen.getByText("Copy 中文 DSL")).toBeTruthy();
-  });
-
-  it("Builder app renders Run Preview UI", () => {
-    render(<App />);
-    expect(screen.getByRole("button", { name: "Run Preview" })).toBeTruthy();
+  it("run debug panel renders", () => {
+    renderStudio();
+    expect(screen.getByLabelText("Run Debug Panel")).toBeTruthy();
     expect(screen.getByLabelText("Sample Input")).toBeTruthy();
-    expect(screen.getByLabelText("Context JSON")).toBeTruthy();
+    expect(screen.getByLabelText("Run Environment")).toBeTruthy();
+    expect(screen.getByText("Running from Builder Config")).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Run Preview" })).toBeTruthy();
   });
 
-  it("sample input selector works", () => {
-    render(<App />);
-    const sampleSelect = screen.getByLabelText("Sample Input") as HTMLSelectElement;
-    fireEvent.change(sampleSelect, { target: { value: "handoffCase" } });
-    expect(sampleSelect.value).toBe("handoffCase");
-    expect((screen.getByLabelText("Context JSON") as HTMLTextAreaElement).value).toContain("ORDER-NEEDS-HUMAN");
-  });
-
-  it("invalid JSON input shows error", async () => {
-    render(<App />);
-    fireEvent.change(screen.getByLabelText("Context JSON"), { target: { value: "{ bad-json" } });
-    fireEvent.click(screen.getByRole("button", { name: "Run Preview" }));
-    await waitFor(() => {
-      expect(screen.getByText("Invalid JSON input.")).toBeTruthy();
-    });
-  });
-
-  it("run button calls runner-client", async () => {
-    vi.mocked(runPreview).mockResolvedValue({
-      ok: true,
-      validation: { ok: true, issues: [] },
-      run: {
-        runId: "run-1",
-        status: "completed",
-        agent: "test-agent",
-        initialState: "triage",
-        finalState: "resolved",
-        matchedIntent: "shipping_query",
-        steps: 2
-      },
-      events: [],
-      timeline: [],
-      traceJsonl: "",
-      auditBundle: {}
-    });
-    render(<App />);
+  it("run preview can still be triggered through UI test mock", async () => {
+    mockCompletedRun();
+    renderStudio();
     fireEvent.click(screen.getByRole("button", { name: "Run Preview" }));
     await waitFor(() => {
       expect(runPreview).toHaveBeenCalledTimes(1);
     });
   });
 
-  it("run summary renders", async () => {
-    vi.mocked(runPreview).mockResolvedValue({
-      ok: true,
-      validation: { ok: true, issues: [] },
-      run: {
-        runId: "run-summary-1",
-        status: "completed",
-        agent: "builder-agent",
-        initialState: "triage",
-        finalState: "resolved",
-        matchedIntent: "shipping_query",
-        steps: 3
-      },
-      events: [],
-      timeline: [],
-      traceJsonl: "",
-      auditBundle: {}
+  it("editing DSL marks buffer dirty", () => {
+    renderStudio();
+    fireEvent.change(screen.getByLabelText("DSL Editor Text"), { target: { value: "agent: edited" } });
+    expect(screen.getByText("dirty")).toBeTruthy();
+    expect(screen.getByText("not inspected")).toBeTruthy();
+  });
+
+  it("inspect success updates normalized and canonical panels", async () => {
+    mockDslInspectSuccess();
+    renderStudio();
+    fireEvent.click(screen.getByRole("button", { name: "Inspect DSL" }));
+    await waitFor(() => {
+      expect(inspectDsl).toHaveBeenCalledTimes(1);
+      expect(screen.getByText("inspect ok")).toBeTruthy();
     });
-    render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: "Normalized" }));
+    expect(screen.getByLabelText("Normalized Builder Config").textContent).toContain("\u7535\u5546\u552e\u540e\u5ba2\u670d");
+    fireEvent.click(screen.getByRole("button", { name: "Canonical IR" }));
+    expect(screen.getByLabelText("Canonical IR").textContent).toContain("generated_agent");
+  });
+
+  it("inspect failure shows structured errors", async () => {
+    mockDslInspectFailure();
+    renderStudio();
+    fireEvent.click(screen.getByRole("button", { name: "Inspect DSL" }));
+    await waitFor(() => {
+      expect(screen.getByText("inspect failed")).toBeTruthy();
+      expect(screen.getByText("Failed to parse YAML DSL source.")).toBeTruthy();
+    });
+    expect(screen.getByLabelText("Validation Panel").textContent).toContain("DSL_PARSE_ERROR");
+  });
+
+  it("Apply DSL switches sourceMode to dsl", async () => {
+    mockDslInspectSuccess();
+    renderStudio();
+    await inspectAndApplyDsl();
+    expect(screen.getByText("Running from DSL Source")).toBeTruthy();
+  });
+
+  it("Reset from Builder switches sourceMode to builder", async () => {
+    mockDslInspectSuccess();
+    renderStudio();
+    await inspectAndApplyDsl();
+    fireEvent.click(screen.getByRole("button", { name: "Reset from Builder" }));
+    expect(screen.getByText("Builder Source active")).toBeTruthy();
+    expect(screen.getByText("Running from Builder Config")).toBeTruthy();
+  });
+
+  it("Run Preview uses DSL source when sourceMode=dsl", async () => {
+    mockDslInspectSuccess();
+    mockCompletedRun();
+    renderStudio();
+    await inspectAndApplyDsl();
     fireEvent.click(screen.getByRole("button", { name: "Run Preview" }));
     await waitFor(() => {
-      const summary = screen.getByLabelText("Run Summary");
-      expect(summary).toBeTruthy();
-      expect(summary.textContent).toContain("status: completed");
+      expect(runPreview).toHaveBeenCalledWith(expect.objectContaining({ sourceMode: "dsl", dslText: expect.any(String), format: "yaml" }));
     });
   });
 
-  it("trace timeline renders skill event", async () => {
-    vi.mocked(runPreview).mockResolvedValue({
-      ok: true,
-      validation: { ok: true, issues: [] },
-      run: {
-        runId: "run-trace-1",
-        status: "completed",
-        agent: "builder-agent",
-        steps: 2
-      },
-      events: [{ type: "action.succeeded", payload: { implementationType: "skill", skillName: "query_shipping_status" } }],
-      timeline: [
-        {
-          index: 0,
-          type: "action.succeeded",
-          state: "query_shipping",
-          action: "query_shipping_status",
-          implementationType: "skill",
-          skillName: "query_shipping_status"
-        }
-      ],
-      traceJsonl: "{\"type\":\"action.succeeded\"}\n",
-      auditBundle: {}
-    });
-    render(<App />);
+  it("Run button is blocked when DSL invalid", async () => {
+    mockDslInspectSuccess();
+    renderStudio();
+    await inspectAndApplyDsl();
+    fireEvent.change(screen.getByLabelText("DSL Editor Text"), { target: { value: "agent: [" } });
+    expect((screen.getByRole("button", { name: "Run Preview" }) as HTMLButtonElement).disabled).toBe(true);
+  });
+
+  it("trace timeline renders after run result", async () => {
+    mockCompletedRun();
+    renderStudio();
     fireEvent.click(screen.getByRole("button", { name: "Run Preview" }));
     await waitFor(() => {
-      expect(screen.getByLabelText("Trace Timeline")).toBeTruthy();
+      expect(screen.getByLabelText("Trace Timeline").textContent).toContain("action.succeeded");
       expect(screen.getByText("Skill: query_shipping_status")).toBeTruthy();
     });
   });
 
-  it("audit panel renders", async () => {
-    vi.mocked(runPreview).mockResolvedValue({
-      ok: true,
-      validation: { ok: true, issues: [] },
-      run: {
-        runId: "run-audit-1",
-        status: "completed",
-        agent: "builder-agent",
-        steps: 2
-      },
-      events: [{ type: "run.completed" }],
-      timeline: [],
-      traceJsonl: "{\"type\":\"run.completed\"}\n",
-      auditBundle: {
-        handoffOrErrorSummary: {
-          handoff: false,
-          failed: false
-        }
-      }
-    });
-    render(<App />);
+  it("event detail updates when selecting event", async () => {
+    mockCompletedRun();
+    renderStudio();
     fireEvent.click(screen.getByRole("button", { name: "Run Preview" }));
     await waitFor(() => {
-      expect(screen.getByLabelText("Audit Panel")).toBeTruthy();
-      expect(screen.getByText("Download Audit JSON")).toBeTruthy();
+      expect(screen.getByText("Skill: query_shipping_status")).toBeTruthy();
     });
+    fireEvent.click(screen.getByText("Skill: query_shipping_status"));
+    expect(screen.getByLabelText("Studio Event Detail Panel").textContent).toContain("event-2");
+    expect(screen.getByLabelText("Studio Event Detail Panel").textContent).toContain("query_shipping_status");
   });
 
-  it("download buttons exist", () => {
-    render(<App />);
+  it("download buttons still exist", () => {
+    renderStudio();
     expect(screen.getByText("Download Trace JSONL")).toBeTruthy();
+    expect(screen.getByText("Download Audit JSON")).toBeTruthy();
   });
 
-  it("AI Draft panel renders", () => {
-    render(<App />);
-    expect(screen.getByLabelText("AI Draft Assistant")).toBeTruthy();
-    expect(screen.getByText("Show AI Draft Assistant")).toBeTruthy();
-  });
-
-  it("provider mode selector renders with default mock", () => {
-    render(<App />);
-    fireEvent.click(screen.getByText("Show AI Draft Assistant"));
-    const select = screen.getByLabelText("AI Draft Provider Mode") as HTMLSelectElement;
-    expect(select.value).toBe("mock");
-    expect(screen.getByText("Mock Draft Provider")).toBeTruthy();
-  });
-
-  it("default scenario is ecommerce_support", () => {
-    render(<App />);
-    fireEvent.click(screen.getByText("Show AI Draft Assistant"));
-    const scenarioSelect = screen.getByLabelText("AI Draft Scenario") as HTMLSelectElement;
-    expect(scenarioSelect.value).toBe("ecommerce_support");
-  });
-
-  it("capability tags render", () => {
-    render(<App />);
-    fireEvent.click(screen.getByText("Show AI Draft Assistant"));
-    expect(screen.getByLabelText("capability-query_order")).toBeTruthy();
-    expect(screen.getByLabelText("capability-create_refund_request")).toBeTruthy();
-  });
-
-  it("strategy tags render", () => {
-    render(<App />);
-    fireEvent.click(screen.getByText("Show AI Draft Assistant"));
-    expect(screen.getByLabelText("strategy-full_trace_audit")).toBeTruthy();
-    expect(screen.getByLabelText("strategy-service_oriented_response")).toBeTruthy();
-  });
-
-  it("brief editor renders default text", () => {
-    render(<App />);
-    fireEvent.click(screen.getByText("Show AI Draft Assistant"));
-    const brief = screen.getByLabelText("AI Draft Brief") as HTMLTextAreaElement;
-    expect(brief.value).toContain("48 小时");
-    expect(brief.value).toContain("5000");
-  });
-
-  it("Generate Draft calls mock provider flow", async () => {
+  it("existing AI Draft mock flow still passes", async () => {
     const spy = vi.spyOn(aiDraftCore, "mockAiDraftProvider");
-    render(<App />);
-    fireEvent.click(screen.getByText("Show AI Draft Assistant"));
+    renderStudio();
     fireEvent.click(screen.getByRole("button", { name: "Generate Draft" }));
     await waitFor(() => {
       expect(spy).toHaveBeenCalledTimes(1);
+      expect(screen.getByLabelText("FlowDraft Preview")).toBeTruthy();
     });
     expect(generateDraftPreview).not.toHaveBeenCalled();
   });
 
-  it("real mode shows configuration hint", () => {
-    render(<App />);
-    fireEvent.click(screen.getByText("Show AI Draft Assistant"));
-    fireEvent.change(screen.getByLabelText("AI Draft Provider Mode"), { target: { value: "real" } });
-    expect(screen.getByText(/Do not input API key in browser/i)).toBeTruthy();
-  });
-
-  it("runner unavailable shows friendly error", async () => {
-    vi.mocked(generateDraftPreview).mockRejectedValue(new Error("Builder Runner is not running. Start it with pnpm builder:runner."));
-    render(<App />);
-    fireEvent.click(screen.getByText("Show AI Draft Assistant"));
-    fireEvent.change(screen.getByLabelText("AI Draft Provider Mode"), { target: { value: "real" } });
-    fireEvent.click(screen.getByRole("button", { name: "Generate Draft" }));
-    await waitFor(() => {
-      expect(screen.getByText("Builder Runner is not running. Start it with pnpm builder:runner.")).toBeTruthy();
-    });
-  });
-
-  it("FlowDraft preview renders", async () => {
-    render(<App />);
-    fireEvent.click(screen.getByText("Show AI Draft Assistant"));
-    fireEvent.click(screen.getByRole("button", { name: "Generate Draft" }));
-    await waitFor(() => {
-      expect(screen.getByLabelText("FlowDraft Preview")).toBeTruthy();
-      expect(screen.getByLabelText("FlowDraft JSON").textContent).toContain('"source"');
-      expect(screen.getByText("This is a draft. Review before applying.")).toBeTruthy();
-    });
-  });
-
-  it("explainFlowDraft output renders", async () => {
-    render(<App />);
-    fireEvent.click(screen.getByText("Show AI Draft Assistant"));
-    fireEvent.click(screen.getByRole("button", { name: "Generate Draft" }));
-    await waitFor(() => {
-      const explanation = screen.getByLabelText("FlowDraft Explanation Text");
-      expect(explanation.textContent).toContain("识别到的意图");
-      expect(explanation.textContent).toContain("请先 validate");
-    });
-  });
-
-  it("warnings render", async () => {
-    render(<App />);
-    fireEvent.click(screen.getByText("Show AI Draft Assistant"));
-    fireEvent.click(screen.getByLabelText("strategy-strict_policy_boundary"));
-    fireEvent.click(screen.getByRole("button", { name: "Generate Draft" }));
-    await waitFor(() => {
-      expect(screen.getByLabelText("Draft Warnings")).toBeTruthy();
-      expect(screen.queryByText("No warnings.")).toBeNull();
-    });
-  });
-
-  it("Draft Apply Preview renders changed fields", async () => {
-    render(<App />);
-    fireEvent.click(screen.getByText("Show AI Draft Assistant"));
-    fireEvent.click(screen.getByLabelText("capability-create_return_request"));
-    fireEvent.click(screen.getByRole("button", { name: "Generate Draft" }));
-    await waitFor(() => {
-      expect(screen.getByLabelText("Draft Apply Preview")).toBeTruthy();
-      expect(screen.getByText("agentName")).toBeTruthy();
-      expect(screen.getByText("rules")).toBeTruthy();
-    });
-  });
-
-  it("Apply Draft updates agentName / intents / skills / rules", async () => {
-    render(<App />);
-    fireEvent.click(screen.getByText("Show AI Draft Assistant"));
-    fireEvent.click(screen.getByLabelText("capability-create_return_request"));
-    fireEvent.click(screen.getByRole("button", { name: "Generate Draft" }));
-    await waitFor(() => {
-      expect(screen.getByRole("button", { name: "Apply Draft" })).toBeTruthy();
-    });
-    fireEvent.click(screen.getByRole("button", { name: "Apply Draft" }));
-    expect((screen.getByLabelText("Agent Name") as HTMLInputElement).value).toBe("电商售后客服草案");
-    expect(screen.getByLabelText("intent-return_request")).toBeTruthy();
-    expect((screen.getByLabelText("skill-create_return_request") as HTMLInputElement).checked).toBe(true);
-    expect((screen.getByLabelText("highRiskAmountThreshold") as HTMLInputElement).value).toBe("5000");
-  });
-
-  it("After Apply, AgentSpec JSON updates", async () => {
-    render(<App />);
-    const before = screen.getByLabelText("AgentSpec JSON").textContent ?? "";
-    fireEvent.click(screen.getByText("Show AI Draft Assistant"));
-    fireEvent.click(screen.getByLabelText("capability-create_return_request"));
-    fireEvent.click(screen.getByRole("button", { name: "Generate Draft" }));
-    await waitFor(() => {
-      expect(screen.getByRole("button", { name: "Apply Draft" })).toBeTruthy();
-    });
-    fireEvent.click(screen.getByRole("button", { name: "Apply Draft" }));
-    const after = screen.getByLabelText("AgentSpec JSON").textContent ?? "";
-    expect(after).not.toBe(before);
-    expect(after).toContain("handle_return");
-  });
-
-  it("After Apply, Chinese DSL updates", async () => {
-    render(<App />);
-    fireEvent.click(screen.getByText("Show AI Draft Assistant"));
-    fireEvent.click(screen.getByLabelText("capability-create_return_request"));
-    fireEvent.click(screen.getByRole("button", { name: "Generate Draft" }));
-    await waitFor(() => {
-      expect(screen.getByRole("button", { name: "Apply Draft" })).toBeTruthy();
-    });
-    fireEvent.click(screen.getByRole("button", { name: "Apply Draft" }));
-    fireEvent.click(screen.getByText("中文 DSL"));
-    expect(screen.getByLabelText("Chinese DSL").textContent).toContain("handle_return:");
-  });
-
-  it("After Apply, validation still passes", async () => {
-    render(<App />);
-    fireEvent.click(screen.getByText("Show AI Draft Assistant"));
-    fireEvent.click(screen.getByLabelText("capability-create_return_request"));
-    fireEvent.click(screen.getByRole("button", { name: "Generate Draft" }));
-    await waitFor(() => {
-      expect(screen.getByRole("button", { name: "Apply Draft" })).toBeTruthy();
-    });
-    fireEvent.click(screen.getByRole("button", { name: "Apply Draft" }));
-    fireEvent.click(screen.getByText("Validation"));
-    expect(screen.getByText("passed")).toBeTruthy();
-  });
-
-  it("Generate Draft does not auto-run Runtime", async () => {
-    render(<App />);
-    fireEvent.click(screen.getByText("Show AI Draft Assistant"));
+  it("AI Draft does not auto-run Runtime", async () => {
+    renderStudio();
     fireEvent.click(screen.getByRole("button", { name: "Generate Draft" }));
     await waitFor(() => {
       expect(screen.getByLabelText("FlowDraft Preview")).toBeTruthy();
     });
     expect(runPreview).not.toHaveBeenCalled();
-  });
-
-  it("Run Preview remains manual", async () => {
-    vi.mocked(runPreview).mockResolvedValue({
-      ok: true,
-      validation: { ok: true, issues: [] },
-      run: {
-        runId: "run-manual-1",
-        status: "completed",
-        agent: "builder-agent",
-        steps: 2
-      },
-      events: [],
-      timeline: [],
-      traceJsonl: "",
-      auditBundle: {}
-    });
-    render(<App />);
-    fireEvent.click(screen.getByText("Show AI Draft Assistant"));
-    fireEvent.click(screen.getByRole("button", { name: "Generate Draft" }));
-    await waitFor(() => {
-      expect(screen.getByLabelText("FlowDraft Preview")).toBeTruthy();
-    });
-    expect(runPreview).not.toHaveBeenCalled();
-    fireEvent.click(screen.getByRole("button", { name: "Run Preview" }));
-    await waitFor(() => {
-      expect(runPreview).toHaveBeenCalledTimes(1);
-    });
-  });
-
-  it("invalid brief shows error", async () => {
-    render(<App />);
-    fireEvent.click(screen.getByText("Show AI Draft Assistant"));
-    fireEvent.change(screen.getByLabelText("AI Draft Brief"), { target: { value: "   " } });
-    fireEvent.click(screen.getByRole("button", { name: "Generate Draft" }));
-    await waitFor(() => {
-      expect(screen.getByText(/String must contain at least 1 character/i)).toBeTruthy();
-    });
   });
 });

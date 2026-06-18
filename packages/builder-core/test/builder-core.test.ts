@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+﻿import { describe, expect, it } from "vitest";
 import {
   BUILDER_ISSUE_CODES,
   BuilderCoreError,
@@ -12,7 +12,7 @@ import {
 
 describe("@yutra/builder-core", () => {
   const shippingForm = {
-    agentName: "电商客服助手",
+    agentName: "\u7535\u5546\u5ba2\u670d\u52a9\u624b",
     templateId: "ecommerce-support",
     selectedIntentIds: ["shipping_query"],
     selectedSkillNames: ["query_order", "query_shipping_status"],
@@ -117,11 +117,11 @@ describe("@yutra/builder-core", () => {
     const dslA = agentSpecToChineseDsl(spec);
     const dslB = agentSpecToChineseDsl(spec);
     expect(dslA).toBe(dslB);
-    expect(dslA).toContain("智能体:");
-    expect(dslA).toContain("初始状态: triage");
-    expect(dslA).toContain("状态集:");
-    expect(dslA).toContain("动作:");
-    expect(dslA).toContain("守卫/条件:");
+    expect(dslA).toContain("\u667a\u80fd\u4f53:");
+    expect(dslA).toContain("\u521d\u59cb\u72b6\u6001: triage");
+    expect(dslA).toContain("\u72b6\u6001\u96c6:");
+    expect(dslA).toContain("\u52a8\u4f5c:");
+    expect(dslA).toContain("implementation:");
   });
 
   it("package exports public API", async () => {
@@ -134,3 +134,4 @@ describe("@yutra/builder-core", () => {
     expect(typeof mod.validateGeneratedSpec).toBe("function");
   });
 });
+
