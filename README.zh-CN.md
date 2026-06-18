@@ -3,14 +3,20 @@
 
 # Yutra
 
-Yutra 当前是面向 Skill 型智能体的执行标准、运行时、Studio 与早期智能体创建层。
+Yutra 是一个开源的可治理智能体创建与执行框架。
 
-Yutra 下一阶段将升级为智能体创建层：
+它通过智能体母型、业务规则配置、Rule Compiler、DSL、Runtime、Trace、Audit 与 Certification，把业务规则转化为可执行、可追踪、可审计的 Agent。
+
+Skill 提供能力，Yutra 让这些能力以结构化、可治理、可追踪、可审计、可认证的方式运行。
+
+当前状态：
+Yutra 当前已提供可治理智能体创建与执行框架的开源核心，包括 DSL、Runtime、Trace/Audit/Certification、Skill Runtime、Archetype Core、Pack Config Core、Rule Compiler、CLI 与 Yutra Studio。
+
+下一阶段方向：
+Yutra 正在升级为更完整的智能体创建层：
 智能体母型库 + 业务规则配置器 + Rule Compiler + Creator Workbench。
 
-当前状态与下一阶段方向需要明确区分：Skill-based Runtime、Studio 与早期创建层基础能力是当前已存在能力；更完整的智能体创建层是本仓库文档化的下一阶段方向。
-
-Skill 提供能力。Yutra 让这些能力以标准方式执行、治理、追踪、审计和认证。
+当前状态与下一阶段方向需要明确区分：开源核心已经存在；完整企业 SaaS、Marketplace、托管控制台和真实客户 API 接入并未在本仓库中实现。
 
 ## 为什么需要 Yutra
 

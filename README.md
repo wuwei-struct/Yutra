@@ -3,15 +3,20 @@
 
 # Yutra
 
-Yutra is a Skill-based Agent Execution Standard, Runtime, Studio, and early Agent Creation Layer.
+Yutra is an open-source governed Agent Creation & Execution Framework.
 
-Yutra is evolving toward an Agent Creation Layer:
+It turns business rules into executable, traceable, and auditable agents through Archetypes, Pack Config, Rule Compiler, DSL, Runtime, Trace, Audit, and Certification.
+
+Skill provides capabilities. Yutra makes those capabilities structured, governed, traceable, auditable, and certifiable.
+
+Current status:
+Yutra currently provides the open-source core of a governed Agent Creation & Execution framework, including DSL, Runtime, Trace/Audit/Certification, Skill Runtime, Archetype Core, Pack Config Core, Rule Compiler, CLI, and Yutra Studio.
+
+vNext direction:
+Yutra is evolving toward a fuller Agent Creation Layer:
 Archetype Library + Business Rule Configuration + Rule Compiler + Creator Workbench.
 
-Current status and vNext direction are intentionally separate: the Skill-based Runtime, Studio, and early creation-layer primitives exist today; the fuller Agent Creation Layer is the next-stage direction documented in this repository.
-
-Skill gives AI capabilities.  
-Yutra makes those capabilities executable, governed, traceable, auditable, and certifiable.
+Current status and vNext direction are intentionally separate: the open-source core exists today; full enterprise SaaS, marketplace, hosted console, and real customer API integration are not implemented in this repository.
 
 Builder Core now exists as `@yutra/builder-core` for form-to-spec and Chinese DSL draft generation.
 Yutra Studio now exists as a local Agent Editor Workbench at `apps/builder` (not SaaS, not multi-tenant).
