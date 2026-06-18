@@ -20,7 +20,9 @@ export function DraftAssistantColumn(props: DraftAssistantColumnProps) {
 
   return (
     <section className="studio-column draft-column" aria-label="Draft Assistant Column">
-      <CreatorWorkbenchPanel />
+      <CreatorWorkbenchPanel
+        onSendCompiledDslToEditor={(dslText, meta) => studio.sendCompiledDslToEditor(dslText, meta)}
+      />
       <div className="panel-title">
         <h2>{t("draft.title")}</h2>
         <span>{t("draft.providerDefault")}</span>

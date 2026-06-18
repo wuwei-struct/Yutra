@@ -78,6 +78,7 @@ In the current MVP, Compile Preview displays the six Rule Compiler artifacts for
 - `trace.expectation.json`
 
 The generated agent artifact is not executed automatically.
+It can be sent to the DSL Editor for manual inspection, but that does not make it a trusted run source.
 
 ### 8. Run Preview
 
@@ -120,6 +121,7 @@ Generated assets -> Canonical IR -> Runtime -> Trace / Audit / Certification
 ```
 
 P6-05A only previews generated assets. It does not run Runtime, write artifacts to disk, publish an Agent, or save customer configuration.
+P6-05B adds a manual bridge from the compiled `agent.yutra.yaml` artifact to the existing DSL Editor. The bridge only copies text into the editor.
 
 ## Current MVP: Compile Preview
 
@@ -144,6 +146,25 @@ POST /creator/compile-preview
 ```
 
 The endpoint calls `@yutra/rule-compiler` in memory and returns artifacts, issues, and compile report metadata. It does not write files and does not execute generated DSL.
+
+## Manual DSL Bridge
+
+After Compile Preview succeeds, the `agent.yutra.yaml` artifact can be sent to the DSL Editor.
+
+Manual flow:
+
+1. Send `agent.yutra.yaml` to DSL Editor
+2. Inspect DSL
+3. Apply DSL as Run Source
+4. Run Preview manually
+
+Important boundaries:
+
+- sending to DSL Editor does not inspect the DSL
+- sending to DSL Editor does not apply DSL as run source
+- sending to DSL Editor does not run Runtime
+- compiled DSL must pass `/dsl/inspect` before it can be used as a run source
+- Studio does not write compiled artifacts to disk
 
 ## Current Boundary
 

@@ -49,6 +49,7 @@ pnpm --filter @yutra/builder test
 - Runtime preview still goes through local builder-runner.
 - Creator Workbench Compile Preview currently supports only `request-resolution`.
 - Compile Preview shows demo/mock artifacts and compile report, but does not run Runtime, write files, save config, or publish.
+- Compiled `agent.yutra.yaml` can be sent to the DSL Editor, but it must be inspected and manually applied before any Run Preview.
 - DSL editing supports Validate DSL, Inspect DSL, and Apply DSL as Run Source.
 - Source mode can be `Builder Source` or `DSL Source`.
 - DSL Source runs through `DSL -> normalized -> canonical AgentSpec -> Runtime Preview`.

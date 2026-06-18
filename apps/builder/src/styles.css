@@ -280,6 +280,35 @@ button:disabled {
   overflow-wrap: anywhere;
 }
 
+.manual-flow-helper,
+.compiled-dsl-meta {
+  border: 1px solid #e8c36a;
+  border-radius: 8px;
+  padding: 10px;
+  background: #fff8df;
+  margin: 10px 0;
+}
+
+.manual-flow-helper ol {
+  margin: 8px 0 0 18px;
+  padding: 0;
+  color: #667789;
+  font-size: 12px;
+}
+
+.compiled-dsl-meta dl {
+  display: grid;
+  grid-template-columns: 112px minmax(0, 1fr);
+  gap: 5px 10px;
+  margin: 8px 0;
+}
+
+.compiled-dsl-meta dd {
+  margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
 .panel-title {
   display: flex;
   justify-content: space-between;

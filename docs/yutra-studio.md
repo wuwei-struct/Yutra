@@ -22,6 +22,7 @@ Builder Core
 - Manual Apply to Editor.
 - DSL editor with Validate DSL, Inspect DSL, Apply DSL as Run Source, Reset from Builder, and Copy DSL.
 - Creator Workbench Compile Preview for the public `request-resolution` demo Pack Config.
+- Manual bridge from compiled `agent.yutra.yaml` to the DSL Editor.
 - AgentSpec JSON preview.
 - Inspect panel for validation, normalized DSL structure, canonical IR, and structure overview.
 - Run Preview through local builder-runner.
@@ -54,6 +55,7 @@ pnpm builder:dev
 - AI Draft does not auto-run Runtime.
 - Creator Compile Preview does not auto-run Runtime, does not write artifacts, and does not publish an Agent.
 - Creator Compile Preview is demo/mock only and does not include real adapters, real endpoints, customer SOP, or customer configuration.
+- Compiled DSL sent to the editor is not trusted until it passes Inspect DSL.
 
 DSL Source execution is now supported:
 
@@ -92,6 +94,18 @@ request-resolution Pack Config
 ```
 
 The generated `agent.yutra.yaml` is shown for inspection only. Users must still explicitly inspect/apply DSL before using any existing Run Preview path.
+
+P6-05B adds the manual bridge:
+
+```text
+compiled agent.yutra.yaml
+-> Send to DSL Editor
+-> Inspect DSL
+-> Apply DSL as Run Source
+-> manual Run Preview
+```
+
+The bridge does not call Runtime, does not call `/dsl/inspect` automatically, does not auto-apply source mode, and does not write artifacts to disk.
 
 Relevant vNext docs:
 

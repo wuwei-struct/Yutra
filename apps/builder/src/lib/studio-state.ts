@@ -27,6 +27,15 @@ export type StudioRunOptions = {
 
 export type StudioSourceMode = "builder" | "dsl";
 
+export type CompiledDslMeta = {
+  compileId?: string;
+  compilerVersion?: string;
+  configHash?: string;
+  artifactHash?: string;
+  sentAt: string;
+  inspected: boolean;
+};
+
 function applyFormToUiState(draftForm: BuilderFormConfig, prev: BuilderUiState): BuilderUiState {
   return {
     ...prev,
@@ -79,6 +88,7 @@ export function useStudioState() {
   const [dslInspectResult, setDslInspectResult] = useState<BuilderDslInspectResponse | undefined>(undefined);
   const [dslInspectLoading, setDslInspectLoading] = useState<boolean>(false);
   const [dslApplied, setDslApplied] = useState<boolean>(false);
+  const [compiledDslMeta, setCompiledDslMeta] = useState<CompiledDslMeta | undefined>(undefined);
   const [sourceMode, setSourceMode] = useState<StudioSourceMode>("builder");
   const [lastValidDslSpec, setLastValidDslSpec] = useState<unknown>(undefined);
   const [builderChangedWhileDslActive, setBuilderChangedWhileDslActive] = useState<boolean>(false);
@@ -139,6 +149,7 @@ export function useStudioState() {
     setDslInspectResult(undefined);
     setLastValidDslSpec(undefined);
     setDslApplied(false);
+    setCompiledDslMeta(undefined);
   };
 
   const inspectCurrentDsl = async () => {
@@ -149,6 +160,7 @@ export function useStudioState() {
       setDslInspectResult(result);
       if (result.ok && result.validation.ok) {
         setLastValidDslSpec(result.canonical);
+        setCompiledDslMeta((prev) => (prev ? { ...prev, inspected: true } : prev));
       }
       return result;
     } catch (error) {
@@ -189,8 +201,31 @@ export function useStudioState() {
     setLastValidDslSpec(undefined);
     setSourceMode("builder");
     setDslApplied(false);
+    setCompiledDslMeta(undefined);
     setBuilderChangedWhileDslActive(false);
     setRunError("");
+  };
+
+  const sendCompiledDslToEditor = (
+    dslText: string,
+    meta?: {
+      compileId?: string;
+      compilerVersion?: string;
+      configHash?: string;
+      artifactHash?: string;
+    }
+  ) => {
+    setDslBuffer(dslText);
+    setDslDirty(true);
+    setDslInspectResult(undefined);
+    setLastValidDslSpec(undefined);
+    setDslApplied(false);
+    setCompiledDslMeta({
+      ...meta,
+      sentAt: new Date().toISOString(),
+      inspected: false
+    });
+    setRunError("Compiled DSL sent to editor. Inspect it before using as run source.");
   };
 
   const runCurrentPreview = async () => {
@@ -201,6 +236,9 @@ export function useStudioState() {
       const parsed = JSON.parse(inputJson) as { context?: Record<string, unknown>; intent?: string; text?: string };
       if (sourceMode === "dsl" && !lastValidDslSpec) {
         throw new Error("DSL source must be inspected successfully before running.");
+      }
+      if (compiledDslMeta && !compiledDslMeta.inspected) {
+        throw new Error("Compiled DSL must be inspected before running.");
       }
       const response = await runPreview(
         sourceMode === "dsl"
@@ -256,6 +294,7 @@ export function useStudioState() {
     dslInspectResult,
     dslInspectLoading,
     dslApplied,
+    compiledDslMeta,
     sourceMode,
     setSourceMode,
     lastValidDslSpec,
@@ -286,6 +325,7 @@ export function useStudioState() {
     inspectCurrentDsl,
     applyDslAsRunSource,
     resetDslFromBuilder,
+    sendCompiledDslToEditor,
     runCurrentPreview,
     resetRunInput: () => {
       const sample = runPreviewSamples.find((item) => item.id === selectedSampleId) ?? runPreviewSamples[0];

@@ -334,7 +334,7 @@ describe("@yutra/builder Studio UI", () => {
     fireEvent.click(screen.getByRole("button", { name: "Compile Preview" }));
     await waitFor(() => expect(compileCreatorPreview).toHaveBeenCalledTimes(1));
     expect(screen.getByLabelText("Artifact Preview")).toBeTruthy();
-    expect(screen.getByRole("button", { name: /agent.yutra.yaml/ })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "agent.yutra.yaml (not executed)" })).toBeTruthy();
     expect(screen.getByRole("button", { name: /adapter.config.json/ })).toBeTruthy();
     expect(screen.getByLabelText("Compiled Artifact Content").textContent).toContain("request-resolution-ecommerce-basic");
   });
@@ -362,6 +362,64 @@ describe("@yutra/builder Studio UI", () => {
     fireEvent.click(screen.getByRole("button", { name: "Compile Preview" }));
     await waitFor(() => expect(compileCreatorPreview).toHaveBeenCalledTimes(1));
     expect(runPreview).not.toHaveBeenCalled();
+  });
+
+  it("Compile Preview success shows Send to DSL Editor for agent artifact", async () => {
+    mockCompilePreviewSuccess();
+    renderStudio();
+    fireEvent.click(screen.getByRole("button", { name: "Compile Preview" }));
+    await waitFor(() => expect(screen.getByRole("button", { name: "Send agent.yutra.yaml to DSL Editor" })).toBeTruthy());
+    expect(screen.getByLabelText("Compiled DSL Manual Flow").textContent).toContain("Inspect DSL");
+    expect(screen.getByLabelText("Compiled DSL Manual Flow").textContent).toContain("Run Preview manually");
+  });
+
+  it("Send to DSL Editor updates DSL buffer and metadata without running or switching source mode", async () => {
+    mockCompilePreviewSuccess();
+    renderStudio();
+    fireEvent.click(screen.getByRole("button", { name: "Compile Preview" }));
+    await waitFor(() => expect(screen.getByRole("button", { name: "Send agent.yutra.yaml to DSL Editor" })).toBeTruthy());
+
+    fireEvent.click(screen.getByRole("button", { name: "Send agent.yutra.yaml to DSL Editor" }));
+
+    expect((screen.getByLabelText("DSL Editor Text") as HTMLTextAreaElement).value).toBe("agent: request-resolution-ecommerce-basic\n");
+    expect(screen.getByLabelText("Compiled DSL Metadata").textContent).toContain("compile:test");
+    expect(screen.getByLabelText("Compiled DSL Metadata").textContent).toContain("sha256:config");
+    expect(screen.getByLabelText("Compiled DSL Metadata").textContent).toContain("sha256:agent");
+    expect(screen.getByLabelText("Compiled DSL Metadata").textContent).toContain("Not inspected yet");
+    expect(screen.getByText("Builder Source active")).toBeTruthy();
+    expect(runPreview).not.toHaveBeenCalled();
+  });
+
+  it("Send to DSL Editor clears/stales inspect state and blocks Run Preview until inspect succeeds", async () => {
+    mockCompilePreviewSuccess();
+    renderStudio();
+    fireEvent.click(screen.getByRole("button", { name: "Compile Preview" }));
+    await waitFor(() => expect(screen.getByRole("button", { name: "Send agent.yutra.yaml to DSL Editor" })).toBeTruthy());
+
+    fireEvent.click(screen.getByRole("button", { name: "Send agent.yutra.yaml to DSL Editor" }));
+
+    expect(screen.getAllByText("not inspected").length).toBeGreaterThan(0);
+    expect(screen.getByText("Compiled DSL must be inspected before running.")).toBeTruthy();
+    expect((screen.getByRole("button", { name: "Run Preview" }) as HTMLButtonElement).disabled).toBe(true);
+  });
+
+  it("Inspect after sending compiled DSL enables Apply DSL as Run Source and updates source mode", async () => {
+    mockCompilePreviewSuccess();
+    mockDslInspectSuccess();
+    renderStudio();
+    fireEvent.click(screen.getByRole("button", { name: "Compile Preview" }));
+    await waitFor(() => expect(screen.getByRole("button", { name: "Send agent.yutra.yaml to DSL Editor" })).toBeTruthy());
+
+    fireEvent.click(screen.getByRole("button", { name: "Send agent.yutra.yaml to DSL Editor" }));
+    fireEvent.click(screen.getByRole("button", { name: "Inspect DSL" }));
+
+    await waitFor(() => {
+      expect(screen.getByLabelText("Compiled DSL Metadata").textContent).toContain("inspected");
+      expect((screen.getByRole("button", { name: "Apply DSL as Run Source" }) as HTMLButtonElement).disabled).toBe(false);
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: "Apply DSL as Run Source" }));
+    await waitFor(() => expect(screen.getByText("Running from DSL Source")).toBeTruthy());
   });
 
   it("DSL editor tab renders generated DSL controls", () => {

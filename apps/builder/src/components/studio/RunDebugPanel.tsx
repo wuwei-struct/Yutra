@@ -12,7 +12,8 @@ interface RunDebugPanelProps {
 export function RunDebugPanel(props: RunDebugPanelProps) {
   const { studio, onRun, onDownloadTrace } = props;
   const { t } = useI18n();
-  const dslRunBlocked = studio.sourceMode === "dsl" && !studio.lastValidDslSpec;
+  const compiledDslBlocked = Boolean(studio.compiledDslMeta && !studio.compiledDslMeta.inspected);
+  const dslRunBlocked = (studio.sourceMode === "dsl" && !studio.lastValidDslSpec) || compiledDslBlocked;
 
   return (
     <section className="studio-bottom-column" aria-label="Run Debug Panel">
@@ -20,7 +21,11 @@ export function RunDebugPanel(props: RunDebugPanelProps) {
         <h2>{t("run.debugTitle")}</h2>
         <span>{studio.sourceMode === "dsl" ? t("run.runningFromDsl") : t("run.runningFromBuilder")}</span>
       </div>
-      {dslRunBlocked ? <p className="warning-text">{t("run.dslBlocked")}</p> : null}
+      {dslRunBlocked ? (
+        <p className="warning-text">
+          {compiledDslBlocked ? "Compiled DSL must be inspected before running." : t("run.dslBlocked")}
+        </p>
+      ) : null}
       <TestInputEditor
         samples={studio.sampleOptions}
         selectedSampleId={studio.selectedSampleId}

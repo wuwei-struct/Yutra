@@ -102,6 +102,7 @@ It includes:
 - left navigation and top operation bar
 - AI Draft Assistant
 - Creator Workbench Compile Preview for the public `request-resolution` demo Pack Config
+- manual bridge from compiled `agent.yutra.yaml` to the DSL Editor
 - DSL editor with Validate / Inspect / Apply as Run Source
 - AgentSpec JSON preview
 - validation / normalized / canonical inspect panel backed by `/dsl/inspect`
@@ -112,6 +113,7 @@ Current limits:
 - no real save or publish
 - no login, database, or multi-tenant backend
 - Compile Preview does not run Runtime, write artifacts, or connect real adapters
+- compiled DSL must be inspected and manually applied before Run Preview
 - no full DSL-to-BuilderFormConfig reverse mapping
 - Runtime execution still uses canonical IR
 - language switching only changes UI labels; DSL, Trace event type strings, payload fields, and canonical IR stay unchanged

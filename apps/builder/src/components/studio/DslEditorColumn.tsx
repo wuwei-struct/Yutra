@@ -65,6 +65,26 @@ export function DslEditorColumn(props: DslEditorColumnProps) {
           {studio.builderChangedWhileDslActive ? (
             <p className="warning-text">{t("dsl.builderChanged")}</p>
           ) : null}
+          {studio.compiledDslMeta ? (
+            <section className="compiled-dsl-meta" aria-label="Compiled DSL Metadata">
+              <h3>Compiled DSL draft</h3>
+              <dl>
+                <dt>compileId</dt>
+                <dd>{studio.compiledDslMeta.compileId ?? "-"}</dd>
+                <dt>compilerVersion</dt>
+                <dd>{studio.compiledDslMeta.compilerVersion ?? "-"}</dd>
+                <dt>configHash</dt>
+                <dd>{studio.compiledDslMeta.configHash ?? "-"}</dd>
+                <dt>artifactHash</dt>
+                <dd>{studio.compiledDslMeta.artifactHash ?? "-"}</dd>
+                <dt>Status</dt>
+                <dd>{studio.compiledDslMeta.inspected ? "inspected" : "Not inspected yet"}</dd>
+              </dl>
+              {!studio.compiledDslMeta.inspected ? (
+                <p className="warning-text">Compiled DSL is not trusted until inspected.</p>
+              ) : null}
+            </section>
+          ) : null}
           {!studio.dslInspectResult ? <p className="hint">{t("dsl.notValidated")}</p> : null}
           <textarea
             aria-label="DSL Editor Text"
