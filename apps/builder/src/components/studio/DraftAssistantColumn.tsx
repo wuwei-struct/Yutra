@@ -4,6 +4,7 @@ import { IntentSelector } from "../IntentSelector";
 import { RulesForm } from "../RulesForm";
 import { SkillSelector } from "../SkillSelector";
 import { TemplateSelector } from "../TemplateSelector";
+import { CreatorWorkbenchPanel } from "../creator/CreatorWorkbenchPanel";
 import { BUILDER_TEMPLATES } from "../../lib/builder-state";
 import { toggleSelection, type StudioStateController } from "../../lib/studio-state";
 import { useI18n } from "../../i18n";
@@ -19,6 +20,7 @@ export function DraftAssistantColumn(props: DraftAssistantColumnProps) {
 
   return (
     <section className="studio-column draft-column" aria-label="Draft Assistant Column">
+      <CreatorWorkbenchPanel />
       <div className="panel-title">
         <h2>{t("draft.title")}</h2>
         <span>{t("draft.providerDefault")}</span>

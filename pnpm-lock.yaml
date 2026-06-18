@@ -77,6 +77,12 @@ importers:
       '@yutra/builder-core':
         specifier: workspace:*
         version: link:../../packages/builder-core
+      '@yutra/pack-config-core':
+        specifier: workspace:*
+        version: link:../../packages/pack-config-core
+      '@yutra/rule-compiler':
+        specifier: workspace:*
+        version: link:../../packages/rule-compiler
       react:
         specifier: ^19.0.0
         version: 19.2.4
@@ -114,6 +120,12 @@ importers:
       '@yutra/dsl':
         specifier: workspace:*
         version: link:../../packages/dsl
+      '@yutra/pack-config-core':
+        specifier: workspace:*
+        version: link:../../packages/pack-config-core
+      '@yutra/rule-compiler':
+        specifier: workspace:*
+        version: link:../../packages/rule-compiler
       '@yutra/runtime':
         specifier: workspace:*
         version: link:../../packages/runtime

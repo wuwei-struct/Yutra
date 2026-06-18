@@ -4,7 +4,8 @@ Creator Workbench is the vNext product direction above the current Yutra Studio.
 
 It is not a generic DSL editor. It is not a complex visual workflow canvas. It is a workbench for customers and implementers to create governed agents by selecting an archetype, configuring business rules, previewing execution, and certifying behavior.
 
-This document describes direction only. P6-01 does not implement new Studio UI.
+This document describes the vNext direction and the current MVP boundary.
+P6-05A adds a first local Compile Preview inside Yutra Studio, but it remains demo/mock only.
 
 ## Main Entry
 
@@ -67,6 +68,17 @@ Show generated assets and mapping:
 - test cases
 - canonical IR summary
 
+In the current MVP, Compile Preview displays the six Rule Compiler artifacts for the public `request-resolution` demo config:
+
+- `agent.yutra.yaml`
+- `policy.yaml`
+- `adapter.config.json`
+- `templates.json`
+- `test-cases.json`
+- `trace.expectation.json`
+
+The generated agent artifact is not executed automatically.
+
 ### 8. Run Preview
 
 Run generated assets locally against selected test input.
@@ -92,7 +104,7 @@ Show test case results, golden trace comparison, expected path coverage, and aud
 Current Yutra Studio is an early workbench prototype:
 
 ```text
-Builder Form / AI Draft / DSL Inspect / Run Preview / Trace / Audit
+Builder Form / AI Draft / DSL Inspect / Creator Compile Preview / Run Preview / Trace / Audit
 ```
 
 Creator Workbench evolves it into:
@@ -107,14 +119,42 @@ The same execution foundation remains:
 Generated assets -> Canonical IR -> Runtime -> Trace / Audit / Certification
 ```
 
+P6-05A only previews generated assets. It does not run Runtime, write artifacts to disk, publish an Agent, or save customer configuration.
+
+## Current MVP: Compile Preview
+
+The current Creator Workbench MVP supports only one archetype:
+
+- enabled: `request-resolution`
+- disabled / coming later: all other main and cross-cutting archetypes
+
+The request-resolution form edits a public demo/mock Pack Config:
+
+- capabilities
+- refund policy basics
+- handoff policy basics
+- response style basics
+
+Adapters remain fixed to `mock`. The UI does not expose secret fields, real endpoints, customer adapter mappings, or customer SOP fields.
+
+Compile Preview calls the local builder-runner endpoint:
+
+```text
+POST /creator/compile-preview
+```
+
+The endpoint calls `@yutra/rule-compiler` in memory and returns artifacts, issues, and compile report metadata. It does not write files and does not execute generated DSL.
+
 ## Current Boundary
 
-P6-01 does not implement:
+The current Creator Workbench MVP does not implement:
 
-- new Studio pages
-- archetype UI
-- business rule forms
-- rule compiler integration
+- full archetype coverage
+- customer-ready rule matrices
+- real adapters or endpoints
+- customer SOP
+- automatic Runtime execution from Compile Preview
+- artifact export from Studio
 - drag-and-drop flow editing
 - database persistence
 - SaaS publishing

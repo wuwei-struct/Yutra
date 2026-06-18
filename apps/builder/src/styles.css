@@ -191,6 +191,8 @@ button:disabled {
 .studio-column,
 .studio-bottom-column,
 .panel-section,
+.creator-workbench-panel,
+.creator-section,
 .preview,
 .coming-soon {
   border: 1px solid #d5dde7;
@@ -212,8 +214,70 @@ button:disabled {
 }
 
 .panel-section,
+.creator-workbench-panel,
+.creator-section,
 .preview {
   padding: 12px;
+}
+
+.creator-workbench-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: #fbfdff;
+}
+
+.creator-section {
+  background: #ffffff;
+}
+
+.creator-archetype-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 220px;
+  overflow: auto;
+}
+
+.creator-archetype {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  text-align: left;
+}
+
+.creator-archetype.enabled {
+  border-color: #79aa8d;
+  background: #eef8f1;
+}
+
+.creator-adapter-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 10px;
+  border: 1px dashed #b8c5d3;
+  border-radius: 6px;
+  padding: 8px;
+  background: #f8fafc;
+}
+
+.creator-report-grid {
+  display: grid;
+  grid-template-columns: 112px minmax(0, 1fr);
+  gap: 6px 10px;
+  margin: 0 0 10px;
+}
+
+.creator-report-grid dt {
+  color: #667789;
+}
+
+.creator-report-grid dd {
+  margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .panel-title {

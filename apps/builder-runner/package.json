@@ -24,6 +24,8 @@
     "@yutra/builder-ai-core": "workspace:*",
     "@yutra/builder-core": "workspace:*",
     "@yutra/dsl": "workspace:*",
+    "@yutra/pack-config-core": "workspace:*",
+    "@yutra/rule-compiler": "workspace:*",
     "@yutra/runtime": "workspace:*",
     "@yutra/trace": "workspace:*"
   },

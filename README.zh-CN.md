@@ -91,6 +91,7 @@ Yutra Studio 是本地单用户工作台原型，用于把 Builder Core、AI Dra
 
 - 左侧导航栏与顶部操作栏
 - AI Draft Assistant
+- Creator Workbench Compile Preview：基于公开 `request-resolution` demo Pack Config 预览编译产物
 - DSL 编辑器：Validate DSL、Inspect DSL、Apply DSL as Run Source
 - AgentSpec JSON 预览
 - Validation / Normalized / Canonical IR / Overview 检查面板
@@ -106,6 +107,7 @@ Source Mode：
 
 - 真实保存或发布
 - 登录、数据库、多租户后台
+- Compile Preview 不运行 Runtime、不写 artifacts、不连接真实 adapter
 - DSL 反向完整回填 BuilderFormConfig
 - 拖拽式流程编辑器
 - 真实客户 API 接入

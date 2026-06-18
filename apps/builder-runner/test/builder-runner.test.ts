@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it } from "vitest";
 import type { BuilderFormConfig } from "@yutra/builder-core";
 import { agentSpecToChineseDsl, ecommerceSupportTemplate, formConfigToAgentSpec } from "@yutra/builder-core";
+import { REQUEST_RESOLUTION_ECOMMERCE_BASIC_CONFIG } from "@yutra/pack-config-core";
 import { createBuilderRunnerServer } from "../src/server";
 
 const baseForm: BuilderFormConfig = {
@@ -346,5 +347,80 @@ describe("@yutra/builder-runner", () => {
     expect(body.ok).toBe(false);
     expect(body.error?.code).toBe("AI_DRAFT_REAL_PROVIDER_DISABLED");
     expect(JSON.stringify(body)).not.toContain("YUTRA_BUILDER_AI_API_KEY");
+  });
+
+  it("POST /creator/compile-preview valid request-resolution config returns artifacts and report", async () => {
+    const baseUrl = await startServer();
+    const res = await fetch(`${baseUrl}/creator/compile-preview`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        config: REQUEST_RESOLUTION_ECOMMERCE_BASIC_CONFIG,
+        mode: "preview",
+        locale: "en"
+      })
+    });
+    const body = (await res.json()) as {
+      ok: boolean;
+      compilerVersion?: string;
+      artifacts?: Record<string, { filename: string }>;
+      report?: { packConfigHash?: string; artifactHashes?: Record<string, string>; failClosedPolicy?: string };
+      events?: unknown[];
+    };
+
+    expect(res.status).toBe(200);
+    expect(body.ok).toBe(true);
+    expect(body.compilerVersion).toBeTruthy();
+    expect(body.artifacts?.agent.filename).toBe("agent.yutra.yaml");
+    expect(body.artifacts?.policy.filename).toBe("policy.yaml");
+    expect(body.artifacts?.adapterConfig.filename).toBe("adapter.config.json");
+    expect(body.artifacts?.templates.filename).toBe("templates.json");
+    expect(body.artifacts?.testCases.filename).toBe("test-cases.json");
+    expect(body.artifacts?.traceExpectation.filename).toBe("trace.expectation.json");
+    expect(body.report?.packConfigHash).toMatch(/^sha256:/);
+    expect(body.report?.artifactHashes?.["agent.yutra.yaml"]).toMatch(/^sha256:/);
+    expect(body.report?.failClosedPolicy).toBe("enabled");
+    expect(body.events).toBeUndefined();
+  });
+
+  it("POST /creator/compile-preview invalid config returns ok=false", async () => {
+    const baseUrl = await startServer();
+    const res = await fetch(`${baseUrl}/creator/compile-preview`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        config: {
+          ...REQUEST_RESOLUTION_ECOMMERCE_BASIC_CONFIG,
+          rules: {
+            ...REQUEST_RESOLUTION_ECOMMERCE_BASIC_CONFIG.rules,
+            required_demo_field: { source: "requiredButMissing", required: true }
+          }
+        }
+      })
+    });
+    const body = (await res.json()) as { ok: boolean; error?: { code?: string }; artifacts?: unknown };
+    expect(res.status).toBe(400);
+    expect(body.ok).toBe(false);
+    expect(body.error?.code).toContain("REQUIRED");
+    expect(body.artifacts).toBeUndefined();
+  });
+
+  it("POST /creator/compile-preview unsupported archetype returns ok=false", async () => {
+    const baseUrl = await startServer();
+    const res = await fetch(`${baseUrl}/creator/compile-preview`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        config: {
+          ...REQUEST_RESOLUTION_ECOMMERCE_BASIC_CONFIG,
+          archetypeId: "knowledge-answering"
+        }
+      })
+    });
+    const body = (await res.json()) as { ok: boolean; error?: { code?: string }; artifacts?: unknown };
+    expect(res.status).toBe(400);
+    expect(body.ok).toBe(false);
+    expect(body.error?.code).toMatch(/^RULE_COMPILER_/);
+    expect(body.artifacts).toBeUndefined();
   });
 });

@@ -5,6 +5,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import App from "../src/App";
 import { I18nProvider, STUDIO_LOCALE_STORAGE_KEY, resolveInitialLocale } from "../src/i18n";
 import { generateDraftPreview } from "../src/lib/ai-draft-client";
+import { compileCreatorPreview } from "../src/lib/creator-client";
 import { inspectDsl, runPreview } from "../src/lib/runner-client";
 
 vi.mock("../src/lib/runner-client", () => ({
@@ -14,6 +15,10 @@ vi.mock("../src/lib/runner-client", () => ({
 
 vi.mock("../src/lib/ai-draft-client", () => ({
   generateDraftPreview: vi.fn()
+}));
+
+vi.mock("../src/lib/creator-client", () => ({
+  compileCreatorPreview: vi.fn()
 }));
 
 afterEach(() => {
@@ -115,6 +120,103 @@ function mockDslInspectFailure() {
   });
 }
 
+function mockCompilePreviewSuccess() {
+  vi.mocked(compileCreatorPreview).mockResolvedValue({
+    ok: true,
+    compileId: "compile:test",
+    compilerVersion: "0.1.0",
+    mode: "preview",
+    artifacts: {
+      agent: {
+        filename: "agent.yutra.yaml",
+        kind: "agent",
+        data: "agent: request-resolution-ecommerce-basic",
+        content: "agent: request-resolution-ecommerce-basic\n",
+        contentType: "text/yaml",
+        hash: "sha256:agent"
+      },
+      policy: {
+        filename: "policy.yaml",
+        kind: "policy",
+        data: {},
+        content: "environment: demo\n",
+        contentType: "text/yaml",
+        hash: "sha256:policy"
+      },
+      adapterConfig: {
+        filename: "adapter.config.json",
+        kind: "adapter_config",
+        data: { adapters: [] },
+        content: "{\"adapters\":[]}",
+        contentType: "application/json",
+        hash: "sha256:adapter"
+      },
+      templates: {
+        filename: "templates.json",
+        kind: "templates",
+        data: {},
+        content: "{\"templates\":[]}",
+        contentType: "application/json",
+        hash: "sha256:templates"
+      },
+      testCases: {
+        filename: "test-cases.json",
+        kind: "test_cases",
+        data: {},
+        content: "{\"testCases\":[]}",
+        contentType: "application/json",
+        hash: "sha256:test"
+      },
+      traceExpectation: {
+        filename: "trace.expectation.json",
+        kind: "trace_expectation",
+        data: {},
+        content: "{\"expectedEventTypes\":[\"run.started\"]}",
+        contentType: "application/json",
+        hash: "sha256:trace"
+      }
+    },
+    report: {
+      status: "passed",
+      archetypeId: "request-resolution",
+      archetypeVersion: "0.1.0",
+      packConfigId: "request-resolution:ecommerce-basic-demo",
+      packConfigVersion: "0.1.0",
+      packConfigHash: "sha256:config",
+      compilerVersion: "0.1.0",
+      mode: "preview",
+      coverage: {
+        schema: "passed",
+        requiredFields: "covered",
+        transitions: "fallback_covered",
+        actions: "registered",
+        guards: "registered",
+        sideEffects: "policy_guarded",
+        handoff: "covered"
+      },
+      failClosedPolicy: "enabled",
+      artifactHashes: {
+        "agent.yutra.yaml": "sha256:agent",
+        "policy.yaml": "sha256:policy",
+        "adapter.config.json": "sha256:adapter",
+        "templates.json": "sha256:templates",
+        "test-cases.json": "sha256:test",
+        "trace.expectation.json": "sha256:trace"
+      },
+      warnings: []
+    },
+    issues: []
+  });
+}
+
+function mockCompilePreviewFailure() {
+  vi.mocked(compileCreatorPreview).mockResolvedValue({
+    ok: false,
+    error: { code: "RULE_COMPILER_REQUIRED_FIELD_MISSING", message: "Required field missing." },
+    issues: [{ code: "RULE_COMPILER_REQUIRED_FIELD_MISSING", severity: "error", message: "Required field missing." }]
+  });
+}
+
 async function inspectAndApplyDsl() {
   fireEvent.click(screen.getByRole("button", { name: "Inspect DSL" }));
   await waitFor(() => expect((screen.getByRole("button", { name: "Apply DSL as Run Source" }) as HTMLButtonElement).disabled).toBe(false));
@@ -197,6 +299,69 @@ describe("@yutra/builder Studio UI", () => {
     expect(screen.getByLabelText("AI Draft Assistant")).toBeTruthy();
     expect(screen.getByLabelText("AI Draft Brief")).toBeTruthy();
     expect(screen.getByRole("button", { name: "Generate Draft" })).toBeTruthy();
+  });
+
+  it("Creator Workbench panel renders", () => {
+    renderStudio();
+    expect(screen.getByLabelText("Creator Workbench")).toBeTruthy();
+    expect(screen.getByText("Compile Preview only / does not run Runtime")).toBeTruthy();
+  });
+
+  it("request-resolution is enabled and other archetypes are disabled", () => {
+    renderStudio();
+    expect((screen.getByRole("button", { name: /request-resolution/ }) as HTMLButtonElement).disabled).toBe(false);
+    expect((screen.getByRole("button", { name: /approval-decision/ }) as HTMLButtonElement).disabled).toBe(true);
+    expect(screen.getAllByText("coming soon").length).toBeGreaterThan(0);
+  });
+
+  it("request-resolution config editor renders fields and mock adapter summary", () => {
+    renderStudio();
+    expect(screen.getByLabelText("Request Resolution Config Editor")).toBeTruthy();
+    expect(screen.getByLabelText("autoRefundMaxAmount")).toBeTruthy();
+    expect(screen.getByLabelText("Adapter Mode Summary").textContent).toContain("containsRealEndpoint=false");
+  });
+
+  it("editing autoRefundMaxAmount updates Pack Config state and source confirmedByUser", () => {
+    renderStudio();
+    fireEvent.change(screen.getByLabelText("autoRefundMaxAmount"), { target: { value: "450" } });
+    expect(screen.getByLabelText("PackConfig Preview").textContent).toContain('"value": 450');
+    expect(screen.getByLabelText("PackConfig Preview").textContent).toContain('"source": "confirmedByUser"');
+  });
+
+  it("Compile Preview calls runner and renders artifact tabs", async () => {
+    mockCompilePreviewSuccess();
+    renderStudio();
+    fireEvent.click(screen.getByRole("button", { name: "Compile Preview" }));
+    await waitFor(() => expect(compileCreatorPreview).toHaveBeenCalledTimes(1));
+    expect(screen.getByLabelText("Artifact Preview")).toBeTruthy();
+    expect(screen.getByRole("button", { name: /agent.yutra.yaml/ })).toBeTruthy();
+    expect(screen.getByRole("button", { name: /adapter.config.json/ })).toBeTruthy();
+    expect(screen.getByLabelText("Compiled Artifact Content").textContent).toContain("request-resolution-ecommerce-basic");
+  });
+
+  it("Compile report renders failClosedPolicy and configHash", async () => {
+    mockCompilePreviewSuccess();
+    renderStudio();
+    fireEvent.click(screen.getByRole("button", { name: "Compile Preview" }));
+    await waitFor(() => expect(screen.getByLabelText("Compile Report").textContent).toContain("sha256:config"));
+    expect(screen.getByLabelText("Compile Report").textContent).toContain("enabled");
+    expect(screen.getByLabelText("Compile Report").textContent).toContain("fallback_covered");
+  });
+
+  it("compile issues render errors and warnings", async () => {
+    mockCompilePreviewFailure();
+    renderStudio();
+    fireEvent.click(screen.getByRole("button", { name: "Compile Preview" }));
+    await waitFor(() => expect(screen.getByLabelText("Compile Issues").textContent).toContain("RULE_COMPILER_REQUIRED_FIELD_MISSING"));
+    expect(screen.getAllByText("Required field missing.").length).toBeGreaterThan(0);
+  });
+
+  it("Compile Preview does not trigger Run Preview", async () => {
+    mockCompilePreviewSuccess();
+    renderStudio();
+    fireEvent.click(screen.getByRole("button", { name: "Compile Preview" }));
+    await waitFor(() => expect(compileCreatorPreview).toHaveBeenCalledTimes(1));
+    expect(runPreview).not.toHaveBeenCalled();
   });
 
   it("DSL editor tab renders generated DSL controls", () => {

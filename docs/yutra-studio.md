@@ -8,6 +8,7 @@ It is a builder shell around existing layers:
 Builder Core
 -> AI Draft Core
 -> DSL / AgentSpec preview
+-> Creator Compile Preview
 -> Builder Runner
 -> Runtime
 -> Trace / Audit
@@ -20,6 +21,7 @@ Builder Core
 - AI Draft Assistant with mock provider by default.
 - Manual Apply to Editor.
 - DSL editor with Validate DSL, Inspect DSL, Apply DSL as Run Source, Reset from Builder, and Copy DSL.
+- Creator Workbench Compile Preview for the public `request-resolution` demo Pack Config.
 - AgentSpec JSON preview.
 - Inspect panel for validation, normalized DSL structure, canonical IR, and structure overview.
 - Run Preview through local builder-runner.
@@ -50,6 +52,8 @@ pnpm builder:dev
 - No drag-and-drop flow editing.
 - No real customer API integration.
 - AI Draft does not auto-run Runtime.
+- Creator Compile Preview does not auto-run Runtime, does not write artifacts, and does not publish an Agent.
+- Creator Compile Preview is demo/mock only and does not include real adapters, real endpoints, customer SOP, or customer configuration.
 
 DSL Source execution is now supported:
 
@@ -77,6 +81,17 @@ Archetype Selection
 ```
 
 The DSL Editor remains valuable as an advanced inspection and override surface, but the default customer-facing entry should become archetype selection plus business rule configuration.
+
+P6-05A is the first step in that direction:
+
+```text
+request-resolution Pack Config
+-> /creator/compile-preview
+-> six demo/mock compiler artifacts
+-> compile report
+```
+
+The generated `agent.yutra.yaml` is shown for inspection only. Users must still explicitly inspect/apply DSL before using any existing Run Preview path.
 
 Relevant vNext docs:
 

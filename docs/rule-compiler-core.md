@@ -11,9 +11,10 @@ Current scope is intentionally narrow:
 - output: six deterministic artifacts
 - mode: `preview` and `publish` gates
 
-It does not connect Runtime or Studio.
+It does not connect Runtime directly and does not connect Studio UI directly.
 
 P6-04B adds a thin CLI/export layer on top of this core package. See [Rule Compiler CLI](rule-compiler-cli.md).
+P6-05A adds a local Studio Compile Preview through builder-runner. That preview calls this package in memory and still does not execute Runtime or write artifacts.
 
 ## Position in the vNext Chain
 
@@ -106,7 +107,7 @@ It intentionally avoids customer SOP, real adapter mappings, and complete indust
 `@yutra/rule-compiler` does not:
 
 - connect Runtime
-- connect Studio UI
+- connect Studio UI directly
 - execute generated DSL
 - call an LLM
 - include customer SOP
@@ -119,7 +120,7 @@ It intentionally avoids customer SOP, real adapter mappings, and complete indust
 
 Likely next steps:
 
-- P6-04B: compiler CLI / artifact export
-- P6-05: Creator Workbench integration
+- P6-05B: optional apply compiled DSL into the existing DSL inspect/run source flow
+- P6-06: richer visual business-rule configuration
 
 Keep those separate from this core package.

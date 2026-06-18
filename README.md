@@ -101,6 +101,7 @@ Yutra Studio is the local single-user Agent Editor Workbench prototype.
 It includes:
 - left navigation and top operation bar
 - AI Draft Assistant
+- Creator Workbench Compile Preview for the public `request-resolution` demo Pack Config
 - DSL editor with Validate / Inspect / Apply as Run Source
 - AgentSpec JSON preview
 - validation / normalized / canonical inspect panel backed by `/dsl/inspect`
@@ -110,6 +111,7 @@ It includes:
 Current limits:
 - no real save or publish
 - no login, database, or multi-tenant backend
+- Compile Preview does not run Runtime, write artifacts, or connect real adapters
 - no full DSL-to-BuilderFormConfig reverse mapping
 - Runtime execution still uses canonical IR
 - language switching only changes UI labels; DSL, Trace event type strings, payload fields, and canonical IR stay unchanged

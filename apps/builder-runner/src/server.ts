@@ -1,8 +1,9 @@
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from "node:http";
 import { runBuilderPreview } from "./run-preview";
 import { buildAiDraftPreview } from "./ai-draft-preview";
+import { buildCreatorCompilePreview } from "./compile-preview";
 import { inspectDslText } from "./dsl-inspect";
-import type { AiDraftPreviewRequest, BuilderDslInspectRequest, BuilderRunPreviewRequest } from "./types";
+import type { AiDraftPreviewRequest, BuilderDslInspectRequest, BuilderRunPreviewRequest, CreatorCompilePreviewRequest } from "./types";
 import { sanitizeErrorMessage } from "./response-formatters";
 
 const DEFAULT_PORT = 8788;
@@ -96,6 +97,23 @@ async function handleAiDraftPreview(req: IncomingMessage, res: ServerResponse): 
   }
 }
 
+async function handleCreatorCompilePreview(req: IncomingMessage, res: ServerResponse): Promise<void> {
+  try {
+    const request = await readJsonBody<CreatorCompilePreviewRequest>(req);
+    const result = buildCreatorCompilePreview(request);
+    sendJson(res, result.ok ? 200 : 400, result);
+  } catch (error) {
+    sendJson(res, 400, {
+      ok: false,
+      error: {
+        code: "CREATOR_COMPILE_BAD_REQUEST",
+        message: sanitizeErrorMessage(error instanceof Error ? error.message : "Invalid creator compile preview request.")
+      },
+      issues: []
+    });
+  }
+}
+
 function requestHandler(req: IncomingMessage, res: ServerResponse): void {
   const method = req.method ?? "GET";
   const path = (req.url ?? "/").split("?")[0];
@@ -127,6 +145,11 @@ function requestHandler(req: IncomingMessage, res: ServerResponse): void {
 
   if (method === "POST" && path === "/ai-draft-preview") {
     void handleAiDraftPreview(req, res);
+    return;
+  }
+
+  if (method === "POST" && path === "/creator/compile-preview") {
+    void handleCreatorCompilePreview(req, res);
     return;
   }
 

@@ -80,6 +80,26 @@ Receives `providerMode + tags + brief + options`, then:
 
 This endpoint does not execute Runtime and does not apply draft automatically.
 
+### POST /creator/compile-preview
+
+Receives a Pack Config, compile mode, and locale:
+
+```json
+{
+  "config": {},
+  "mode": "preview",
+  "locale": "zh-CN"
+}
+```
+
+Then:
+
+1. calls `@yutra/rule-compiler` in memory
+2. returns compile issues, compile report, and six demo/mock artifacts when compilation succeeds
+3. returns structured errors without artifacts when compilation fails
+
+This endpoint does not execute Runtime, does not run generated `agent.yutra.yaml`, does not write files, does not read `.env`, and does not connect to real adapters or endpoints.
+
 ## Boundaries
 
 - local-only service
@@ -88,7 +108,8 @@ This endpoint does not execute Runtime and does not apply draft automatically.
 - no cloud deployment contract
 - no file writes from DSL inspect
 - no runtime execution from AI draft endpoint
+- no runtime execution from Creator Compile Preview
+- no artifact file writes from Creator Compile Preview
 - no DSL-to-BuilderFormConfig backfill
 - no secret value returned to UI
 - no real customer API integration
-

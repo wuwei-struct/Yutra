@@ -1,5 +1,7 @@
 import type { BuilderFormConfig } from "@yutra/builder-core";
 import type { AiDraftIssue, AiDraftValidationResult, FlowDraft, NaturalLanguageBrief, TagSelection } from "@yutra/builder-ai-core";
+import type { PackConfig } from "@yutra/pack-config-core";
+import type { CompileMode, RuleCompilerArtifacts, RuleCompilerIssue, RuleCompilerReport } from "@yutra/rule-compiler";
 
 export interface BuilderRunnerIssue {
   code: string;
@@ -82,6 +84,34 @@ export interface BuilderDslInspectErrorResponse {
 }
 
 export type BuilderDslInspectResponse = BuilderDslInspectSuccessResponse | BuilderDslInspectErrorResponse;
+
+export interface CreatorCompilePreviewRequest {
+  config: PackConfig;
+  mode?: CompileMode;
+  locale?: "en" | "zh-CN";
+}
+
+export interface CreatorCompilePreviewSuccessResponse {
+  ok: true;
+  compileId: string;
+  compilerVersion: string;
+  mode: CompileMode;
+  artifacts: RuleCompilerArtifacts;
+  report: RuleCompilerReport;
+  issues: RuleCompilerIssue[];
+}
+
+export interface CreatorCompilePreviewErrorResponse {
+  ok: false;
+  error: {
+    code: string;
+    message: string;
+  };
+  issues: RuleCompilerIssue[];
+  report?: RuleCompilerReport;
+}
+
+export type CreatorCompilePreviewResponse = CreatorCompilePreviewSuccessResponse | CreatorCompilePreviewErrorResponse;
 
 export interface LegacyBuilderRunPreviewRequest {
   form: BuilderFormConfig;

@@ -87,6 +87,8 @@ Compiler must be deterministic. AI may draft configuration but must not directly
 
 Goal: prove the creation layer using a public request-resolution demo pack without exposing customer-ready SOP or implementation playbooks.
 
+Current status: P6-05A adds the first Yutra Studio Creator Workbench Compile Preview for `request-resolution`. It can edit basic demo Pack Config fields and show the six Rule Compiler artifacts plus compile report. It does not run Runtime, save artifacts, publish, or connect real adapters.
+
 Focus:
 
 - archetype: `request-resolution`

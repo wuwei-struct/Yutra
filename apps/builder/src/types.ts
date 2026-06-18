@@ -1,5 +1,7 @@
 import type { BuilderFormConfig, BuilderIssue } from "@yutra/builder-core";
 import type { AiDraftIssue, AiDraftValidationResult, FlowDraft, FlowDraftScenario, NaturalLanguageBrief, TagSelection } from "@yutra/builder-ai-core";
+import type { PackConfig } from "@yutra/pack-config-core";
+import type { CompileMode, RuleCompilerArtifacts, RuleCompilerIssue, RuleCompilerReport } from "@yutra/rule-compiler";
 
 export interface EcommerceRuleInputs {
   delayedShipmentThresholdHours: number;
@@ -189,5 +191,25 @@ export interface AiDraftPreviewResponse {
     validated: boolean;
     promptChars?: number;
     responseChars?: number;
+  };
+}
+
+export interface CreatorCompilePreviewRequest {
+  config: PackConfig;
+  mode?: CompileMode;
+  locale?: "en" | "zh-CN";
+}
+
+export interface CreatorCompilePreviewResponse {
+  ok: boolean;
+  compileId?: string;
+  compilerVersion?: string;
+  mode?: CompileMode;
+  artifacts?: RuleCompilerArtifacts;
+  report?: RuleCompilerReport;
+  issues: RuleCompilerIssue[];
+  error?: {
+    code: string;
+    message: string;
   };
 }

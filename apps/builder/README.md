@@ -34,7 +34,7 @@ pnpm --filter @yutra/builder test
 
 - Sidebar: local navigation shell.
 - Top bar: draft status, local save placeholder, publish placeholder.
-- Main left: AI Draft Assistant and structured Builder config.
+- Main left: Creator Workbench Compile Preview, AI Draft Assistant, and structured Builder config.
 - Main center: DSL editor buffer, AgentSpec JSON, visual flow beta.
 - Main right: validation, DSL normalized view, canonical IR, structure overview.
 - Bottom left: run input and local runner options.
@@ -47,6 +47,8 @@ pnpm --filter @yutra/builder test
 - No login, database, persistence, publishing, or multi-tenant features.
 - AI Draft never auto-runs runtime.
 - Runtime preview still goes through local builder-runner.
+- Creator Workbench Compile Preview currently supports only `request-resolution`.
+- Compile Preview shows demo/mock artifacts and compile report, but does not run Runtime, write files, save config, or publish.
 - DSL editing supports Validate DSL, Inspect DSL, and Apply DSL as Run Source.
 - Source mode can be `Builder Source` or `DSL Source`.
 - DSL Source runs through `DSL -> normalized -> canonical AgentSpec -> Runtime Preview`.

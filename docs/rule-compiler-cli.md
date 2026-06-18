@@ -4,6 +4,8 @@ The Rule Compiler CLI exports deterministic demo/mock artifacts from a Pack Conf
 
 It is a local developer tool for inspecting compiler output. It does not run Runtime, publish an Agent, or connect to real customer systems. It also does not automatically run generated `agent.yutra.yaml`.
 
+Yutra Studio also has a Creator Workbench Compile Preview. That preview shows the same kind of demo/mock artifacts in the browser, but it does not write files. The CLI remains the explicit local artifact export path.
+
 ## Command
 
 ```bash
