@@ -13,6 +13,8 @@ Current scope is intentionally narrow:
 
 It does not connect Runtime or Studio.
 
+P6-04B adds a thin CLI/export layer on top of this core package. See [Rule Compiler CLI](rule-compiler-cli.md).
+
 ## Position in the vNext Chain
 
 ```text

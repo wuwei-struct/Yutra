@@ -70,7 +70,7 @@ Field types:
 
 Goal: compile Pack Config into executable and certifiable assets.
 
-Current status: `@yutra/rule-compiler` provides the first request-resolution basic compiler for public demo/mock artifacts. It does not connect Runtime or Studio.
+Current status: `@yutra/rule-compiler` provides the first request-resolution basic compiler for public demo/mock artifacts. `yutra compile` can export those artifacts locally. It does not connect Runtime or Studio.
 
 Scope:
 

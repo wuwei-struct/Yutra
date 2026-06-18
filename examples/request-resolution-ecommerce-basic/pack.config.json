@@ -1,0 +1,101 @@
+{
+  "packConfigId": "request-resolution:ecommerce-basic-demo",
+  "packConfigVersion": "0.1.0",
+  "archetypeId": "request-resolution",
+  "archetypeVersion": "0.1.0",
+  "variantId": "ecommerce-basic-demo",
+  "variantVersion": "0.1.0",
+  "locale": "en",
+  "capabilities": {
+    "orderLookup": { "value": true, "source": "confirmedByUser", "required": true },
+    "shippingLookup": { "value": true, "source": "confirmedByUser" },
+    "refundRequest": { "value": true, "source": "confirmedByUser" },
+    "returnRequest": { "value": true, "source": "confirmedByUser" },
+    "handoff": { "value": true, "source": "confirmedByUser", "required": true }
+  },
+  "businessObjects": [
+    { "objectId": "order", "label": { "en": "Order", "zhCN": "订单" }, "fields": ["order_id", "status", "amount"] },
+    { "objectId": "request", "label": { "en": "Request", "zhCN": "请求" }, "fields": ["request_type", "reason"] }
+  ],
+  "rules": {
+    "refundPolicy.autoRefundWhenNotShipped": {
+      "value": true,
+      "source": "defaultFromPack",
+      "label": { "en": "Auto refund when not shipped", "zhCN": "未发货自动退款" }
+    },
+    "refundPolicy.autoRefundMaxAmount": {
+      "value": 300,
+      "source": "defaultFromPack",
+      "label": { "en": "Demo auto refund max amount", "zhCN": "演示自动退款金额上限" },
+      "description": { "en": "Demo value only. Replace in private implementation.", "zhCN": "仅演示值，私有实施时替换。" }
+    },
+    "refundPolicy.shippedOrderStrategy": { "value": "require_return_first", "source": "confirmedByUser" },
+    "refundPolicy.expiredAfterSaleStrategy": { "value": "ask_for_more_info", "source": "confirmedByUser" },
+    "refundPolicy.apiFailureStrategy": { "value": "retry_then_handoff", "source": "confirmedByUser" },
+    "handoffPolicy.highValueRefund": { "value": true, "source": "confirmedByUser" },
+    "handoffPolicy.complaint": { "value": true, "source": "confirmedByUser" },
+    "handoffPolicy.orderNotFound": { "value": true, "source": "confirmedByUser" },
+    "handoffPolicy.ruleConflict": { "value": true, "source": "confirmedByUser" },
+    "handoffPolicy.maxUserRetryCount": { "value": 2, "source": "defaultFromPack" },
+    "responseStyle.tone": { "value": "warm_professional", "source": "confirmedByUser" },
+    "responseStyle.includeReason": { "value": true, "source": "confirmedByUser" },
+    "responseStyle.includeHumanSupportEntry": { "value": true, "source": "confirmedByUser" }
+  },
+  "policies": {
+    "publish.requiresHumanReview": { "value": true, "source": "defaultFromPack" }
+  },
+  "adapters": [
+    {
+      "adapterId": "order-adapter",
+      "mode": "mock",
+      "contractRef": "contracts/order-contract.md",
+      "fieldMappings": { "orderId": "order_id" },
+      "containsRealEndpoint": false,
+      "containsSecret": false
+    },
+    {
+      "adapterId": "escalation-adapter",
+      "mode": "mock",
+      "contractRef": "contracts/escalation-contract.md",
+      "fieldMappings": { "reasonCode": "reason_code" },
+      "containsRealEndpoint": false,
+      "containsSecret": false
+    }
+  ],
+  "templates": [
+    {
+      "templateId": "response.default.demo",
+      "purpose": "demo response",
+      "locale": "en",
+      "text": {
+        "value": "Demo response template. Replace with private brand-approved copy during implementation.",
+        "source": "defaultFromPack"
+      }
+    }
+  ],
+  "tests": [
+    {
+      "testCaseId": "happy-path-demo",
+      "title": "Happy path demo",
+      "input": { "request_type": "demo_request", "order_id": "DEMO-ORDER" },
+      "expectedPath": ["triage", "resolve", "respond"],
+      "expectedOutcome": "completed",
+      "tags": ["demo", "mock"]
+    }
+  ],
+  "governance": {
+    "environment": "demo",
+    "publishable": true,
+    "requiresHumanReview": true,
+    "unconfirmedFieldPolicy": "block_publish",
+    "missingFieldPolicy": "block_compile",
+    "sideEffectPolicy": {
+      "maxAutoSideEffect": "read",
+      "requiresPolicyGuardFrom": "write"
+    }
+  },
+  "metadata": {
+    "publicDemo": true,
+    "containsCustomerData": false
+  }
+}

@@ -141,8 +141,17 @@ Start here:
 - [Pack Config Core](docs/pack-config-core.md)
 - [Rule Compiler Overview](docs/rule-compiler-overview.md)
 - [Rule Compiler Core](docs/rule-compiler-core.md)
+- [Rule Compiler CLI](docs/rule-compiler-cli.md)
 - [Creator Workbench](docs/creator-workbench.md)
 - [vNext Roadmap](docs/vnext-roadmap.md)
+
+Local demo/mock artifact export:
+
+```bash
+pnpm exec yutra compile examples/request-resolution-ecommerce-basic/pack.config.json --out .tmp/compiled-request-resolution
+```
+
+This exports compiler artifacts only. It does not run Runtime or publish an Agent.
 
 ## Skill-based Demo
 
@@ -261,6 +270,7 @@ Yutra is currently not:
 - [Pack Config Core](docs/pack-config-core.md)
 - [Rule Compiler Overview](docs/rule-compiler-overview.md)
 - [Rule Compiler Core](docs/rule-compiler-core.md)
+- [Rule Compiler CLI](docs/rule-compiler-cli.md)
 - [Creator Workbench](docs/creator-workbench.md)
 - [vNext Roadmap](docs/vnext-roadmap.md)
 

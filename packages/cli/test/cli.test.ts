@@ -2,11 +2,22 @@ import { mkdtemp, rm, mkdir, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
+import { inspectDsl, parseDsl } from "@yutra/dsl";
 import { describe, expect, it } from "vitest";
 import { runCli } from "../src/cli";
 
 const workspaceRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
+const compileConfigPath = "examples/request-resolution-ecommerce-basic/pack.config.json";
+const compiledArtifactFiles = [
+  "agent.yutra.yaml",
+  "policy.yaml",
+  "adapter.config.json",
+  "templates.json",
+  "test-cases.json",
+  "trace.expectation.json",
+  "compile-report.json"
+];
 
 function createMemoryIO() {
   const stdout: string[] = [];
@@ -476,6 +487,155 @@ describe("@yutra/cli", () => {
     const code = await runCli(["skill", "validate", skillDir], io);
     expect(code).toBe(0);
     expect(stdout.some((line) => line.includes("warnings: 1"))).toBe(true);
+    await rm(dir, { recursive: true, force: true });
+  });
+
+  it("compile --help displays command usage", async () => {
+    const { io, stdout } = createMemoryIO();
+    const code = await runCli(["compile", "--help"], io);
+    expect(code).toBe(0);
+    expect(stdout.some((line) => line.includes("yutra compile <pack-config.json> --out <dir>"))).toBe(true);
+  });
+
+  it("compile demo config --dry-run succeeds without writing files", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "yutra-compile-dry-"));
+    const outDir = join(dir, "out");
+    const { io, stdout } = createMemoryIO();
+    const code = await runCli(["compile", compileConfigPath, "--out", outDir, "--dry-run"], io);
+
+    expect(code).toBe(0);
+    expect(stdout.some((line) => line.includes("dryRun: true"))).toBe(true);
+    expect(existsSync(outDir)).toBe(false);
+    await rm(dir, { recursive: true, force: true });
+  });
+
+  it("compile demo config writes all artifacts and compile report", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "yutra-compile-out-"));
+    const { io } = createMemoryIO();
+    const code = await runCli(["compile", compileConfigPath, "--out", dir], io);
+
+    expect(code).toBe(0);
+    for (const file of compiledArtifactFiles) {
+      expect(existsSync(join(dir, file))).toBe(true);
+    }
+
+    const report = JSON.parse(readFileSync(join(dir, "compile-report.json"), "utf8")) as {
+      compileId: string;
+      compilerVersion: string;
+      report: { packConfigHash: string; artifactHashes: Record<string, string> };
+    };
+    expect(report.compileId).toMatch(/^compile:/);
+    expect(report.compilerVersion).toBeTruthy();
+    expect(report.report.packConfigHash).toMatch(/^sha256:/);
+    expect(report.report.artifactHashes["agent.yutra.yaml"]).toMatch(/^sha256:/);
+    await rm(dir, { recursive: true, force: true });
+  });
+
+  it("compile refuses overwrite without --force and allows it with --force", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "yutra-compile-force-"));
+    const firstIO = createMemoryIO();
+    const secondIO = createMemoryIO();
+    const forceIO = createMemoryIO();
+
+    expect(await runCli(["compile", compileConfigPath, "--out", dir], firstIO.io)).toBe(0);
+    expect(await runCli(["compile", compileConfigPath, "--out", dir], secondIO.io)).not.toBe(0);
+    expect(secondIO.stderr.some((line) => line.includes("COMPILE_OUTPUT_EXISTS"))).toBe(true);
+    expect(await runCli(["compile", compileConfigPath, "--out", dir, "--force"], forceIO.io)).toBe(0);
+    await rm(dir, { recursive: true, force: true });
+  });
+
+  it("compile invalid JSON returns non-zero", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "yutra-compile-invalid-json-"));
+    const configPath = join(dir, "bad.json");
+    await writeFile(configPath, "{ not json", "utf8");
+
+    const { io, stderr } = createMemoryIO();
+    const code = await runCli(["compile", configPath, "--out", join(dir, "out")], io);
+    expect(code).not.toBe(0);
+    expect(stderr.some((line) => line.includes("PACK_CONFIG_JSON_INVALID"))).toBe(true);
+    await rm(dir, { recursive: true, force: true });
+  });
+
+  it("compile unsupported archetype returns non-zero", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "yutra-compile-unsupported-"));
+    const config = JSON.parse(readFileSync(resolve(workspaceRoot, compileConfigPath), "utf8")) as Record<string, unknown>;
+    config.archetypeId = "approval-decision";
+    const configPath = join(dir, "unsupported.json");
+    await writeFile(configPath, JSON.stringify(config, null, 2), "utf8");
+
+    const { io, stderr } = createMemoryIO();
+    const code = await runCli(["compile", configPath, "--out", join(dir, "out")], io);
+    expect(code).not.toBe(0);
+    expect(stderr.some((line) => line.includes("RULE_COMPILER_UNSUPPORTED_ARCHETYPE"))).toBe(true);
+    await rm(dir, { recursive: true, force: true });
+  });
+
+  it("compile requiredButMissing config returns non-zero", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "yutra-compile-missing-"));
+    const config = JSON.parse(readFileSync(resolve(workspaceRoot, compileConfigPath), "utf8")) as {
+      rules: Record<string, unknown>;
+    };
+    config.rules.required_demo_field = {
+      source: "requiredButMissing",
+      required: true,
+      label: { en: "Required demo field", zhCN: "必填演示字段" }
+    };
+    const configPath = join(dir, "missing.json");
+    await writeFile(configPath, JSON.stringify(config, null, 2), "utf8");
+
+    const { io, stderr } = createMemoryIO();
+    const code = await runCli(["compile", configPath, "--out", join(dir, "out")], io);
+    expect(code).not.toBe(0);
+    expect(stderr.some((line) => line.includes("REQUIRED_FIELD_MISSING"))).toBe(true);
+    await rm(dir, { recursive: true, force: true });
+  });
+
+  it("compiled agent.yutra.yaml can be parsed and inspected by @yutra/dsl", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "yutra-compile-dsl-"));
+    const { io } = createMemoryIO();
+    const code = await runCli(["compile", compileConfigPath, "--out", dir], io);
+    expect(code).toBe(0);
+
+    const agentYaml = readFileSync(join(dir, "agent.yutra.yaml"), "utf8");
+    const report = inspectDsl(parseDsl(agentYaml, "yaml"), { format: "yaml" });
+    expect(report.issues).toHaveLength(0);
+    expect(Object.keys(report.canonical.states)).toContain("handoff");
+    await rm(dir, { recursive: true, force: true });
+  });
+
+  it("compiled output contains no secret, real endpoint, or customer name markers", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "yutra-compile-safe-"));
+    const { io } = createMemoryIO();
+    const code = await runCli(["compile", compileConfigPath, "--out", dir], io);
+    expect(code).toBe(0);
+
+    const combined = compiledArtifactFiles
+      .map((file) => readFileSync(join(dir, file), "utf8"))
+      .join("\n")
+      .toLowerCase();
+    expect(combined).not.toContain("api_key");
+    expect(combined).not.toContain("bearer ");
+    expect(combined).not.toContain("https://");
+    expect(combined).not.toContain("customer name");
+    await rm(dir, { recursive: true, force: true });
+  });
+
+  it("compile --json --dry-run returns parseable JSON summary", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "yutra-compile-json-"));
+    const { io, stdout } = createMemoryIO();
+    const code = await runCli(["compile", compileConfigPath, "--out", join(dir, "out"), "--dry-run", "--json"], io);
+
+    expect(code).toBe(0);
+    const parsed = JSON.parse(stdout.join("\n")) as {
+      ok: boolean;
+      dryRun: boolean;
+      artifactFilenames: string[];
+      artifactHashes: Record<string, string>;
+    };
+    expect(parsed.ok).toBe(true);
+    expect(parsed.dryRun).toBe(true);
+    expect(parsed.artifactFilenames).toContain("agent.yutra.yaml");
+    expect(parsed.artifactHashes["trace.expectation.json"]).toMatch(/^sha256:/);
     await rm(dir, { recursive: true, force: true });
   });
 });

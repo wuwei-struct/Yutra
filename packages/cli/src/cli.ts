@@ -2,8 +2,9 @@ import { existsSync, readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { isAbsolute } from "node:path";
 import { pathToFileURL } from "node:url";
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, rename, writeFile } from "node:fs/promises";
 import { formatExplainOutput, inspectCanonicalization, loadAndValidateDslFile, loadDslFile } from "@yutra/dsl";
+import { compilePackConfig, stableJson, type CompileMode, type RuleCompilerOutput } from "@yutra/rule-compiler";
 import { executeRun } from "@yutra/runtime";
 import type { ActionRegistry } from "@yutra/runtime";
 import { createSkillRegistry, discoverSkills, loadSkillFromDir, skillToAction, validateLoadedSkill } from "@yutra/skill-core";
@@ -58,9 +59,18 @@ function printHelp(io: CliIO): void {
   io.stdout("  yutra skill list [--json] [--skills-dir <path>]");
   io.stdout("  yutra skill inspect <nameOrPath> [--as-action] [--json] [--skills-dir <path>]");
   io.stdout("  yutra skill validate <path> [--json]");
+  io.stdout("  yutra compile <pack-config.json> --out <dir> [--mode <preview|publish>] [--locale <en|zh-CN>] [--force] [--dry-run] [--json]");
   io.stdout("  yutra trace list [--trace-file <jsonl>]");
   io.stdout("  yutra trace show <runId> [--trace-file <jsonl>] [--json]");
   io.stdout("  yutra trace export <runId> --out <json> [--trace-file <jsonl>]");
+}
+
+function printCompileHelp(io: CliIO): void {
+  io.stdout("Usage:");
+  io.stdout("  yutra compile <pack-config.json> --out <dir> [--mode <preview|publish>] [--locale <en|zh-CN>] [--force] [--dry-run] [--json]");
+  io.stdout("");
+  io.stdout("Compiles a local Pack Config JSON into demo/mock Rule Compiler artifacts.");
+  io.stdout("This command does not run Runtime and does not execute the generated agent.");
 }
 
 function resolveSkillsSearchPaths(flags: Record<string, string | boolean>): string[] {
@@ -102,6 +112,197 @@ function createDefaultActionRegistry(actionNames: string[] = []) {
       })
     ])
   );
+}
+
+function compileSummary(output: RuleCompilerOutput, outDir?: string, dryRun = false) {
+  return {
+    ok: output.ok,
+    compileId: output.compileId,
+    compilerVersion: output.compilerVersion,
+    mode: output.mode,
+    dryRun,
+    outDir: outDir ?? null,
+    configHash: output.report.packConfigHash,
+    artifactFilenames: output.artifacts
+      ? [
+          output.artifacts.agent.filename,
+          output.artifacts.policy.filename,
+          output.artifacts.adapterConfig.filename,
+          output.artifacts.templates.filename,
+          output.artifacts.testCases.filename,
+          output.artifacts.traceExpectation.filename
+        ]
+      : [],
+    artifactHashes: output.report.artifactHashes,
+    issues: output.issues
+  };
+}
+
+async function writeUtf8Atomic(path: string, content: string): Promise<void> {
+  const tempPath = `${path}.tmp-${process.pid}-${Date.now()}`;
+  await writeFile(tempPath, content, "utf8");
+  await rename(tempPath, path);
+}
+
+async function runCompile(args: string[], flags: Record<string, string | boolean>, io: CliIO): Promise<number> {
+  if (flags.help === true) {
+    printCompileHelp(io);
+    return EXIT_CODE_SUCCESS;
+  }
+
+  const file = args[0];
+  if (!file) {
+    io.stderr("Missing required argument <pack-config.json>.");
+    return EXIT_CODE_GENERAL_FAILURE;
+  }
+
+  const out = getStringFlag(flags, "out");
+  if (!out) {
+    io.stderr("Missing required flag --out <dir>.");
+    return EXIT_CODE_GENERAL_FAILURE;
+  }
+
+  const modeFlag = getStringFlag(flags, "mode") ?? "preview";
+  if (modeFlag !== "preview" && modeFlag !== "publish") {
+    io.stderr("Invalid --mode. Expected preview or publish.");
+    return EXIT_CODE_GENERAL_FAILURE;
+  }
+
+  const configPath = resolveWorkspacePath(file);
+  const outDir = resolveWorkspacePath(out);
+  const dryRun = flags["dry-run"] === true;
+  const force = flags.force === true;
+  const json = flags.json === true;
+
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(readFileSync(configPath, "utf8"));
+  } catch (error) {
+    const issue = {
+      code: "PACK_CONFIG_JSON_INVALID",
+      message: `Failed to read or parse Pack Config JSON: ${(error as Error).message}`,
+      path: [file],
+      hint: "Only local JSON Pack Config files are supported."
+    };
+    if (json) {
+      io.stdout(stableJson({ ok: false, issues: [issue] }));
+    } else {
+      io.stderr(`${issue.code}: ${issue.message}`);
+    }
+    return EXIT_CODE_GENERAL_FAILURE;
+  }
+
+  const locale =
+    getStringFlag(flags, "locale") ??
+    ((parsed as { locale?: string }).locale === "zh-CN" ? "zh-CN" : "en");
+  if (locale !== "en" && locale !== "zh-CN") {
+    io.stderr("Invalid --locale. Expected en or zh-CN.");
+    return EXIT_CODE_GENERAL_FAILURE;
+  }
+
+  const output = compilePackConfig({
+    config: parsed as Parameters<typeof compilePackConfig>[0]["config"],
+    mode: modeFlag as CompileMode,
+    locale
+  });
+
+  if (!output.ok || !output.artifacts) {
+    const summary = compileSummary(output, dryRun ? undefined : outDir, dryRun);
+    if (json) {
+      io.stdout(stableJson(summary));
+    } else {
+      io.stderr(`compile: failed`);
+      for (const issue of output.issues) {
+        io.stderr(`- [${issue.severity}] ${issue.code}: ${issue.message}${issue.path ? ` path=${issue.path.join(".")}` : ""}`);
+      }
+    }
+    return EXIT_CODE_GENERAL_FAILURE;
+  }
+
+  const artifactFiles = [
+    output.artifacts.agent,
+    output.artifacts.policy,
+    output.artifacts.adapterConfig,
+    output.artifacts.templates,
+    output.artifacts.testCases,
+    output.artifacts.traceExpectation
+  ];
+  const compileReportContent = stableJson({
+    compileId: output.compileId,
+    compilerVersion: output.compilerVersion,
+    mode: output.mode,
+    ok: output.ok,
+    report: output.report,
+    issues: output.issues
+  });
+
+  if (dryRun) {
+    const summary = compileSummary(output, undefined, true);
+    if (json) {
+      io.stdout(stableJson(summary));
+    } else {
+      io.stdout(`compileId: ${output.compileId}`);
+      io.stdout(`compilerVersion: ${output.compilerVersion}`);
+      io.stdout(`mode: ${output.mode}`);
+      io.stdout(`configHash: ${output.report.packConfigHash}`);
+      io.stdout(`artifacts: ${artifactFiles.map((artifact) => artifact.filename).join(", ")}, compile-report.json`);
+      io.stdout(`issues: ${output.issues.length}`);
+      io.stdout("dryRun: true");
+    }
+    return EXIT_CODE_SUCCESS;
+  }
+
+  const targetFiles = [...artifactFiles.map((artifact) => resolve(outDir, artifact.filename)), resolve(outDir, "compile-report.json")];
+  const existing = targetFiles.filter((target) => existsSync(target));
+  if (existing.length > 0 && !force) {
+    const issue = {
+      code: "COMPILE_OUTPUT_EXISTS",
+      message: `Output artifact already exists: ${existing[0]}`,
+      hint: "Use --force to overwrite known compiler artifacts."
+    };
+    if (json) {
+      io.stdout(stableJson({ ok: false, issues: [issue] }));
+    } else {
+      io.stderr(`${issue.code}: ${issue.message}`);
+    }
+    return EXIT_CODE_GENERAL_FAILURE;
+  }
+
+  try {
+    await mkdir(outDir, { recursive: true });
+    for (const artifact of artifactFiles) {
+      await writeUtf8Atomic(resolve(outDir, artifact.filename), artifact.content);
+    }
+    await writeUtf8Atomic(resolve(outDir, "compile-report.json"), compileReportContent);
+  } catch (error) {
+    const issue = {
+      code: "COMPILE_WRITE_FAILED",
+      message: `Failed to write compiler artifacts: ${(error as Error).message}`,
+      path: [outDir]
+    };
+    if (json) {
+      io.stdout(stableJson({ ok: false, issues: [issue] }));
+    } else {
+      io.stderr(`${issue.code}: ${issue.message}`);
+    }
+    return EXIT_CODE_TRACE_FAILURE;
+  }
+
+  const summary = compileSummary(output, outDir);
+  if (json) {
+    io.stdout(stableJson({ ...summary, writtenFiles: [...artifactFiles.map((artifact) => artifact.filename), "compile-report.json"] }));
+  } else {
+    io.stdout(`compileId: ${output.compileId}`);
+    io.stdout(`compilerVersion: ${output.compilerVersion}`);
+    io.stdout(`mode: ${output.mode}`);
+    io.stdout(`outDir: ${outDir}`);
+    io.stdout(`configHash: ${output.report.packConfigHash}`);
+    for (const artifact of artifactFiles) {
+      io.stdout(`artifact: ${artifact.filename} ${artifact.hash}`);
+    }
+    io.stdout("artifact: compile-report.json");
+  }
+  return EXIT_CODE_SUCCESS;
 }
 
 async function loadExampleActionRegistry(
@@ -608,6 +809,10 @@ export async function runCli(argv: string[], io: CliIO): Promise<number> {
 
     if (command === "run") {
       return runRun([subcommand, ...rest].filter(Boolean) as string[], flags, io);
+    }
+
+    if (command === "compile") {
+      return runCompile([subcommand, ...rest].filter(Boolean) as string[], flags, io);
     }
 
     if (command === "trace" && subcommand === "list") {

@@ -105,6 +105,12 @@ exceptionStrategy = <retry | deny | handoff>
 
 `@yutra/rule-compiler` now provides the first core implementation for the public `request-resolution` demo/mock compiler.
 
+The CLI can export those artifacts locally:
+
+```bash
+pnpm exec yutra compile examples/request-resolution-ecommerce-basic/pack.config.json --out .tmp/compiled-request-resolution
+```
+
 It can generate:
 
 - `agent.yutra.yaml`
@@ -116,12 +122,10 @@ It can generate:
 
 It still does not implement:
 
-- compiler CLI
-- artifact export to disk
 - Studio compiler integration
 - Runtime integration
 - customer SOP
 - real adapters
 - runtime semantic changes
 
-See [Rule Compiler Core](rule-compiler-core.md).
+See [Rule Compiler Core](rule-compiler-core.md) and [Rule Compiler CLI](rule-compiler-cli.md).

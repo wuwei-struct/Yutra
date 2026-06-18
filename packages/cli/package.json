@@ -25,9 +25,10 @@
                     "lint":  "eslint src test --max-warnings=0"
                 },
     "dependencies":  {
-                         "@yutra/skill-core":  "workspace:*",
                          "@yutra/dsl":  "workspace:*",
+                         "@yutra/rule-compiler":  "workspace:*",
                          "@yutra/runtime":  "workspace:*",
+                         "@yutra/skill-core":  "workspace:*",
                          "@yutra/trace":  "workspace:*"
                      },
     "license":  "MIT",
