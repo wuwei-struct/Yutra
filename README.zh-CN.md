@@ -51,6 +51,7 @@ Yutra 关注这些问题：
 - Rule Impact Explanation。
 - Certification Readiness Preview。
 - Compiled DSL manual bridge。
+- Certification Readiness Panel 中的手动 Run Preview Evidence。
 
 ## 开源边界
 
@@ -115,6 +116,7 @@ Yutra Studio 是本地单用户工作台原型，用于把 Builder Core、AI Dra
 - Creator Workbench Compile Preview：基于公开 `request-resolution` demo Pack Config 预览编译产物
 - Rule Impact Explanation：解释公开 `request-resolution` demo 字段会影响哪些 Guard / Action / Transition / Policy / Trace Expectation
 - Certification Readiness Preview：基于 demo/mock compile output 展示认证准备度；不运行 Runtime，也不声明生产就绪
+- 手动 Run Preview Evidence：用户手动运行预览后展示 runId / event count / trace / audit evidence；不让正式认证门禁变为 ready
 - 可将编译出的 `agent.yutra.yaml` 手动发送到 DSL 编辑器
 - DSL 编辑器：Validate DSL、Inspect DSL、Apply DSL as Run Source
 - AgentSpec JSON 预览

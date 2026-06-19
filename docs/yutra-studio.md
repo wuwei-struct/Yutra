@@ -24,6 +24,7 @@ Builder Core
 - Creator Workbench Compile Preview for the public `request-resolution` demo Pack Config.
 - Rule Impact Explanation for public `request-resolution` demo fields.
 - Certification Readiness Preview for demo/mock compile output.
+- Manual Run Preview Evidence for showing user-triggered run evidence in the readiness panel.
 - Manual bridge from compiled `agent.yutra.yaml` to the DSL Editor.
 - AgentSpec JSON preview.
 - Inspect panel for validation, normalized DSL structure, canonical IR, and structure overview.
@@ -130,7 +131,12 @@ Compile Preview output
 -> boundary notes
 ```
 
-This panel is a preview only. It does not execute Runtime, does not execute test cases, does not run official certification, and does not declare production readiness.
+P6-06C lets Studio display manual Run Preview Evidence in this panel after the user manually runs the compiled DSL path.
+The evidence can show runId, event count, trace presence, audit bundle presence, and compiled DSL metadata.
+
+This panel is a preview only. It does not automatically execute Runtime, does not execute test cases, does not run official certification, and does not declare production readiness.
+Manual Run Preview evidence does not make the official certification gate ready.
+If the DSL changes after evidence capture, the evidence becomes stale.
 
 Relevant vNext docs:
 

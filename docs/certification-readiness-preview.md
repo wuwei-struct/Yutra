@@ -30,7 +30,37 @@ The preview checks these gates:
 - Manual Runtime Run
 - Official Certification
 
-The current demo/mock path is expected to show `warning` overall because manual Run Preview and official certification evidence are intentionally absent.
+The current demo/mock path is expected to show `warning` overall because official certification evidence is intentionally absent.
+
+## Manual Run Preview Evidence
+
+P6-06C lets Studio attach evidence from a user-triggered manual Run Preview.
+
+The evidence is captured only after this manual flow:
+
+```text
+Compile Preview
+-> Send agent.yutra.yaml to DSL Editor
+-> Inspect DSL manually
+-> Apply DSL as Run Source manually
+-> Run Preview manually
+-> Capture Run Preview Evidence
+```
+
+The panel can show:
+
+- runId
+- run status
+- source mode
+- trace event count
+- trace events present
+- audit bundle present
+- compileId / compilerVersion / configHash / artifactHash for compiled DSL
+
+This evidence can update the UI display of the `manual_runtime_run` gate.
+It does not change the official compiler readiness object, does not run Runtime automatically, and does not make `official_certification` ready.
+
+If the DSL buffer changes after evidence is captured, Studio marks the evidence as stale and asks the user to run preview again.
 
 ## Boundary
 
@@ -44,4 +74,4 @@ It does not include customer SOP, real adapter mapping, production UAT criteria,
 
 P6-06B supports the request-resolution demo/mock compile preview path only.
 
-Future iterations may attach manual Run Preview evidence or official certification summaries, but this preview remains separate from Runtime execution.
+Future iterations may attach official certification summaries, but this preview remains separate from automatic Runtime execution.

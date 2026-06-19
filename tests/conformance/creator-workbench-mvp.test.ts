@@ -88,10 +88,21 @@ describe("P6-05A Creator Workbench MVP conformance", () => {
     expect(docs).toContain("does not claim production readiness");
   });
 
+  it("docs mention manual run preview evidence without official certification", () => {
+    const docs = `${read("docs/creator-workbench.md")}\n${read("docs/yutra-studio.md")}\n${read("docs/certification-readiness-preview.md")}`;
+    expect(docs).toContain("Manual Run Preview Evidence");
+    expect(docs).toContain("runId");
+    expect(docs).toContain("manual_runtime_run");
+    expect(docs).toContain("official certification remains separate");
+    expect(docs).toContain("evidence becomes stale");
+  });
+
   it("README does not claim production readiness", () => {
     const readme = `${read("README.md")}\n${read("README.zh-CN.md")}`;
     expect(readme).toContain("docs/certification-readiness-preview.md");
     expect(readme).toContain("does not run Runtime or claim production readiness");
+    expect(readme).toContain("Manual Run Preview Evidence");
+    expect(readme).toContain("does not make official certification ready");
     expect(readme).not.toContain("production ready");
   });
 

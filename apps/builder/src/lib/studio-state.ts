@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { BuilderFormConfig } from "@yutra/builder-core";
-import type { BuilderDslInspectResponse, BuilderRunPreviewResponse, BuilderUiState } from "../types";
+import type { BuilderDslInspectResponse, BuilderRunPreviewResponse, BuilderUiState, RunPreviewEvidence } from "../types";
 import { mapDraftFormToRuleValues } from "./ai-draft-formatters";
 import { BUILDER_TEMPLATES, generateBuilderPreview } from "./builder-state";
 import { collectPreviewIssues, prettyJson } from "./formatters";
@@ -98,6 +98,7 @@ export function useStudioState() {
   const [runLoading, setRunLoading] = useState<boolean>(false);
   const [runError, setRunError] = useState<string>("");
   const [runResponse, setRunResponse] = useState<BuilderRunPreviewResponse | undefined>(undefined);
+  const [runPreviewEvidence, setRunPreviewEvidence] = useState<RunPreviewEvidence | undefined>(undefined);
   const [selectedEventIndex, setSelectedEventIndex] = useState<number>(0);
   const [runOptions, setRunOptions] = useState<StudioRunOptions>({
     environment: "mock",
@@ -150,6 +151,16 @@ export function useStudioState() {
     setLastValidDslSpec(undefined);
     setDslApplied(false);
     setCompiledDslMeta(undefined);
+    setRunPreviewEvidence((prev) =>
+      prev && prev.status !== "none"
+        ? {
+            ...prev,
+            status: "stale",
+            capturedAt: new Date().toISOString(),
+            reason: "DSL changed after run evidence was captured."
+          }
+        : prev
+    );
   };
 
   const inspectCurrentDsl = async () => {
@@ -202,6 +213,7 @@ export function useStudioState() {
     setSourceMode("builder");
     setDslApplied(false);
     setCompiledDslMeta(undefined);
+    setRunPreviewEvidence(undefined);
     setBuilderChangedWhileDslActive(false);
     setRunError("");
   };
@@ -225,7 +237,59 @@ export function useStudioState() {
       sentAt: new Date().toISOString(),
       inspected: false
     });
+    setRunPreviewEvidence((prev) =>
+      prev && prev.status !== "none"
+        ? {
+            ...prev,
+            status: "stale",
+            capturedAt: new Date().toISOString(),
+            reason: "Compiled DSL was sent to the editor after run evidence was captured."
+          }
+        : prev
+    );
     setRunError("Compiled DSL sent to editor. Inspect it before using as run source.");
+  };
+
+  const recordRunPreviewEvidence = (response: BuilderRunPreviewResponse) => {
+    const eventCount = response.events?.length ?? 0;
+    const runId = response.run?.runId;
+    const hasTraceEvents = eventCount > 0;
+    const hasAuditBundle = Boolean(response.auditBundle);
+    const inspected = Boolean(dslInspectResult?.ok && dslInspectResult.validation.ok);
+    const canTrustManualDslRun =
+      sourceMode === "dsl" && inspected && response.ok && Boolean(runId) && hasTraceEvents && Boolean(compiledDslMeta ?? lastValidDslSpec);
+
+    setRunPreviewEvidence({
+      status: canTrustManualDslRun ? "ready" : response.ok ? "failed" : "failed",
+      runId,
+      runStatus: response.run?.status ?? response.error?.code,
+      sourceMode,
+      capturedAt: new Date().toISOString(),
+      eventCount,
+      hasTraceEvents,
+      hasAuditBundle,
+      compiledDsl: compiledDslMeta
+        ? {
+            compileId: compiledDslMeta.compileId,
+            compilerVersion: compiledDslMeta.compilerVersion,
+            configHash: compiledDslMeta.configHash,
+            artifactHash: compiledDslMeta.artifactHash,
+            inspected: compiledDslMeta.inspected
+          }
+        : undefined,
+      reason: canTrustManualDslRun
+        ? undefined
+        : response.error?.message ??
+          (sourceMode !== "dsl"
+            ? "Builder source Run Preview does not count as compiled DSL readiness evidence."
+            : !inspected
+              ? "DSL was not inspected successfully before Run Preview evidence capture."
+              : !runId
+                ? "Run Preview did not return a runId."
+                : !hasTraceEvents
+                  ? "Run Preview did not return trace events."
+                  : "Run Preview evidence is incomplete.")
+    });
   };
 
   const runCurrentPreview = async () => {
@@ -264,6 +328,7 @@ export function useStudioState() {
       );
       setRunResponse(response);
       setSelectedEventIndex(0);
+      recordRunPreviewEvidence(response);
       if (!response.ok) {
         setRunError(response.error?.message ?? "Run preview failed.");
       }
@@ -273,6 +338,23 @@ export function useStudioState() {
         setInputJsonError("Invalid JSON input.");
       } else {
         setRunError(message);
+        setRunPreviewEvidence({
+          status: "failed",
+          sourceMode,
+          capturedAt: new Date().toISOString(),
+          hasTraceEvents: false,
+          hasAuditBundle: false,
+          compiledDsl: compiledDslMeta
+            ? {
+                compileId: compiledDslMeta.compileId,
+                compilerVersion: compiledDslMeta.compilerVersion,
+                configHash: compiledDslMeta.configHash,
+                artifactHash: compiledDslMeta.artifactHash,
+                inspected: compiledDslMeta.inspected
+              }
+            : undefined,
+          reason: message
+        });
       }
     } finally {
       setRunLoading(false);
@@ -308,6 +390,7 @@ export function useStudioState() {
     runLoading,
     runError,
     runResponse,
+    runPreviewEvidence,
     selectedEventIndex,
     setSelectedEventIndex,
     runOptions,

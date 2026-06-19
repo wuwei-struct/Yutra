@@ -96,6 +96,10 @@ It checks compile status, artifact presence, test-case artifact presence, trace 
 
 It is not an official certification result, does not execute test cases, does not run Runtime, and does not claim production readiness.
 
+P6-06C adds a manual Run Preview Evidence bridge.
+After a user manually sends compiled DSL to the DSL Editor, inspects it, applies it as DSL Source, and runs Run Preview, Studio can show that runId, event count, trace presence, and audit bundle presence in the Certification Readiness Panel.
+This evidence only updates the `manual_runtime_run` gate display. It does not run Runtime automatically, does not execute test cases, does not mark official certification as ready, and does not claim production readiness.
+
 ## UI Principles
 
 - Main entry uses business language, not code language.
@@ -207,6 +211,8 @@ Important boundaries:
 - it does not run `pnpm certify`
 - it is not an official certification result
 - it does not prove production readiness
+- manual Run Preview evidence is UI evidence only; official certification remains separate
+- DSL edits after evidence capture make the manual run evidence stale
 
 See [Certification Readiness Preview](certification-readiness-preview.md).
 

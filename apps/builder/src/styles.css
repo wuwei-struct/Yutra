@@ -667,6 +667,30 @@ pre,
   background: #fbfdff;
 }
 
+.manual-run-evidence {
+  border: 1px solid #d8e0ea;
+  border-radius: 8px;
+  padding: 10px;
+  background: #fbfdff;
+}
+
+.manual-run-evidence dl {
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr);
+  gap: 6px 10px;
+  margin: 0 0 8px;
+}
+
+.manual-run-evidence dt {
+  color: #667789;
+}
+
+.manual-run-evidence dd {
+  margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
 .flow-node {
   display: grid;
   grid-template-columns: 28px 1fr auto;

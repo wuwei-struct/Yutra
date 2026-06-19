@@ -477,6 +477,16 @@ describe("@yutra/builder Studio UI", () => {
     expect(panelText).toContain("Production readiness is not claimed.");
   });
 
+  it("Certification Readiness Panel shows no manual run evidence before Run Preview", async () => {
+    mockCompilePreviewSuccess();
+    renderStudio();
+    fireEvent.click(screen.getByRole("button", { name: "Compile Preview" }));
+    await waitFor(() => expect(screen.getByLabelText("Manual Run Preview Evidence")).toBeTruthy());
+    const evidenceText = screen.getByLabelText("Manual Run Preview Evidence").textContent ?? "";
+    expect(evidenceText).toContain("Not run");
+    expect(evidenceText).toContain("This evidence comes from manual Run Preview, not official certification.");
+  });
+
   it("compile issues render errors and warnings", async () => {
     mockCompilePreviewFailure();
     renderStudio();
@@ -491,6 +501,7 @@ describe("@yutra/builder Studio UI", () => {
     fireEvent.click(screen.getByRole("button", { name: "Compile Preview" }));
     await waitFor(() => expect(compileCreatorPreview).toHaveBeenCalledTimes(1));
     expect(runPreview).not.toHaveBeenCalled();
+    expect(screen.getByLabelText("Manual Run Preview Evidence").textContent).toContain("Not run");
   });
 
   it("Compile Preview success shows Send to DSL Editor for agent artifact", async () => {
@@ -530,6 +541,7 @@ describe("@yutra/builder Studio UI", () => {
     expect(screen.getAllByText("not inspected").length).toBeGreaterThan(0);
     expect(screen.getByText("Compiled DSL must be inspected before running.")).toBeTruthy();
     expect((screen.getByRole("button", { name: "Run Preview" }) as HTMLButtonElement).disabled).toBe(true);
+    expect(screen.getByLabelText("Manual Run Preview Evidence").textContent).toContain("Not run");
   });
 
   it("Inspect after sending compiled DSL enables Apply DSL as Run Source and updates source mode", async () => {
@@ -549,6 +561,72 @@ describe("@yutra/builder Studio UI", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Apply DSL as Run Source" }));
     await waitFor(() => expect(screen.getByText("Running from DSL Source")).toBeTruthy());
+    expect(screen.getByLabelText("Manual Run Preview Evidence").textContent).toContain("Not run");
+  });
+
+  it("Manual Run Preview records readiness evidence for inspected compiled DSL", async () => {
+    mockCompilePreviewSuccess();
+    mockDslInspectSuccess();
+    mockCompletedRun();
+    renderStudio();
+    fireEvent.click(screen.getByRole("button", { name: "Compile Preview" }));
+    await waitFor(() => expect(screen.getByRole("button", { name: "Send agent.yutra.yaml to DSL Editor" })).toBeTruthy());
+
+    fireEvent.click(screen.getByRole("button", { name: "Send agent.yutra.yaml to DSL Editor" }));
+    fireEvent.click(screen.getByRole("button", { name: "Inspect DSL" }));
+    await waitFor(() => expect((screen.getByRole("button", { name: "Apply DSL as Run Source" }) as HTMLButtonElement).disabled).toBe(false));
+    fireEvent.click(screen.getByRole("button", { name: "Apply DSL as Run Source" }));
+    await waitFor(() => expect(screen.getByText("Running from DSL Source")).toBeTruthy());
+
+    fireEvent.click(screen.getByRole("button", { name: "Run Preview" }));
+    await waitFor(() => expect(runPreview).toHaveBeenCalledWith(expect.objectContaining({ sourceMode: "dsl" })));
+    await waitFor(() => expect(screen.getByLabelText("Manual Run Preview Evidence").textContent).toContain("Evidence captured"));
+
+    const evidenceText = screen.getByLabelText("Manual Run Preview Evidence").textContent ?? "";
+    expect(evidenceText).toContain("studio-run-1");
+    expect(evidenceText).toContain("completed");
+    expect(evidenceText).toContain("dsl");
+    expect(evidenceText).toContain("2");
+    expect(evidenceText).toContain("true");
+    expect(evidenceText).toContain("compile:test");
+    expect(evidenceText).toContain("sha256:config");
+    expect(screen.getByLabelText("Certification Readiness Panel").textContent).toContain("Manual Run Preview evidence was captured");
+    expect(screen.getByLabelText("Certification Readiness Panel").textContent).toContain("Official certification still not run.");
+    expect(screen.getByLabelText("Certification Readiness Panel").textContent).toContain("Production readiness is still not claimed.");
+  });
+
+  it("editing DSL after manual run evidence marks evidence stale", async () => {
+    mockCompilePreviewSuccess();
+    mockDslInspectSuccess();
+    mockCompletedRun();
+    renderStudio();
+    fireEvent.click(screen.getByRole("button", { name: "Compile Preview" }));
+    await waitFor(() => expect(screen.getByRole("button", { name: "Send agent.yutra.yaml to DSL Editor" })).toBeTruthy());
+
+    fireEvent.click(screen.getByRole("button", { name: "Send agent.yutra.yaml to DSL Editor" }));
+    fireEvent.click(screen.getByRole("button", { name: "Inspect DSL" }));
+    await waitFor(() => expect((screen.getByRole("button", { name: "Apply DSL as Run Source" }) as HTMLButtonElement).disabled).toBe(false));
+    fireEvent.click(screen.getByRole("button", { name: "Apply DSL as Run Source" }));
+    fireEvent.click(screen.getByRole("button", { name: "Run Preview" }));
+    await waitFor(() => expect(screen.getByLabelText("Manual Run Preview Evidence").textContent).toContain("Evidence captured"));
+
+    fireEvent.change(screen.getByLabelText("DSL Editor Text"), { target: { value: "agent: changed" } });
+    expect(screen.getByLabelText("Manual Run Preview Evidence").textContent).toContain("Evidence stale");
+    expect(screen.getByLabelText("Manual Run Preview Evidence").textContent).toContain("DSL changed after run evidence was captured.");
+  });
+
+  it("Builder source Run Preview does not count as compiled DSL readiness evidence", async () => {
+    mockCompilePreviewSuccess();
+    mockCompletedRun();
+    renderStudio();
+    fireEvent.click(screen.getByRole("button", { name: "Compile Preview" }));
+    await waitFor(() => expect(screen.getByLabelText("Manual Run Preview Evidence").textContent).toContain("Not run"));
+
+    fireEvent.click(screen.getByRole("button", { name: "Run Preview" }));
+    await waitFor(() => expect(runPreview).toHaveBeenCalledTimes(1));
+    const evidenceText = screen.getByLabelText("Manual Run Preview Evidence").textContent ?? "";
+    expect(evidenceText).toContain("Run failed");
+    expect(evidenceText).toContain("Builder source Run Preview does not count as compiled DSL readiness evidence.");
   });
 
   it("DSL editor tab renders generated DSL controls", () => {

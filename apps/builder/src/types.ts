@@ -146,6 +146,27 @@ export interface BuilderRunPreviewResponse {
   auditBundle?: Record<string, unknown>;
 }
 
+export type RunPreviewEvidenceStatus = "none" | "ready" | "failed" | "stale";
+
+export interface RunPreviewEvidence {
+  status: RunPreviewEvidenceStatus;
+  runId?: string;
+  runStatus?: string;
+  sourceMode: "builder" | "dsl";
+  capturedAt: string;
+  eventCount?: number;
+  hasTraceEvents: boolean;
+  hasAuditBundle: boolean;
+  compiledDsl?: {
+    compileId?: string;
+    compilerVersion?: string;
+    configHash?: string;
+    artifactHash?: string;
+    inspected?: boolean;
+  };
+  reason?: string;
+}
+
 export interface DraftDiffItem {
   field: "agentName" | "selectedIntentIds" | "selectedSkillNames" | "rules" | "handoffRules" | "responseStyle" | "language";
   before: unknown;

@@ -6,7 +6,7 @@ import {
   type RuleImpactDefinition
 } from "../../../../../packages/pack-config-core/src/rule-impact";
 import type { RuleCompilerIssue } from "@yutra/rule-compiler";
-import type { CreatorCompilePreviewResponse } from "../../types";
+import type { CreatorCompilePreviewResponse, RunPreviewEvidence } from "../../types";
 import { compileCreatorPreview } from "../../lib/creator-client";
 import {
   createRequestResolutionDemoConfig,
@@ -482,6 +482,7 @@ function ArtifactPreviewTabs(props: {
 
 export function CreatorWorkbenchPanel(props: {
   onSendCompiledDslToEditor?: (dslText: string, meta?: SendCompiledDslMeta) => void;
+  runPreviewEvidence?: RunPreviewEvidence;
 }) {
   const [config, setConfig] = useState<PackConfig>(() => createRequestResolutionDemoConfig());
   const [selectedImpact, setSelectedImpact] = useState<RuleImpactDefinition | undefined>(() =>
@@ -540,7 +541,7 @@ export function CreatorWorkbenchPanel(props: {
         <>
           <CompileIssuesPanel issues={response.issues} />
           <CompileReportPanel response={response} />
-          <CertificationReadinessPanel readiness={response.certificationReadiness} />
+          <CertificationReadinessPanel readiness={response.certificationReadiness} runPreviewEvidence={props.runPreviewEvidence} />
           <ArtifactPreviewTabs response={response} onSendCompiledDslToEditor={props.onSendCompiledDslToEditor} />
         </>
       ) : null}

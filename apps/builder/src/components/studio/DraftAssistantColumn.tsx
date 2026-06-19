@@ -22,6 +22,7 @@ export function DraftAssistantColumn(props: DraftAssistantColumnProps) {
     <section className="studio-column draft-column" aria-label="Draft Assistant Column">
       <CreatorWorkbenchPanel
         onSendCompiledDslToEditor={(dslText, meta) => studio.sendCompiledDslToEditor(dslText, meta)}
+        runPreviewEvidence={studio.runPreviewEvidence}
       />
       <div className="panel-title">
         <h2>{t("draft.title")}</h2>

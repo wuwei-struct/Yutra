@@ -1,4 +1,4 @@
-import type { CertificationReadinessGate, CertificationReadinessPreview, ReadinessLevel } from "../../types";
+import type { CertificationReadinessGate, CertificationReadinessPreview, ReadinessLevel, RunPreviewEvidence } from "../../types";
 import { useI18n } from "../../i18n";
 
 const artifactLabels: Array<[keyof CertificationReadinessPreview["artifactStatus"], string]> = [
@@ -30,6 +30,77 @@ function levelText(level: ReadinessLevel, t: (key: "creator.readiness.ready" | "
   return t("creator.readiness.blocked");
 }
 
+function evidenceStatusText(evidence: RunPreviewEvidence | undefined, t: (key: "creator.readiness.notRun" | "creator.readiness.evidenceCaptured" | "creator.readiness.runFailed" | "creator.readiness.evidenceStale") => string): string {
+  if (!evidence || evidence.status === "none") {
+    return t("creator.readiness.notRun");
+  }
+  if (evidence.status === "ready") {
+    return t("creator.readiness.evidenceCaptured");
+  }
+  if (evidence.status === "stale") {
+    return t("creator.readiness.evidenceStale");
+  }
+  return t("creator.readiness.runFailed");
+}
+
+function displayedManualRuntimeGate(gate: CertificationReadinessGate, evidence?: RunPreviewEvidence): CertificationReadinessGate {
+  if (gate.gateId !== "manual_runtime_run" || !evidence || evidence.status === "none") {
+    return gate;
+  }
+
+  if (evidence.status === "ready") {
+    return {
+      ...gate,
+      level: "ready",
+      message: {
+        en: "Manual Run Preview evidence was captured for the inspected DSL source.",
+        zhCN: "已为检查通过的 DSL 源捕获手动运行预览证据。"
+      },
+      evidence: {
+        runId: evidence.runId,
+        runStatus: evidence.runStatus,
+        sourceMode: evidence.sourceMode,
+        eventCount: evidence.eventCount,
+        hasTraceEvents: evidence.hasTraceEvents,
+        hasAuditBundle: evidence.hasAuditBundle,
+        configHash: evidence.compiledDsl?.configHash
+      }
+    };
+  }
+
+  if (evidence.status === "failed") {
+    return {
+      ...gate,
+      level: "blocked",
+      message: {
+        en: "Manual Run Preview failed or did not produce usable compiled DSL evidence.",
+        zhCN: "手动运行预览失败，或未产生可用的编译 DSL 证据。"
+      },
+      evidence: { reason: evidence.reason, runStatus: evidence.runStatus, sourceMode: evidence.sourceMode }
+    };
+  }
+
+  return {
+    ...gate,
+    level: "warning",
+    message: {
+      en: "Manual Run Preview evidence is stale because the DSL changed after capture.",
+      zhCN: "DSL 在证据捕获后发生变化，手动运行预览证据已过期。"
+    },
+    evidence: { reason: evidence.reason, runId: evidence.runId, sourceMode: evidence.sourceMode }
+  };
+}
+
+function displayedOverall(gates: CertificationReadinessGate[]): ReadinessLevel {
+  if (gates.some((gate) => gate.level === "blocked")) {
+    return "blocked";
+  }
+  if (gates.some((gate) => gate.level === "warning")) {
+    return "warning";
+  }
+  return "ready";
+}
+
 function GateCard(props: { gate: CertificationReadinessGate; localeKey: "en" | "zhCN" }) {
   const { t } = useI18n();
   const gate = props.gate;
@@ -45,10 +116,12 @@ function GateCard(props: { gate: CertificationReadinessGate; localeKey: "en" | "
   );
 }
 
-export function CertificationReadinessPanel(props: { readiness?: CertificationReadinessPreview }) {
+export function CertificationReadinessPanel(props: { readiness?: CertificationReadinessPreview; runPreviewEvidence?: RunPreviewEvidence }) {
   const { locale, t } = useI18n();
   const readiness = props.readiness;
   const localeKey = locale === "zh-CN" ? "zhCN" : "en";
+  const displayedGates = readiness?.gates.map((gate) => displayedManualRuntimeGate(gate, props.runPreviewEvidence)) ?? [];
+  const overall = readiness ? displayedOverall(displayedGates) : undefined;
 
   return (
     <section className="creator-section certification-readiness-panel" aria-label="Certification Readiness Panel">
@@ -57,7 +130,9 @@ export function CertificationReadinessPanel(props: { readiness?: CertificationRe
       {readiness ? (
         <>
           <div className="readiness-overall">
-            <span className={`readiness-badge ${readinessClass(readiness.overall)}`}>{levelText(readiness.overall, t)}</span>
+            <span className={`readiness-badge ${readinessClass(overall ?? readiness.overall)}`}>
+              {levelText(overall ?? readiness.overall, t)}
+            </span>
             <div>
               <strong>{t("creator.readiness.overall")}</strong>
               <p>{readiness.summary[localeKey]}</p>
@@ -67,9 +142,43 @@ export function CertificationReadinessPanel(props: { readiness?: CertificationRe
 
           <h4>{t("creator.readiness.gates")}</h4>
           <div className="readiness-gate-grid">
-            {readiness.gates.map((gate) => (
+            {displayedGates.map((gate) => (
               <GateCard key={gate.gateId} gate={gate} localeKey={localeKey} />
             ))}
+          </div>
+
+          <h4>{t("creator.readiness.manualEvidence")}</h4>
+          <div className="manual-run-evidence" aria-label="Manual Run Preview Evidence">
+            <dl>
+              <dt>{t("creator.readiness.evidenceStatus")}</dt>
+              <dd>{evidenceStatusText(props.runPreviewEvidence, t)}</dd>
+              <dt>runId</dt>
+              <dd>{props.runPreviewEvidence?.runId ?? "-"}</dd>
+              <dt>runStatus</dt>
+              <dd>{props.runPreviewEvidence?.runStatus ?? "-"}</dd>
+              <dt>sourceMode</dt>
+              <dd>{props.runPreviewEvidence?.sourceMode ?? "-"}</dd>
+              <dt>{t("creator.readiness.eventCount")}</dt>
+              <dd>{props.runPreviewEvidence?.eventCount ?? 0}</dd>
+              <dt>{t("creator.readiness.traceEventsPresent")}</dt>
+              <dd>{props.runPreviewEvidence?.hasTraceEvents ? "true" : "false"}</dd>
+              <dt>{t("creator.readiness.auditBundlePresent")}</dt>
+              <dd>{props.runPreviewEvidence?.hasAuditBundle ? "true" : "false"}</dd>
+              <dt>compileId</dt>
+              <dd>{props.runPreviewEvidence?.compiledDsl?.compileId ?? "-"}</dd>
+              <dt>compilerVersion</dt>
+              <dd>{props.runPreviewEvidence?.compiledDsl?.compilerVersion ?? "-"}</dd>
+              <dt>configHash</dt>
+              <dd>{props.runPreviewEvidence?.compiledDsl?.configHash ?? "-"}</dd>
+              <dt>artifactHash</dt>
+              <dd>{props.runPreviewEvidence?.compiledDsl?.artifactHash ?? "-"}</dd>
+              <dt>capturedAt</dt>
+              <dd>{props.runPreviewEvidence?.capturedAt ?? "-"}</dd>
+            </dl>
+            {props.runPreviewEvidence?.reason ? <p className="warning-text">{props.runPreviewEvidence.reason}</p> : null}
+            <p className="hint">{t("creator.readiness.manualEvidenceBoundary")}</p>
+            <p className="hint">{t("creator.readiness.officialStillNotRun")}</p>
+            <p className="hint">{t("creator.readiness.productionStillNotClaimed")}</p>
           </div>
 
           <h4>{t("creator.readiness.artifactStatus")}</h4>

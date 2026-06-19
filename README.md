@@ -43,6 +43,7 @@ Implemented today:
 - Rule Impact Explanation
 - Certification Readiness Preview
 - Compiled DSL manual bridge
+- Manual Run Preview Evidence in the readiness panel
 
 ## Why Yutra
 
@@ -132,6 +133,7 @@ It includes:
 - Creator Workbench Compile Preview for the public `request-resolution` demo Pack Config
 - Rule Impact Explanation for public `request-resolution` demo fields
 - Certification Readiness Preview for demo/mock compile output; it does not run Runtime or claim production readiness
+- Manual Run Preview Evidence after a user-triggered Run Preview; it does not make official certification ready
 - manual bridge from compiled `agent.yutra.yaml` to the DSL Editor
 - DSL editor with Validate / Inspect / Apply as Run Source
 - AgentSpec JSON preview
