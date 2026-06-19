@@ -41,6 +41,7 @@ Implemented today:
 - Rule Compiler CLI
 - Creator Workbench Compile Preview
 - Rule Impact Explanation
+- Certification Readiness Preview
 - Compiled DSL manual bridge
 
 ## Why Yutra
@@ -130,6 +131,7 @@ It includes:
 - AI Draft Assistant
 - Creator Workbench Compile Preview for the public `request-resolution` demo Pack Config
 - Rule Impact Explanation for public `request-resolution` demo fields
+- Certification Readiness Preview for demo/mock compile output; it does not run Runtime or claim production readiness
 - manual bridge from compiled `agent.yutra.yaml` to the DSL Editor
 - DSL editor with Validate / Inspect / Apply as Run Source
 - AgentSpec JSON preview
@@ -176,6 +178,7 @@ Start here:
 - [Rule Compiler Core](docs/rule-compiler-core.md)
 - [Rule Compiler CLI](docs/rule-compiler-cli.md)
 - [Rule Impact Explanation](docs/rule-impact-explanation.md)
+- [Certification Readiness Preview](docs/certification-readiness-preview.md)
 - [Creator Workbench](docs/creator-workbench.md)
 - [vNext Roadmap](docs/vnext-roadmap.md)
 
@@ -308,6 +311,7 @@ Yutra is currently not:
 - [Rule Compiler Core](docs/rule-compiler-core.md)
 - [Rule Compiler CLI](docs/rule-compiler-cli.md)
 - [Rule Impact Explanation](docs/rule-impact-explanation.md)
+- [Certification Readiness Preview](docs/certification-readiness-preview.md)
 - [Creator Workbench](docs/creator-workbench.md)
 - [vNext Roadmap](docs/vnext-roadmap.md)
 

@@ -91,6 +91,11 @@ Every configuration path must be previewable before delivery.
 
 Show test case results, golden trace comparison, expected path coverage, and audit readiness.
 
+P6-06B adds a Certification Readiness Preview panel for the current demo/mock compile output.
+It checks compile status, artifact presence, test-case artifact presence, trace expectation evidence, fail-closed coverage, publish gate status, side-effect coverage, adapter safety, manual Runtime Run evidence, and official certification evidence.
+
+It is not an official certification result, does not execute test cases, does not run Runtime, and does not claim production readiness.
+
 ## UI Principles
 
 - Main entry uses business language, not code language.
@@ -181,6 +186,29 @@ The panel explains:
 - safety notes such as fail-closed or handoff requirements
 
 This is explanation metadata only. It does not change Rule Compiler output, does not run Runtime, and does not contain customer SOP or real adapter mapping.
+
+## Certification Readiness Preview
+
+After Compile Preview succeeds, Creator Workbench shows a Certification Readiness Panel.
+
+The panel includes:
+
+- overall readiness: ready / warning / blocked
+- gate status for compile, artifacts, test cases, trace expectation, fail-closed, publish gate, side effect, adapter safety, manual runtime run, and official certification
+- artifact status for the six compiler outputs
+- counts for test cases, trace expectations, issue counts, and rule impact metadata
+- an explicit boundary note
+
+Important boundaries:
+
+- it does not run Runtime
+- it does not execute generated DSL
+- it does not execute test cases
+- it does not run `pnpm certify`
+- it is not an official certification result
+- it does not prove production readiness
+
+See [Certification Readiness Preview](certification-readiness-preview.md).
 
 ## Current Boundary
 

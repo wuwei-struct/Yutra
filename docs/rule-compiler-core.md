@@ -16,6 +16,7 @@ It does not connect Runtime directly and does not connect Studio UI directly.
 P6-04B adds a thin CLI/export layer on top of this core package. See [Rule Compiler CLI](rule-compiler-cli.md).
 P6-05A adds a local Studio Compile Preview through builder-runner. That preview calls this package in memory and still does not execute Runtime or write artifacts.
 P6-06A adds Rule Impact Explanation in the Creator Workbench using Pack Config metadata. That layer explains field impact but does not change compiler output.
+P6-06B adds Certification Readiness Preview derived from compile output. It does not execute Runtime, does not execute test cases, and does not run official certification.
 
 ## Position in the vNext Chain
 
@@ -73,6 +74,27 @@ Every compile result includes:
 - warnings
 
 This prepares for future audit binding. The compiler does not write trace events.
+
+## Certification Readiness Preview
+
+`@yutra/rule-compiler` exposes a deterministic readiness preview helper.
+
+It derives readiness gates from a `RuleCompilerOutput`:
+
+- compile
+- artifacts
+- test cases
+- trace expectation
+- fail-closed
+- publish gate
+- side effect
+- adapter safety
+- manual runtime run
+- official certification
+
+The preview is intentionally conservative. Demo/mock output is expected to remain `warning` until manual Run Preview evidence and official certification evidence are attached.
+
+It does not call Runtime, execute generated DSL, execute test cases, write artifacts, or claim production readiness.
 
 ## Fail-closed Gate
 

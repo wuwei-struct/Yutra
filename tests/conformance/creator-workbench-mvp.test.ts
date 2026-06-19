@@ -79,6 +79,22 @@ describe("P6-05A Creator Workbench MVP conformance", () => {
     expect(readme).not.toContain("Creator Workbench auto-runs Runtime");
   });
 
+  it("docs mention certification readiness preview boundaries", () => {
+    const docs = `${read("docs/creator-workbench.md")}\n${read("docs/yutra-studio.md")}\n${read("docs/certification-readiness-preview.md")}`;
+    expect(docs).toContain("Certification Readiness Preview");
+    expect(docs).toContain("does not run Runtime");
+    expect(docs).toContain("does not execute test cases");
+    expect(docs).toContain("not an official certification result");
+    expect(docs).toContain("does not claim production readiness");
+  });
+
+  it("README does not claim production readiness", () => {
+    const readme = `${read("README.md")}\n${read("README.zh-CN.md")}`;
+    expect(readme).toContain("docs/certification-readiness-preview.md");
+    expect(readme).toContain("does not run Runtime or claim production readiness");
+    expect(readme).not.toContain("production ready");
+  });
+
   it("docs state request-resolution is first supported archetype", () => {
     const docs = read("docs/creator-workbench.md");
     expect(docs).toContain("supports only one archetype");

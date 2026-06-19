@@ -14,6 +14,8 @@ Creator Workbench should not be a plain form. A user should understand how a fie
 
 Rule Impact metadata makes the mapping inspectable without executing Runtime.
 
+P6-06B uses this metadata as one input to Certification Readiness Preview counts, but readiness preview still does not run Runtime or execute test cases.
+
 ## Current Scope
 
 The current public implementation covers request-resolution demo/basic fields only:

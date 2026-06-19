@@ -23,6 +23,7 @@ Builder Core
 - DSL editor with Validate DSL, Inspect DSL, Apply DSL as Run Source, Reset from Builder, and Copy DSL.
 - Creator Workbench Compile Preview for the public `request-resolution` demo Pack Config.
 - Rule Impact Explanation for public `request-resolution` demo fields.
+- Certification Readiness Preview for demo/mock compile output.
 - Manual bridge from compiled `agent.yutra.yaml` to the DSL Editor.
 - AgentSpec JSON preview.
 - Inspect panel for validation, normalized DSL structure, canonical IR, and structure overview.
@@ -57,6 +58,7 @@ pnpm builder:dev
 - Creator Compile Preview does not auto-run Runtime, does not write artifacts, and does not publish an Agent.
 - Creator Compile Preview is demo/mock only and does not include real adapters, real endpoints, customer SOP, or customer configuration.
 - Rule Impact Explanation is demo/basic metadata only and does not change compiler output or Runtime behavior.
+- Certification Readiness Preview is not official certification, does not run Runtime, does not execute test cases, and does not claim production readiness.
 - Compiled DSL sent to the editor is not trusted until it passes Inspect DSL.
 
 DSL Source execution is now supported:
@@ -118,6 +120,17 @@ Pack Config field
 ```
 
 This explanation layer helps users understand generated behavior. It does not run Runtime, does not auto-apply DSL, and does not include customer SOP.
+
+P6-06B adds Certification Readiness Preview:
+
+```text
+Compile Preview output
+-> readiness gates
+-> artifact status
+-> boundary notes
+```
+
+This panel is a preview only. It does not execute Runtime, does not execute test cases, does not run official certification, and does not declare production readiness.
 
 Relevant vNext docs:
 

@@ -16,6 +16,7 @@ import {
   type CreatorArtifactTab
 } from "../../lib/creator-state";
 import { useI18n, type MessageKey } from "../../i18n";
+import { CertificationReadinessPanel } from "./CertificationReadinessPanel";
 import { RuleImpactPanel } from "./RuleImpactPanel";
 
 function fieldValue<T>(config: PackConfig, key: string, fallback: T): T {
@@ -539,6 +540,7 @@ export function CreatorWorkbenchPanel(props: {
         <>
           <CompileIssuesPanel issues={response.issues} />
           <CompileReportPanel response={response} />
+          <CertificationReadinessPanel readiness={response.certificationReadiness} />
           <ArtifactPreviewTabs response={response} onSendCompiledDslToEditor={props.onSendCompiledDslToEditor} />
         </>
       ) : null}

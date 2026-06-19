@@ -1,7 +1,7 @@
 import { parseDsl, inspectDsl } from "@yutra/dsl";
 import { REQUEST_RESOLUTION_ECOMMERCE_BASIC_CONFIG, type PackConfig } from "@yutra/pack-config-core";
 import { describe, expect, it } from "vitest";
-import { compilePackConfig, compilerVersion } from "../src/index";
+import { compilePackConfig, compilerVersion, createCertificationReadinessPreview } from "../src/index";
 
 function cloneConfig(overrides: Partial<PackConfig> = {}): PackConfig {
   return {
@@ -163,5 +163,58 @@ describe("@yutra/rule-compiler", () => {
     expect(combined).not.toContain("api_key");
     expect(combined).not.toContain("bearer ");
     expect(combined).not.toContain("https://");
+  });
+
+  it("creates certification readiness preview for valid demo output", () => {
+    const output = compileOk();
+    const readiness = createCertificationReadinessPreview(output);
+    expect(readiness.overall).toBe("warning");
+    expect(readiness.gates.some((gate) => gate.gateId === "compile" && gate.level === "ready")).toBe(true);
+    expect(readiness.gates.some((gate) => gate.gateId === "manual_runtime_run" && gate.level === "warning")).toBe(true);
+    expect(readiness.gates.some((gate) => gate.gateId === "official_certification" && gate.level === "warning")).toBe(true);
+    expect(readiness.artifactStatus).toEqual({
+      agent: true,
+      policy: true,
+      adapterConfig: true,
+      templates: true,
+      testCases: true,
+      traceExpectation: true
+    });
+    expect(readiness.counts.testCases).toBeGreaterThan(0);
+    expect(readiness.counts.traceExpectations).toBeGreaterThan(0);
+    expect(readiness.certificationBoundary).toEqual({
+      previewOnly: true,
+      runtimeExecuted: false,
+      officialCertificationRun: false,
+      productionReady: false
+    });
+  });
+
+  it("missing artifact makes readiness blocked", () => {
+    const output = compileOk();
+    const readiness = createCertificationReadinessPreview({
+      ...output,
+      artifacts: {
+        ...output.artifacts!,
+        traceExpectation: undefined
+      }
+    } as never);
+    expect(readiness.overall).toBe("blocked");
+    expect(readiness.gates.some((gate) => gate.gateId === "artifacts" && gate.level === "blocked")).toBe(true);
+    expect(readiness.gates.some((gate) => gate.gateId === "trace_expectation" && gate.level === "blocked")).toBe(true);
+  });
+
+  it("compile error makes readiness blocked and never claims production ready", () => {
+    const config = cloneConfig({
+      rules: {
+        ...REQUEST_RESOLUTION_ECOMMERCE_BASIC_CONFIG.rules,
+        "refundPolicy.autoRefundMaxAmount": { source: "requiredButMissing", required: true }
+      }
+    });
+    const output = compilePackConfig({ config });
+    const readiness = createCertificationReadinessPreview(output);
+    expect(readiness.overall).toBe("blocked");
+    expect(readiness.gates.some((gate) => gate.gateId === "compile" && gate.level === "blocked")).toBe(true);
+    expect(readiness.certificationBoundary.productionReady).toBe(false);
   });
 });

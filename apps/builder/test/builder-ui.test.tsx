@@ -205,6 +205,98 @@ function mockCompilePreviewSuccess() {
       },
       warnings: []
     },
+    certificationReadiness: {
+      overall: "warning",
+      environment: "demo",
+      summary: {
+        en: "Certification readiness is suitable for demo review only.",
+        zhCN: "认证准备度仅适合 demo 评审。"
+      },
+      gates: [
+        {
+          gateId: "compile",
+          level: "ready",
+          label: { en: "Compile", zhCN: "编译" },
+          message: { en: "Compile preview passed.", zhCN: "Compile Preview 通过。" },
+          evidence: { ok: true }
+        },
+        {
+          gateId: "artifacts",
+          level: "ready",
+          label: { en: "Artifacts", zhCN: "产物" },
+          message: { en: "All six artifacts are present.", zhCN: "6 类产物均存在。" }
+        },
+        {
+          gateId: "test_cases",
+          level: "ready",
+          label: { en: "Test Cases", zhCN: "测试用例" },
+          message: { en: "Demo test cases exist.", zhCN: "Demo 测试用例存在。" }
+        },
+        {
+          gateId: "trace_expectation",
+          level: "ready",
+          label: { en: "Trace Expectation", zhCN: "Trace 预期" },
+          message: { en: "Trace expectation exists.", zhCN: "Trace 预期存在。" }
+        },
+        {
+          gateId: "fail_closed",
+          level: "ready",
+          label: { en: "Fail-Closed", zhCN: "Fail-Closed" },
+          message: { en: "Fail-closed coverage exists.", zhCN: "Fail-closed 覆盖存在。" }
+        },
+        {
+          gateId: "publish_gate",
+          level: "warning",
+          label: { en: "Publish Gate", zhCN: "发布门禁" },
+          message: { en: "Preview mode is not publish-approved.", zhCN: "Preview 模式不代表发布批准。" }
+        },
+        {
+          gateId: "side_effect",
+          level: "ready",
+          label: { en: "Side Effect", zhCN: "副作用" },
+          message: { en: "Side effects are policy guarded.", zhCN: "副作用已受策略保护。" }
+        },
+        {
+          gateId: "adapter_safety",
+          level: "ready",
+          label: { en: "Adapter Safety", zhCN: "Adapter 安全" },
+          message: { en: "Mock adapter safe.", zhCN: "Mock adapter 安全。" }
+        },
+        {
+          gateId: "manual_runtime_run",
+          level: "warning",
+          label: { en: "Manual Runtime Run", zhCN: "手动 Runtime 运行" },
+          message: { en: "Run Preview has not been executed in this readiness panel.", zhCN: "该面板未执行 Run Preview。" }
+        },
+        {
+          gateId: "official_certification",
+          level: "warning",
+          label: { en: "Official Certification", zhCN: "正式认证" },
+          message: { en: "This is not an official certification result.", zhCN: "这不是正式认证结果。" }
+        }
+      ],
+      artifactStatus: {
+        agent: true,
+        policy: true,
+        adapterConfig: true,
+        templates: true,
+        testCases: true,
+        traceExpectation: true
+      },
+      counts: {
+        testCases: 4,
+        traceExpectations: 10,
+        errors: 0,
+        warnings: 0,
+        ruleImpacts: 18
+      },
+      certificationBoundary: {
+        previewOnly: true,
+        runtimeExecuted: false,
+        officialCertificationRun: false,
+        productionReady: false
+      }
+    },
     issues: []
   });
 }
@@ -354,7 +446,7 @@ describe("@yutra/builder Studio UI", () => {
     renderStudio();
     fireEvent.click(screen.getByRole("button", { name: "Compile Preview" }));
     await waitFor(() => expect(compileCreatorPreview).toHaveBeenCalledTimes(1));
-    expect(screen.getByLabelText("Artifact Preview")).toBeTruthy();
+    await waitFor(() => expect(screen.getByLabelText("Artifact Preview")).toBeTruthy());
     expect(screen.getByRole("button", { name: "agent.yutra.yaml (not executed)" })).toBeTruthy();
     expect(screen.getByRole("button", { name: /adapter.config.json/ })).toBeTruthy();
     expect(screen.getByLabelText("Compiled Artifact Content").textContent).toContain("request-resolution-ecommerce-basic");
@@ -368,6 +460,21 @@ describe("@yutra/builder Studio UI", () => {
     expect(screen.getByLabelText("Compile Report").textContent).toContain("enabled");
     expect(screen.getByLabelText("Compile Report").textContent).toContain("fallback_covered");
     expect(screen.getByLabelText("Rule Impact Summary").textContent).toContain("explained fields");
+  });
+
+  it("Certification Readiness Panel renders after compile success", async () => {
+    mockCompilePreviewSuccess();
+    renderStudio();
+    fireEvent.click(screen.getByRole("button", { name: "Compile Preview" }));
+    await waitFor(() => expect(screen.getByLabelText("Certification Readiness Panel")).toBeTruthy());
+    const panelText = screen.getByLabelText("Certification Readiness Panel").textContent ?? "";
+    expect(panelText).toContain("Warning");
+    expect(panelText).toContain("Fail-Closed");
+    expect(panelText).toContain("agent.yutra.yaml");
+    expect(panelText).toContain("trace.expectation.json");
+    expect(panelText).toContain("This is a readiness preview, not an official certification.");
+    expect(panelText).toContain("Runtime was not executed.");
+    expect(panelText).toContain("Production readiness is not claimed.");
   });
 
   it("compile issues render errors and warnings", async () => {

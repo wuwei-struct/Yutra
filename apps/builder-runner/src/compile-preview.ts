@@ -1,4 +1,4 @@
-import { compilePackConfig } from "@yutra/rule-compiler";
+import { compilePackConfig, createCertificationReadinessPreview } from "@yutra/rule-compiler";
 import type { CreatorCompilePreviewRequest, CreatorCompilePreviewResponse } from "./types";
 
 export function buildCreatorCompilePreview(request: CreatorCompilePreviewRequest): CreatorCompilePreviewResponse {
@@ -18,7 +18,10 @@ export function buildCreatorCompilePreview(request: CreatorCompilePreviewRequest
         message: firstIssue?.message ?? "Creator compile preview failed."
       },
       issues: output.issues,
-      report: output.report
+      report: output.report,
+      certificationReadiness: createCertificationReadinessPreview(output, {
+        environment: request.config.governance.environment
+      })
     };
   }
 
@@ -29,6 +32,9 @@ export function buildCreatorCompilePreview(request: CreatorCompilePreviewRequest
     mode: output.mode,
     artifacts: output.artifacts,
     report: output.report,
+    certificationReadiness: createCertificationReadinessPreview(output, {
+      environment: request.config.governance.environment
+    }),
     issues: output.issues
   };
 }

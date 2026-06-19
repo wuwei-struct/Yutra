@@ -16,8 +16,8 @@
   "files": ["dist"],
   "scripts": {
     "dev": "tsx src/server.ts",
-    "build": "pnpm --filter @yutra/builder-ai-core build && tsup src/server.ts --format esm --dts",
-    "test": "pnpm --filter @yutra/builder-ai-core build && vitest run --passWithNoTests",
+    "build": "pnpm --filter @yutra/builder-ai-core build && pnpm --filter @yutra/rule-compiler build && tsup src/server.ts --format esm --dts",
+    "test": "pnpm --filter @yutra/builder-ai-core build && pnpm --filter @yutra/rule-compiler build && vitest run --passWithNoTests",
     "lint": "eslint src test --max-warnings=0"
   },
   "dependencies": {

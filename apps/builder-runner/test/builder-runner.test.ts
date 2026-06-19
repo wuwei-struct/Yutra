@@ -365,6 +365,11 @@ describe("@yutra/builder-runner", () => {
       compilerVersion?: string;
       artifacts?: Record<string, { filename: string }>;
       report?: { packConfigHash?: string; artifactHashes?: Record<string, string>; failClosedPolicy?: string };
+      certificationReadiness?: {
+        overall?: string;
+        gates?: Array<{ gateId: string; level: string }>;
+        certificationBoundary?: { runtimeExecuted?: boolean };
+      };
       events?: unknown[];
     };
 
@@ -380,6 +385,9 @@ describe("@yutra/builder-runner", () => {
     expect(body.report?.packConfigHash).toMatch(/^sha256:/);
     expect(body.report?.artifactHashes?.["agent.yutra.yaml"]).toMatch(/^sha256:/);
     expect(body.report?.failClosedPolicy).toBe("enabled");
+    expect(body.certificationReadiness?.overall).toBe("warning");
+    expect(body.certificationReadiness?.gates?.some((gate) => gate.gateId === "official_certification" && gate.level === "warning")).toBe(true);
+    expect(body.certificationReadiness?.certificationBoundary?.runtimeExecuted).toBe(false);
     expect(body.events).toBeUndefined();
   });
 
@@ -398,11 +406,12 @@ describe("@yutra/builder-runner", () => {
         }
       })
     });
-    const body = (await res.json()) as { ok: boolean; error?: { code?: string }; artifacts?: unknown };
+    const body = (await res.json()) as { ok: boolean; error?: { code?: string }; artifacts?: unknown; certificationReadiness?: { overall?: string } };
     expect(res.status).toBe(400);
     expect(body.ok).toBe(false);
     expect(body.error?.code).toContain("REQUIRED");
     expect(body.artifacts).toBeUndefined();
+    expect(body.certificationReadiness?.overall).toBe("blocked");
   });
 
   it("POST /creator/compile-preview unsupported archetype returns ok=false", async () => {
