@@ -83,12 +83,9 @@ Related files:
 - This pack does not include real channel SDK sending logic in P3-05.
 - Customer-specific legal/policy wording must be reviewed by business owner.
 
-## 8) Delivery planning references
+## 8) Public demo boundary
 
-- `docs/ecommerce-client-onboarding-checklist.md`
-- `docs/ecommerce-delivery-plan-template.md`
-- `docs/ecommerce-uat-plan.md`
-- `docs/ecommerce-joint-debug-checklist.md`
-- `docs/ecommerce-rollout-checklist.md`
-- `docs/ecommerce-delivery-risks.md`
+- `docs/public-demo-boundary.md`
 - `docs/ecommerce-deliverables.md`
+
+This public integration note is for mock/demo validation. Customer onboarding, production rollout, UAT, private SOP, and production adapter mapping belong in private implementation repositories.

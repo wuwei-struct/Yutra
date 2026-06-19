@@ -1,64 +1,43 @@
-﻿# DELIVERY - E-commerce Support Pack (P3-05)
+# E-commerce Support Pack Public Demo Boundary
 
-## Delivery prerequisites
+This is a public mock/demo document.
+It is not a customer delivery playbook.
+It does not include real customer SOP, pricing, UAT, rollout, production adapter mapping, or private operational procedures.
 
-- Runtime/CLI stack is available locally.
-- Customer confirms policy baseline and handoff owner.
-- Customer can provide required adapter interfaces.
-- Auth owner and secret management process are assigned.
+这是公开 mock/demo 文档，不是客户交付 Playbook。
+不包含真实客户 SOP、报价、UAT、上线计划、生产 adapter mapping 或私有运营流程。
 
-## Built-in vs customer-adapted
+## Purpose
 
-Built-in:
-- SOP DSL and action glue
-- adapter contracts + mock adapters + real adapter skeletons
+This pack demonstrates how Yutra can model a support-oriented ecommerce agent using public, non-production assets:
+
+- demo DSL entries
+- mock adapters
+- mock demo inputs
+- public policy examples
 - response templates
-- policy sample files
-- certification scenarios
-- integration profile sample
+- trace/audit/certification examples
 
-Customer-adapted:
-- real order/shipping/return/refund APIs
-- real ticket/escalation system
-- real channel output sender
-- merchant wording and policy thresholds
+## Local Demo Flow
 
-## Replacement points for customer integration
+Developers can use this pack to:
 
-- `adapters/real/order-adapter.real.example.mjs`
-- `adapters/real/shipping-adapter.real.example.mjs`
-- `adapters/real/return-adapter.real.example.mjs`
-- `adapters/real/refund-adapter.real.example.mjs`
-- `adapters/real/escalation-adapter.real.example.mjs`
-- `adapters/real/channel-response-adapter.real.example.mjs`
+1. Review `agent.yutra.yaml` and `agent.skill.yutra.yaml`.
+2. Run mock demo inputs from `demo-inputs/`.
+3. Inspect trace and audit output generated locally.
+4. Run certification checks.
+5. Review adapter contracts as examples, not production mappings.
 
-## Delivery acceptance definition (DoD)
+## Boundaries
 
-1. shipping / return / refund / handoff cases run with expected status in mock mode.
-2. adapter contract shape tests pass.
-3. real adapter skeleton files exist and dry-run mapping works.
-4. trace and audit export remain available.
-5. integration docs are complete and path-valid.
+This public pack does not provide:
 
-## Customer-facing demo and proposal assets
+- customer onboarding steps
+- production deployment instructions
+- production adapter mapping
+- commercial delivery scope
+- UAT or rollout process
+- customer-specific SOP
+- real customer data, credentials, or endpoints
 
-- `docs/ecommerce-demo-path.md`
-- `docs/ecommerce-demo-script.md`
-- `docs/ecommerce-scope-checklist.md`
-- `docs/ecommerce-pricing-scope.md`
-- `docs/ecommerce-delivery-plan-template.md`
-- `docs/ecommerce-delivery-risks.md`
-- `docs/ecommerce-deliverables.md`
-- `docs/ecommerce-proposal-outline.md`
-
-## Integration execution assets (P3-05)
-
-- `.env.example`
-- `integrations/generic-shop-profile/profile.json`
-- `integrations/generic-shop-profile/adapter-map.json`
-- `docs/ecommerce-uat-plan.md`
-- `docs/ecommerce-joint-debug-checklist.md`
-- `docs/ecommerce-rollout-checklist.md`
-
-These assets are for delivery implementation readiness and scope alignment.
-They do not claim real production integration completion.
+Customer-specific delivery assets should live in private implementation repositories.

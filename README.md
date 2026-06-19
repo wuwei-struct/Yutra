@@ -104,6 +104,8 @@ Yutra keeps the execution standard and reference runtime transparent. Commercial
 
 See [Open Source Boundary](docs/open-source-boundary.md).
 
+Public examples are mock/demo only. Pricing, proposal, UAT, rollout, customer-specific SOP, and production integration assets are not part of the public core. See [Public Demo Boundary](docs/public-demo-boundary.md).
+
 ## Quick Start
 
 ```bash

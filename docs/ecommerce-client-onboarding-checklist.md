@@ -1,63 +1,25 @@
-﻿# E-commerce Client Onboarding Checklist
+# E-commerce Public Demo Onboarding Boundary
 
-## Integration assets required from customer
+This public repository does not include a customer onboarding checklist.
 
-- Order API (by order_id / customer)
-- Shipping API (status, latest event)
-- Return API (eligibility + request)
-- Refund API (eligibility + request)
-- Escalation/Ticket API
-- Channel mapping strategy (taobao/douyin/wechat/webchat/generic)
-- Auth strategy (token/api key rotation owner)
+The ecommerce support pack remains a mock/demo example for local validation. Real onboarding, implementation readiness, and customer system access should be handled in private delivery repositories.
 
-## Policy decisions to confirm
+## Public Demo Checklist
 
-- `returnWindowDays`
-- `refundAutoApproveBeforeShipment`
-- `delayedShipmentThresholdDays`
-- `allowPartialRefund`
-- `highRiskAmountThreshold`
-- `requireHumanForDamagedGoods`
-- `requireHumanForRefundAfterDelivery`
+- Confirm mock adapters are used.
+- Confirm no real endpoint or credential is present.
+- Run local demo inputs.
+- Review trace/audit output.
+- Run certification checks.
+- Review adapter contracts as public examples only.
 
-## Response template confirmations
+## Not Included
 
-- shipping template wording
-- return template wording
-- refund template wording
-- handoff notice wording
+- customer onboarding workflow
+- production system access checklist
+- private field mapping
+- customer-specific policy confirmation
+- UAT or rollout checklist
+- customer SOP
 
-## Handoff rule confirmations
-
-- missing order or missing tracking behavior
-- damaged goods manual review
-- high-risk / high-amount refund escalation
-- policy-required manual review queue and priority
-
-## Acceptance checklist
-
-1. Shipping path validates and runs (normal + exception)
-2. Return path validates and runs (eligible + expired/damaged)
-3. Refund path validates and runs (before-shipment + high-risk)
-4. At least one handoff path emits structured handoff payload
-5. Trace export and audit bundle export are available
-
-## Out of scope for this onboarding
-
-- Customer service backend construction
-- Seat management / assignment engine
-- BI/quality-inspection platforms
-- Full OMS/ERP/CRM platform integration
-- Multitenant SaaS platform features
-
-## Related implementation documents
-
-- `docs/ecommerce-scope-checklist.md`
-- `docs/ecommerce-delivery-plan-template.md`
-- `docs/ecommerce-delivery-risks.md`
-- `docs/ecommerce-deliverables.md`
-- `docs/ecommerce-uat-plan.md`
-- `docs/ecommerce-joint-debug-checklist.md`
-- `docs/ecommerce-rollout-checklist.md`
-- `examples/ecommerce-support/.env.example`
-- `examples/ecommerce-support/integrations/generic-shop-profile/profile.json`
+Public examples are for developer learning and local validation only.

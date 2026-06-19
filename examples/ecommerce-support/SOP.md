@@ -1,37 +1,49 @@
-﻿# SOP - E-commerce Support Pack (P3-03)
+# E-commerce Support Pack Public Demo SOP Boundary
 
-## Shipping SOP
+This is a public mock/demo document.
+It is not a customer delivery playbook.
+It does not include real customer SOP, pricing, UAT, rollout, production adapter mapping, or private operational procedures.
 
-`triage -> fetch_order -> answer_shipping -> resolved|handoff_human`
+这是公开 mock/demo 文档，不是客户交付 Playbook。
+不包含真实客户 SOP、报价、UAT、上线计划、生产 adapter mapping 或私有运营流程。
 
-Handoff triggers:
-- order missing
-- shipping exception
-- missing tracking
+## Demo-Level Flow Concepts
 
-## Return SOP
+The public ecommerce support pack keeps only abstract demo flows:
 
-`triage -> fetch_order -> check_return_eligibility -> create_return_request|inform_policy|handoff_human`
+- classify a shipping, return, refund, or handoff request
+- collect required mock information
+- check mock order or shipping data
+- evaluate demo policy fields
+- complete a mock action or route to handoff
+- emit trace/audit evidence for local validation
 
-Handoff triggers:
-- missing required info
-- damaged goods under manual-review policy
+## Demo Paths
 
-## Refund SOP
+### Shipping
 
-`triage -> fetch_order -> check_refund_eligibility -> create_refund_request|inform_policy|handoff_human`
+The demo shipping path shows how a request can move from order lookup to mock shipping status handling. Exception-like demo cases route to `handoff`.
 
-Handoff triggers:
-- high-risk/high-amount refund
-- policy requiring manual review after delivery
-- missing required info
+### Return
 
-## Handoff SOP
+The demo return path shows basic eligibility-style branching with mock policy fields. Damaged-goods style demo cases route to `handoff`.
 
-`handoff_human` is the explicit escalation state.
-Escalation adapter contract governs ticket payload shape and queue metadata.
+### Refund
 
-## Execution vs wording boundary
+The demo refund path shows before-shipment, after-delivery, and high-risk examples using mock values only. High-risk demo cases route to `handoff`.
 
-- State/Guard/Action/Transition controls execution.
-- `response-templates/*` + channel output contract controls customer-facing text.
+### Handoff
+
+The `handoff` path is a public demonstration of fail-closed routing. It is not a production escalation process or customer operations procedure.
+
+## Not Included
+
+- real customer SOP
+- production support procedures
+- private exception matrices
+- production queue or agent assignment rules
+- customer-specific templates
+- real endpoint or adapter mapping
+- UAT, rollout, pricing, or proposal material
+
+Keep customer implementation procedures in private repositories.

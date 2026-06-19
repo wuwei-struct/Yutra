@@ -1,63 +1,24 @@
-# E-commerce Support Pack Pricing Scope Boundary (P3-04)
+# E-commerce Pricing Scope Boundary
 
-This document defines delivery scope tiers.
-It does not provide fixed price numbers.
+This public repository does not include pricing, quotation, proposal, or customer-specific commercial scope.
 
-## Tier 1: Standard Delivery
+The previous commercial planning content for this topic is reserved for private implementation assets. Public Yutra only includes open-source core contracts and mock/demo examples for local validation.
 
-Suitable for:
-- demo-first engagement with mock adapters
-- limited template adjustments
-- limited policy parameter tuning
+## Public Boundary
 
-Includes:
-- pack setup and walkthrough
-- core scenario runs and certification alignment
-- baseline delivery docs and handoff rules
+Included here:
 
-Excludes:
-- real customer API integration
-- production deployment and SLA ownership
+- demo/mock Pack Config examples
+- local Rule Compiler artifact preview
+- non-production adapter contracts
+- trace, audit, and certification examples
 
-Main risks:
-- business expectation mismatch if scope is not frozen
+Not included here:
 
-## Tier 2: Integration Delivery
+- pricing or quotation models
+- customer proposal structure
+- customer-specific delivery scope
+- production rollout plan
+- private commercial terms
 
-Suitable for:
-- connecting 1-2 real customer systems
-- replacing key adapters (order/shipping/refund/return/escalation)
-- joint API testing with customer team
-
-Includes:
-- adapter replacement implementation
-- contract mapping and data-shape alignment
-- integration test and UAT support
-
-Excludes:
-- full enterprise platform rollout
-- advanced multi-channel orchestration backend
-
-Main risks:
-- unstable upstream APIs
-- incomplete fields and inconsistent status semantics
-
-## Tier 3: Deep Custom Delivery
-
-Suitable for:
-- multi-channel operations
-- complex policy and approval requirements
-- extended exception-path coverage
-
-Includes:
-- deeper policy and workflow customization
-- expanded edge-case certification set
-- stronger organizational handoff integration
-
-Excludes:
-- building a generic SaaS support platform
-- building BI or seat-management platforms
-
-Main risks:
-- long policy negotiation cycle
-- cross-team dependencies and governance overhead
+Private or commercial delivery materials should live outside this public repository.

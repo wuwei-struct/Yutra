@@ -1,36 +1,25 @@
-﻿# E-commerce Rollout Checklist (P3-05)
+# E-commerce Public Demo Rollout Boundary
 
-## Pre-rollout
+This public repository does not include production rollout instructions.
 
-- [ ] UAT sign-off completed
-- [ ] policy/template freeze confirmed
-- [ ] adapter config reviewed (env/auth/timeout/retry)
-- [ ] handoff owner and queue confirmed
+The ecommerce materials here are mock/demo assets for local validation and developer learning. They do not describe a live customer launch process.
 
-## Grey rollout plan
+## Public Demo Boundary
 
-- [ ] select low-risk traffic subset
-- [ ] define observation window and rollback owner
-- [ ] confirm trace file location and audit export path
-- [ ] confirm manual fallback process
+Included here:
 
-## Rollback criteria
+- local mock-mode run checks
+- trace/audit validation references
+- certification summary references
+- non-production adapter contract examples
 
-Rollback immediately if:
-- adapter contract mismatch blocks key path
-- repeated auth/rate-limit failures prevent service continuity
-- handoff route is unavailable for high-risk requests
-- output message contract breaks channel delivery constraints
+Not included here:
 
-## Runtime evidence checks during rollout
+- production rollout plan
+- customer cutover checklist
+- release approval process
+- rollback operations
+- channel launch procedure
+- private operational SOP
 
-- [ ] completed path traces are readable
-- [ ] handoff path traces contain reasonCode/source/summary
-- [ ] audit bundle export works for at least one run
-- [ ] no uncontrolled state drift in core SOP path
-
-## Post-rollout review
-
-- [ ] summarize defects and policy adjustments
-- [ ] update integration profile overrides if needed
-- [ ] record next-step scope (without expanding beyond frozen paths)
+Production rollout material belongs in a private implementation repository.

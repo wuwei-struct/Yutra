@@ -108,12 +108,9 @@ Channel output contract:
 - handoff rules and queue ownership
 - auth owner and secret management process
 
-## 8) Commercial delivery references
+## 8) Public demo boundary
 
+- `docs/public-demo-boundary.md`
 - `docs/ecommerce-scope-checklist.md`
-- `docs/ecommerce-pricing-scope.md`
-- `docs/ecommerce-delivery-plan-template.md`
-- `docs/ecommerce-delivery-risks.md`
-- `docs/ecommerce-uat-plan.md`
-- `docs/ecommerce-joint-debug-checklist.md`
-- `docs/ecommerce-rollout-checklist.md`
+
+Pricing, proposal, UAT, rollout, customer-specific SOP, and production integration assets are not part of this public demo pack.

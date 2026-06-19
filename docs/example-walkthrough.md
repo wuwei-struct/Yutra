@@ -75,15 +75,13 @@ In viewer:
 5. 15s: Close with deterministic policy-driven execution summary.
 
 
-Integration docs:
-- docs/ecommerce-client-onboarding-checklist.md
+Public demo references:
+- docs/public-demo-boundary.md
 - docs/ecommerce-demo-path.md
 - docs/ecommerce-demo-script.md
 - docs/ecommerce-scope-checklist.md
-- docs/ecommerce-pricing-scope.md
-- docs/ecommerce-delivery-plan-template.md
-- docs/ecommerce-delivery-risks.md
 - docs/ecommerce-deliverables.md
-- docs/ecommerce-proposal-outline.md
 - examples/ecommerce-support/INTEGRATION.md
+
+Pricing, proposal, UAT, rollout, customer-specific SOP, and production integration assets are not part of the public walkthrough.
 

@@ -1,6 +1,8 @@
-# E-commerce Support Pack Deliverables (P3-04)
+# E-commerce Support Pack Public Demo Assets
 
-## Standard deliverables
+This public document lists mock/demo assets only. It is not a customer deliverables checklist.
+
+## Public demo assets
 
 1. Pack source assets
 - `examples/ecommerce-support/agent.yutra.yaml`
@@ -20,12 +22,12 @@
 - `examples/ecommerce-support/adapters/mock/*.mjs`
 - `examples/ecommerce-support/adapters/real/*.real.example.mjs`
 
-5. Integration docs
+5. Public demo docs
 - `examples/ecommerce-support/DELIVERY.md`
 - `examples/ecommerce-support/CONFIG.md`
 - `examples/ecommerce-support/INTEGRATION.md`
 - `examples/ecommerce-support/SOP.md`
-- `docs/ecommerce-client-onboarding-checklist.md`
+- `docs/public-demo-boundary.md`
 
 6. Certification references
 - `examples/ecommerce-support/certification/scenarios.json`
@@ -48,9 +50,6 @@
 
 These are generated artifacts, not static hand-authored deliverables.
 
-## Demo-only assets
+## Not public deliverables
 
-- sample traces and audit bundles used in sales/demo sessions
-- demo scripts and proposal outline docs
-
-These assets are for explanation and validation; they do not imply production integration.
+The public repository does not include pricing, proposal, UAT, rollout, customer-specific SOP, production adapter mapping, or private operational procedures.

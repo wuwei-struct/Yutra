@@ -123,19 +123,14 @@ Boundary note:
 - Skill is behind Action execution contract, not a peer object of Agent/State.
 - No marketplace / remote registry / install workflow in this pack.
 
-Commercial delivery assets:
+Public demo references:
 - `docs/ecommerce-demo-path.md`
 - `docs/ecommerce-demo-script.md`
 - `docs/ecommerce-scope-checklist.md`
-- `docs/ecommerce-pricing-scope.md`
-- `docs/ecommerce-delivery-plan-template.md`
-- `docs/ecommerce-delivery-risks.md`
 - `docs/ecommerce-deliverables.md`
-- `docs/ecommerce-proposal-outline.md`
-- `docs/ecommerce-client-onboarding-checklist.md`
-- `docs/ecommerce-uat-plan.md`
-- `docs/ecommerce-joint-debug-checklist.md`
-- `docs/ecommerce-rollout-checklist.md`
+- `docs/public-demo-boundary.md`
+
+Commercial delivery assets such as pricing, proposal, UAT, rollout, customer-specific SOP, and production integration material are not part of this public pack.
 
 ## Response templates
 - `response-templates/shipping.md`

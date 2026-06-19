@@ -1,55 +1,31 @@
-﻿# E-commerce UAT Plan (P3-05)
+# E-commerce Public Demo Validation Plan
 
-## UAT goal
+This is a public mock/demo validation note. It is not a production UAT plan and is not a customer acceptance playbook.
 
-Validate ecommerce-support pack in customer-integration mode with deterministic outcomes and auditable evidence.
+## Scope
 
-## Scope under UAT
+Public validation covers only local demo assets:
 
-- shipping path
-- return path
-- refund path
-- handoff/escalation path
+- mock adapters
+- demo inputs
+- generated trace/audit examples
+- certification checks
+- non-production Rule Compiler artifacts
 
-## Acceptance matrix
+## Demo Checks
 
-1. Shipping path
-- input: shipping normal / delayed / exception cases
-- expected: completed or handoff by policy
-- evidence: trace + status + handoff reason (if any)
+- Validate the example DSL.
+- Run representative mock shipping, return, refund, and handoff cases.
+- Inspect trace and audit output generated locally.
+- Confirm mock/demo policies do not contain secrets, real endpoints, or customer data.
 
-2. Return path
-- input: eligible / expired / damaged cases
-- expected: completed or handoff
-- evidence: return eligibility decision and next_step mapping
+## Not Included
 
-3. Refund path
-- input: before shipment / after delivery / high risk
-- expected: completed or handoff
-- evidence: refund decision + reason_code + status
+- production UAT criteria
+- customer sign-off process
+- rollout schedule
+- production system integration
+- private customer SOP
+- commercial delivery commitments
 
-4. Handoff path
-- input: missing info / policy-required scenarios
-- expected: handoff with structured reason
-- evidence: handoff payload + escalation output
-
-## Roles
-
-- Delivery lead: owns final acceptance summary
-- Integration engineer: owns adapter mapping verification
-- Customer API owner: owns upstream data correctness
-- Customer business owner: owns policy/template sign-off
-
-## Required outputs
-
-- UAT run log (case -> expected -> actual)
-- trace file references
-- audit bundle references
-- open issue list (if any)
-
-## Exit criteria
-
-- all critical cases meet expected status
-- no blocker in adapter contract mapping
-- handoff path is usable as fallback
-- audit bundle is exportable for reviewed runs
+Use private implementation repositories for real customer UAT material.

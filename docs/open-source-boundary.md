@@ -45,6 +45,8 @@ These are possible future directions, not commitments in this repository.
 
 Customer-specific delivery assets should live in private implementation repositories, not in the public reference repository.
 
+For the demo-specific boundary, see [Public Demo Boundary](public-demo-boundary.md).
+
 ## What Should Never Be Committed
 
 Do not commit:
