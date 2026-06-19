@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
+  APPROVAL_DECISION_BASIC_CONFIG,
+  APPROVAL_DECISION_FIELD_DEFINITIONS,
+  APPROVAL_DECISION_RULE_IMPACTS,
   REQUEST_RESOLUTION_ECOMMERCE_BASIC_CONFIG,
   REQUEST_RESOLUTION_FIELD_DEFINITIONS,
   REQUEST_RESOLUTION_RULE_IMPACTS,
@@ -9,6 +12,7 @@ import {
   explainPackConfig,
   explainRuleImpact,
   getRuleImpact,
+  validateApprovalDecisionConfig,
   validatePackConfig,
   validateRequestResolutionConfig
 } from "../src";
@@ -184,5 +188,53 @@ describe("@yutra/pack-config-core", () => {
   it("unknown rule impact returns undefined", () => {
     expect(getRuleImpact("rules.unknown")).toBeUndefined();
     expect(explainRuleImpact("rules.unknown", "en")).toBeUndefined();
+  });
+
+  it("approval-decision basic config validates", () => {
+    expect(validatePackConfig(APPROVAL_DECISION_BASIC_CONFIG).ok).toBe(true);
+    expect(validateApprovalDecisionConfig(APPROVAL_DECISION_BASIC_CONFIG).ok).toBe(true);
+  });
+
+  it("approval-decision fields include approval, risk, and response basics", () => {
+    const ids = APPROVAL_DECISION_FIELD_DEFINITIONS.map((field) => field.fieldId);
+    expect(ids).toEqual(expect.arrayContaining([
+      "rules.approvalPolicy.lowRiskMaxAmount",
+      "rules.approvalPolicy.highRiskStrategy",
+      "rules.riskPolicy.requireReasonForRejection",
+      "rules.responseStyle.tone"
+    ]));
+  });
+
+  it("approval-decision fingerprint is deterministic", () => {
+    const first = createPackConfigFingerprint(APPROVAL_DECISION_BASIC_CONFIG);
+    const second = createPackConfigFingerprint(APPROVAL_DECISION_BASIC_CONFIG);
+    expect(first).toBe(second);
+    expect(first.startsWith("sha256:")).toBe(true);
+  });
+
+  it("approval-decision rule impacts explain threshold, risk, evidence, and tone", () => {
+    expect(APPROVAL_DECISION_RULE_IMPACTS.length).toBeGreaterThan(0);
+    const threshold = getRuleImpact("rules.approvalPolicy.lowRiskMaxAmount");
+    expect(threshold?.affects.some((target) => target.id === "high_value_review_required")).toBe(true);
+    expect(threshold?.artifacts).toContain("trace.expectation.json");
+
+    const highRisk = getRuleImpact("rules.approvalPolicy.highRiskStrategy");
+    expect(highRisk?.affects.some((target) => target.id.includes("high_risk") || target.id.includes("human_review"))).toBe(true);
+
+    const missingEvidence = getRuleImpact("rules.approvalPolicy.missingEvidenceStrategy");
+    expect(missingEvidence?.affects.some((target) => target.id.includes("ask_more_info"))).toBe(true);
+
+    const tone = getRuleImpact("rules.responseStyle.tone");
+    expect(tone?.artifacts).toEqual(["templates.json"]);
+  });
+
+  it("approval-decision sample contains no real endpoint, secret, or customer data", () => {
+    const serialized = JSON.stringify(APPROVAL_DECISION_BASIC_CONFIG).toLowerCase();
+    expect(serialized).not.toContain("https://");
+    expect(serialized).not.toContain("api_key");
+    expect(serialized).not.toContain("bearer ");
+    expect(serialized).not.toContain("customer_name");
+    expect(APPROVAL_DECISION_BASIC_CONFIG.adapters.every((adapter) => adapter.mode === "mock")).toBe(true);
+    expect(APPROVAL_DECISION_BASIC_CONFIG.adapters.every((adapter) => adapter.containsRealEndpoint === false && adapter.containsSecret === false)).toBe(true);
   });
 });

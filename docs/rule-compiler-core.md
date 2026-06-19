@@ -6,7 +6,7 @@ It compiles a validated Pack Config into a fixed set of demo/mock artifacts.
 
 Current scope is intentionally narrow:
 
-- archetype: `request-resolution`
+- archetypes: `request-resolution` and `approval-decision`
 - input: public demo Pack Config from `@yutra/pack-config-core`
 - output: six deterministic artifacts
 - mode: `preview` and `publish` gates
@@ -114,7 +114,7 @@ Preview mode may allow warnings, but it still blocks secrets, real endpoints, an
 
 ## Request-resolution Basic Compiler
 
-The first compiler supports only the public `request-resolution` basic config.
+The first compiler supports the public `request-resolution` basic config.
 
 It maps public field groups:
 
@@ -124,6 +124,30 @@ It maps public field groups:
 - response style basics
 
 It intentionally avoids customer SOP, real adapter mappings, and complete industry rule matrices.
+
+## Approval-decision Basic Compiler
+
+The second compiler supports the public `approval-decision` basic config.
+
+It maps public field groups:
+
+- capabilities
+- approval policy basics
+- risk policy basics
+- response style basics
+
+It generates the same six artifacts as request-resolution:
+
+- `agent.yutra.yaml`
+- `policy.yaml`
+- `adapter.config.json`
+- `templates.json`
+- `test-cases.json`
+- `trace.expectation.json`
+
+It intentionally avoids real enterprise approval procedures, real approval hierarchy, production adapter mappings, organization data, customer SOP, and delivery templates.
+
+Creator Workbench UI is not enabled for `approval-decision` yet. The current support is Pack Config + Rule Compiler + CLI only.
 
 ## Rule Impact Explanation Relationship
 

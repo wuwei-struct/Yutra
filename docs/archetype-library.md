@@ -43,6 +43,7 @@ See [Archetype Core](archetype-core.md) for the TypeScript manifest, validation,
 - Use cases: access approval, discount approval, configuration change approval, refund exception approval.
 - Common rules: risk level, approval threshold, approver requirement, expiry, escalation rule, denial template.
 - Composable cross-cutting archetypes: `human-handoff`, `policy-guard`, `adapter-connector`.
+- Current core support: `@yutra/pack-config-core` and `@yutra/rule-compiler` include a public demo/mock approval-decision chain. Creator Workbench UI is not enabled for this archetype yet.
 
 ### 5. `diagnostic-resolution` / 诊断排障型
 
@@ -144,3 +145,17 @@ The first five priority archetypes are:
 - `knowledge-answering`
 - `intake-collector`
 - `human-handoff`
+
+## Second Archetype Core Chain
+
+`approval-decision` is the second public core chain after `request-resolution`.
+
+It currently proves the shared vNext pattern at the standard layer:
+
+- Pack Config contract
+- Rule Impact metadata
+- deterministic Rule Compiler
+- CLI compile/export path
+- six demo/mock artifacts
+
+It does not include Studio UI integration, Runtime execution, real approval systems, real organization data, customer SOP, approval hierarchy, pricing, UAT, rollout, or delivery playbooks.

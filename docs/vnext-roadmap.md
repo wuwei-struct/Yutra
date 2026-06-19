@@ -45,7 +45,7 @@ Non-goal:
 
 Goal: define Pack Config as the customer-facing configuration model.
 
-Current status: `@yutra/pack-config-core` provides the first Pack Config contract, field provenance, validation, publish gate, fingerprint, and demo-only request-resolution sample. Rule Compiler is still not implemented.
+Current status: `@yutra/pack-config-core` provides the Pack Config contract, field provenance, validation, publish gate, fingerprint, and demo-only `request-resolution` plus `approval-decision` samples.
 
 Scope:
 
@@ -70,7 +70,7 @@ Field types:
 
 Goal: compile Pack Config into executable and certifiable assets.
 
-Current status: `@yutra/rule-compiler` provides the first request-resolution basic compiler for public demo/mock artifacts. `yutra compile` can export those artifacts locally. It does not connect Runtime or Studio.
+Current status: `@yutra/rule-compiler` provides public demo/mock compilers for `request-resolution` and `approval-decision`. `yutra compile` can export those artifacts locally. It does not connect Runtime or Studio.
 
 Scope:
 
@@ -135,9 +135,10 @@ Every generated agent must be previewable and certifiable.
 
 Goal: prove that Creator Workbench is not a single ecommerce hard-code.
 
-Priority target:
+Current status:
 
-- `approval-decision` creator
+- `approval-decision` Pack Config, Rule Impact metadata, Rule Compiler, and CLI demo are supported.
+- Creator Workbench UI is not enabled for `approval-decision` yet.
 
 Expected proof:
 

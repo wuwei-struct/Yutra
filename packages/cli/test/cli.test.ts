@@ -9,6 +9,7 @@ import { runCli } from "../src/cli";
 
 const workspaceRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
 const compileConfigPath = "examples/request-resolution-ecommerce-basic/pack.config.json";
+const approvalCompileConfigPath = "examples/approval-decision-basic/pack.config.json";
 const compiledArtifactFiles = [
   "agent.yutra.yaml",
   "policy.yaml",
@@ -559,7 +560,7 @@ describe("@yutra/cli", () => {
   it("compile unsupported archetype returns non-zero", async () => {
     const dir = await mkdtemp(join(tmpdir(), "yutra-compile-unsupported-"));
     const config = JSON.parse(readFileSync(resolve(workspaceRoot, compileConfigPath), "utf8")) as Record<string, unknown>;
-    config.archetypeId = "approval-decision";
+    config.archetypeId = "knowledge-answering";
     const configPath = join(dir, "unsupported.json");
     await writeFile(configPath, JSON.stringify(config, null, 2), "utf8");
 
@@ -567,6 +568,36 @@ describe("@yutra/cli", () => {
     const code = await runCli(["compile", configPath, "--out", join(dir, "out")], io);
     expect(code).not.toBe(0);
     expect(stderr.some((line) => line.includes("RULE_COMPILER_UNSUPPORTED_ARCHETYPE"))).toBe(true);
+    await rm(dir, { recursive: true, force: true });
+  });
+
+  it("compile approval-decision demo config --dry-run succeeds", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "yutra-compile-approval-dry-"));
+    const outDir = join(dir, "out");
+    const { io, stdout } = createMemoryIO();
+    const code = await runCli(["compile", approvalCompileConfigPath, "--out", outDir, "--dry-run"], io);
+
+    expect(code).toBe(0);
+    expect(stdout.some((line) => line.includes("dryRun: true"))).toBe(true);
+    expect(stdout.some((line) => line.includes("agent.yutra.yaml"))).toBe(true);
+    expect(existsSync(outDir)).toBe(false);
+    await rm(dir, { recursive: true, force: true });
+  });
+
+  it("compile approval-decision demo config writes artifacts", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "yutra-compile-approval-out-"));
+    const { io } = createMemoryIO();
+    const code = await runCli(["compile", approvalCompileConfigPath, "--out", dir], io);
+
+    expect(code).toBe(0);
+    for (const file of compiledArtifactFiles) {
+      expect(existsSync(join(dir, file))).toBe(true);
+    }
+
+    const agentYaml = readFileSync(join(dir, "agent.yutra.yaml"), "utf8");
+    const inspected = inspectDsl(parseDsl(agentYaml, "yaml"), { format: "yaml" });
+    expect(inspected.issues).toHaveLength(0);
+    expect(inspected.canonical.agent).toBe("approval_decision_basic");
     await rm(dir, { recursive: true, force: true });
   });
 

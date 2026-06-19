@@ -44,6 +44,7 @@ Implemented today:
 - Certification Readiness Preview
 - Compiled DSL manual bridge
 - Manual Run Preview Evidence in the readiness panel
+- approval-decision second archetype core support (Pack Config + Rule Compiler + CLI; Studio UI not enabled yet)
 
 ## Why Yutra
 
@@ -119,6 +120,7 @@ pnpm exec yutra validate examples/it-helpdesk/agent.yutra.yaml
 pnpm exec yutra run examples/it-helpdesk/agent.yutra.yaml --input examples/it-helpdesk/demo-inputs/case1.json
 pnpm exec yutra compile examples/request-resolution-ecommerce-basic/pack.config.json --out .tmp/compiled-request-resolution --dry-run
 pnpm exec yutra compile examples/request-resolution-ecommerce-basic/pack.config.json --out .tmp/compiled-request-resolution --force
+pnpm exec yutra compile examples/approval-decision-basic/pack.config.json --out .tmp/compiled-approval-decision --dry-run
 pnpm builder:runner
 pnpm builder:dev
 ```
@@ -181,6 +183,7 @@ Start here:
 - [Rule Compiler CLI](docs/rule-compiler-cli.md)
 - [Rule Impact Explanation](docs/rule-impact-explanation.md)
 - [Certification Readiness Preview](docs/certification-readiness-preview.md)
+- [Approval Decision Basic Demo](docs/approval-decision-basic.md)
 - [Creator Workbench](docs/creator-workbench.md)
 - [vNext Roadmap](docs/vnext-roadmap.md)
 
@@ -190,9 +193,11 @@ Local demo/mock artifact export:
 pnpm exec yutra compile examples/request-resolution-ecommerce-basic/pack.config.json --out .tmp/compiled-request-resolution
 pnpm exec yutra compile examples/request-resolution-ecommerce-basic/pack.config.json --out .tmp/compiled-request-resolution --dry-run
 pnpm exec yutra compile examples/request-resolution-ecommerce-basic/pack.config.json --out .tmp/compiled-request-resolution --force
+pnpm exec yutra compile examples/approval-decision-basic/pack.config.json --out .tmp/compiled-approval-decision --dry-run
 ```
 
 This exports compiler artifacts only. It does not run Runtime or publish an Agent.
+`approval-decision` is currently supported at Pack Config, Rule Compiler, and CLI level only; Creator Workbench UI remains disabled / coming later for this archetype.
 
 ## Skill-based Demo
 
@@ -240,6 +245,7 @@ It is the implementation unit behind a Yutra Action.
 
 - `examples/it-helpdesk` - basic stateful support flow.
 - `examples/ecommerce-support` - Skill-based e-commerce support pack.
+- `examples/approval-decision-basic` - demo/mock Pack Config for the approval-decision compiler chain.
 - `examples/approval-agent` - approval and human-in-the-loop flow.
 - `starters/minimal-agent-pack` - minimal starter pack.
 - `starters/support-pack` - support-oriented starter pack.
@@ -314,6 +320,7 @@ Yutra is currently not:
 - [Rule Compiler CLI](docs/rule-compiler-cli.md)
 - [Rule Impact Explanation](docs/rule-impact-explanation.md)
 - [Certification Readiness Preview](docs/certification-readiness-preview.md)
+- [Approval Decision Basic Demo](docs/approval-decision-basic.md)
 - [Creator Workbench](docs/creator-workbench.md)
 - [vNext Roadmap](docs/vnext-roadmap.md)
 

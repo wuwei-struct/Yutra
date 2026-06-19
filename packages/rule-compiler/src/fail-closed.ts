@@ -1,5 +1,6 @@
 import {
   canPublishPackConfig,
+  validateApprovalDecisionConfig,
   validatePackConfig,
   validateRequestResolutionConfig,
   type PackConfig,
@@ -30,19 +31,29 @@ function hasHandoffCapability(config: PackConfig): boolean {
   return config.capabilities.handoff?.value === true;
 }
 
+function validateArchetypeSpecificConfig(config: PackConfig): PackConfigIssue[] {
+  if (config.archetypeId === "request-resolution") {
+    return validateRequestResolutionConfig(config).issues;
+  }
+  if (config.archetypeId === "approval-decision") {
+    return validateApprovalDecisionConfig(config).issues;
+  }
+  return [];
+}
+
 export function validateCompileInput(input: RuleCompilerInput): RuleCompilerIssue[] {
   const issues: RuleCompilerIssue[] = [];
   const mode = input.mode ?? "preview";
   const base = validatePackConfig(input.config);
-  const requestResolution = validateRequestResolutionConfig(input.config);
+  const archetypeSpecific = validateArchetypeSpecificConfig(input.config);
   issues.push(...base.issues.map(mapPackIssue));
-  issues.push(...requestResolution.issues.filter((issue) => !base.issues.includes(issue)).map(mapPackIssue));
+  issues.push(...archetypeSpecific.filter((issue) => !base.issues.includes(issue)).map(mapPackIssue));
 
-  if (input.config.archetypeId !== "request-resolution") {
+  if (input.config.archetypeId !== "request-resolution" && input.config.archetypeId !== "approval-decision") {
     issues.push({
       code: "RULE_COMPILER_UNSUPPORTED_ARCHETYPE",
       severity: "error",
-      message: `Unsupported archetype ${input.config.archetypeId}. This compiler only supports request-resolution.`,
+      message: `Unsupported archetype ${input.config.archetypeId}. This compiler supports request-resolution and approval-decision.`,
       path: ["archetypeId"]
     });
   }
@@ -75,7 +86,7 @@ export function validateCompileInput(input: RuleCompilerInput): RuleCompilerIssu
     issues.push({
       code: "RULE_COMPILER_FAIL_CLOSED",
       severity: "error",
-      message: "request-resolution compilation requires handoff capability for fail-closed fallback.",
+      message: `${input.config.archetypeId} compilation requires handoff capability for fail-closed fallback.`,
       path: ["capabilities", "handoff"]
     });
   }

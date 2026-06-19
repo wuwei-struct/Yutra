@@ -23,6 +23,10 @@ export {
   packConfigSchema
 } from "./pack-config-schema";
 export {
+  APPROVAL_DECISION_FIELD_DEFINITIONS,
+  APPROVAL_DECISION_FIELD_IDS
+} from "./approval-decision-config";
+export {
   REQUEST_RESOLUTION_FIELD_DEFINITIONS,
   REQUEST_RESOLUTION_FIELD_IDS
 } from "./request-resolution-config";
@@ -33,17 +37,19 @@ export type {
   RuleImpactTargetKind
 } from "./rule-impact";
 export {
+  APPROVAL_DECISION_RULE_IMPACTS,
   REQUEST_RESOLUTION_RULE_IMPACTS,
   explainRuleImpact,
   getRuleImpact,
   listRuleImpacts
 } from "./rule-impact";
-export { REQUEST_RESOLUTION_ECOMMERCE_BASIC_CONFIG } from "./sample-configs";
+export { APPROVAL_DECISION_BASIC_CONFIG, REQUEST_RESOLUTION_ECOMMERCE_BASIC_CONFIG } from "./sample-configs";
 export { createPackConfigFingerprint, stripFieldVolatileMetadata } from "./config-fingerprint";
 export {
   canPublishPackConfig,
+  validateApprovalDecisionConfig,
   validatePackConfig,
   validateRequestResolutionConfig
 } from "./validate-pack-config";
 export { explainPackConfig } from "./explain-pack-config";
-export { REQUEST_RESOLUTION_ECOMMERCE_BASIC_CONFIG_ID, isSafePublicConfigId } from "./ids";
+export { APPROVAL_DECISION_BASIC_CONFIG_ID, REQUEST_RESOLUTION_ECOMMERCE_BASIC_CONFIG_ID, isSafePublicConfigId } from "./ids";

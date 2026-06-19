@@ -18,11 +18,13 @@ P6-06B uses this metadata as one input to Certification Readiness Preview counts
 
 ## Current Scope
 
-The current public implementation covers request-resolution demo/basic fields only:
+The current public implementation covers request-resolution and approval-decision demo/basic fields:
 
 - capabilities
 - refund policy basics
 - handoff policy basics
+- approval policy basics
+- risk policy basics
 - response style basics
 
 This is public demo metadata. It is not a customer SOP, not a complete industry rule matrix, and not a production adapter mapping.
@@ -49,6 +51,17 @@ rules.refundPolicy.autoRefundMaxAmount
 -> policy: refund amount threshold
 -> test_case: high-value refund handoff
 -> trace_expectation: handoff.requested
+```
+
+Example:
+
+```text
+rules.approvalPolicy.lowRiskMaxAmount
+-> guard: high_value_review_required
+-> transition: evaluate_policy -> auto_approved / human_review
+-> policy: approval threshold
+-> test_case: high-value approval requires review
+-> trace_expectation: guard.evaluated + handoff.requested
 ```
 
 ## Relationship to Rule Compiler

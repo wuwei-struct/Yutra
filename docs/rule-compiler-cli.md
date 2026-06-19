@@ -10,6 +10,7 @@ Yutra Studio also has a Creator Workbench Compile Preview. That preview shows th
 
 ```bash
 pnpm exec yutra compile examples/request-resolution-ecommerce-basic/pack.config.json --out .tmp/compiled-request-resolution
+pnpm exec yutra compile examples/approval-decision-basic/pack.config.json --out .tmp/compiled-approval-decision
 ```
 
 Options:
@@ -86,10 +87,11 @@ Use `--force` to overwrite only the known artifact files. The CLI does not delet
 
 ## Demo Boundary
 
-The public example config is:
+The public example configs are:
 
 ```text
 examples/request-resolution-ecommerce-basic/pack.config.json
+examples/approval-decision-basic/pack.config.json
 ```
 
 It is demo/mock only:
@@ -100,6 +102,9 @@ It is demo/mock only:
 - no customer names
 - no real API endpoints
 - no customer SOP
+- no real organization data or approval hierarchy
+
+`approval-decision` is supported by the compiler core and CLI. It is not enabled in Creator Workbench UI yet.
 
 ## Non-goals
 

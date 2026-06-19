@@ -339,14 +339,112 @@ export const REQUEST_RESOLUTION_RULE_IMPACTS: RuleImpactDefinition[] = [
   })
 ];
 
-const impactByPath = new Map(REQUEST_RESOLUTION_RULE_IMPACTS.map((definition) => [definition.fieldPath, definition]));
+export const APPROVAL_DECISION_RULE_IMPACTS: RuleImpactDefinition[] = [
+  impact({
+    fieldPath: "rules.approvalPolicy.lowRiskMaxAmount",
+    label: { en: "Low-risk max amount", zhCN: "低风险金额上限" },
+    summary: {
+      en: "Determines whether a demo approval request can follow the low-risk automatic decision path.",
+      zhCN: "用于判断演示审批请求是否可进入低风险自动决策路径。"
+    },
+    affects: [
+      target("guard", "low_risk_auto_approval", "Low-risk auto approval guard", "低风险自动审批 Guard"),
+      target("guard", "high_value_review_required", "High-value review guard", "高金额复核 Guard"),
+      target("transition", "evaluate_policy -> auto_approved / human_review", "Approval or review transition", "通过或人工复核路径"),
+      target("policy", "approval threshold", "Approval threshold policy", "审批阈值策略"),
+      target("test_case", "high-value approval requires review", "High-value approval review test", "高金额审批复核测试"),
+      target("trace_expectation", "guard.evaluated + handoff.requested", "Guard and handoff evidence", "Guard 与人工转接证据")
+    ],
+    artifacts: ["agent.yutra.yaml", "policy.yaml", "test-cases.json", "trace.expectation.json"],
+    safetyNotes: {
+      en: ["Amounts above the demo threshold should route to human review or fail-closed handling, not automatic approval."],
+      zhCN: ["超过演示阈值时应进入人工复核或 fail-closed 路径，不应自动通过。"]
+    }
+  }),
+  impact({
+    fieldPath: "rules.approvalPolicy.missingEvidenceStrategy",
+    label: { en: "Missing evidence strategy", zhCN: "材料缺失策略" },
+    summary: {
+      en: "Controls whether missing evidence asks for more information, routes to handoff, or rejects with a generic reason.",
+      zhCN: "控制材料缺失时请求补充、转人工，或按通用原因拒绝。"
+    },
+    affects: [
+      target("transition", "collect_evidence -> ask_more_info / handoff / rejected", "Missing evidence transition", "材料缺失路径"),
+      target("template", "ask_missing_evidence", "Missing evidence response", "材料缺失回复"),
+      target("test_case", "missing evidence path", "Missing evidence test", "材料缺失测试"),
+      target("trace_expectation", "state.entered collect_evidence / transition.resolved", "Evidence state trace", "材料状态 trace")
+    ],
+    artifacts: ["agent.yutra.yaml", "templates.json", "test-cases.json", "trace.expectation.json"],
+    safetyNotes: failClosedNotes
+  }),
+  impact({
+    fieldPath: "rules.approvalPolicy.highRiskStrategy",
+    label: { en: "High-risk strategy", zhCN: "高风险策略" },
+    summary: {
+      en: "Controls how high-risk demo approval requests route to human review, handoff, or generic rejection.",
+      zhCN: "控制高风险演示审批请求进入人工复核、转人工或通用拒绝路径。"
+    },
+    affects: [
+      target("guard", "high_risk_request", "High-risk request guard", "高风险请求 Guard"),
+      target("transition", "evaluate_policy -> human_review / rejected", "High-risk routing", "高风险路由"),
+      target("policy", "high risk approval handling", "High-risk handling policy", "高风险处理策略"),
+      target("test_case", "high-risk handoff", "High-risk handoff test", "高风险转人工测试"),
+      target("trace_expectation", "handoff.requested", "Handoff trace expectation", "人工转接 trace 预期")
+    ],
+    artifacts: ["agent.yutra.yaml", "policy.yaml", "test-cases.json", "trace.expectation.json"],
+    safetyNotes: failClosedNotes
+  }),
+  impact({
+    fieldPath: "rules.approvalPolicy.policyConflictStrategy",
+    label: { en: "Policy conflict strategy", zhCN: "规则冲突策略" },
+    summary: {
+      en: "Routes conflicting policy results to handoff or fail-closed behavior in the public demo compiler.",
+      zhCN: "在公开 demo 编译器中，将冲突的策略结果路由到转人工或 fail-closed 路径。"
+    },
+    affects: [
+      target("guard", "policy_conflict", "Policy conflict guard", "规则冲突 Guard"),
+      target("transition", "evaluate_policy -> handoff / fail_closed", "Conflict fallback transition", "冲突兜底路径"),
+      target("policy", "policy conflict handling", "Conflict handling policy", "冲突处理策略"),
+      target("trace_expectation", "fail-closed marker", "Fail-closed trace marker", "fail-closed trace 标记")
+    ],
+    artifacts: ["agent.yutra.yaml", "policy.yaml", "trace.expectation.json"],
+    safetyNotes: failClosedNotes
+  }),
+  impact({
+    fieldPath: "rules.riskPolicy.requireReasonForRejection",
+    label: { en: "Require rejection reason", zhCN: "拒绝时要求说明原因" },
+    summary: {
+      en: "Controls whether generic rejection templates and tests require a decision reason.",
+      zhCN: "控制通用拒绝模板与测试是否要求决策原因。"
+    },
+    affects: [
+      target("template", "approval_rejected", "Rejection reason template", "拒绝原因模板"),
+      target("policy", "decision explanation requirement", "Decision explanation requirement", "决策解释要求"),
+      target("test_case", "rejection includes reason", "Rejection reason test", "拒绝原因测试")
+    ],
+    artifacts: ["policy.yaml", "templates.json", "test-cases.json"]
+  }),
+  impact({
+    fieldPath: "rules.responseStyle.tone",
+    label: { en: "Response tone", zhCN: "回复语气" },
+    summary: {
+      en: "Changes only the generic demo approval template tone.",
+      zhCN: "仅影响通用 demo 审批模板语气。"
+    },
+    affects: [target("template", "approval response tone", "Approval response tone", "审批回复语气")],
+    artifacts: ["templates.json"]
+  })
+];
+
+const ALL_RULE_IMPACTS = [...REQUEST_RESOLUTION_RULE_IMPACTS, ...APPROVAL_DECISION_RULE_IMPACTS];
+const impactByPath = new Map(ALL_RULE_IMPACTS.map((definition) => [definition.fieldPath, definition]));
 
 export function getRuleImpact(fieldPath: string): RuleImpactDefinition | undefined {
   return impactByPath.get(fieldPath);
 }
 
 export function listRuleImpacts(): RuleImpactDefinition[] {
-  return [...REQUEST_RESOLUTION_RULE_IMPACTS];
+  return [...ALL_RULE_IMPACTS];
 }
 
 export function explainRuleImpact(fieldPath: string, locale: Locale = "en"): string | undefined {

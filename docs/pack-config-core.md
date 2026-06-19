@@ -23,6 +23,8 @@ This package only defines and validates Pack Config. It does not compile DSL and
 - first field type library
 - request-resolution public base field definitions
 - request-resolution public rule impact metadata
+- approval-decision public base field definitions
+- approval-decision public rule impact metadata
 - demo-only sample config
 - publish gate validation
 - deterministic config fingerprint
@@ -89,21 +91,36 @@ Fields cover:
 
 These are public base fields only. They are not customer SOP, not a complete industry rule table, and not a commercial delivery template.
 
+## Approval-decision Base Config
+
+The package also includes public base field definitions for `approval-decision`.
+
+Fields cover:
+
+- capabilities: request intake, evidence collection, eligibility check, risk review, approval decision, handoff
+- approval policy basics
+- risk policy basics
+- response style basics
+
+These fields are public demo/basic contract fields. They are not a real enterprise approval policy, not a real approval hierarchy, not organization data, and not customer SOP.
+
 ## Rule Impact Metadata
 
-`REQUEST_RESOLUTION_RULE_IMPACTS` explains how public demo/basic fields affect generated governed behavior.
+`REQUEST_RESOLUTION_RULE_IMPACTS` and `APPROVAL_DECISION_RULE_IMPACTS` explain how public demo/basic fields affect generated governed behavior.
 
 Examples:
 
 - `rules.refundPolicy.autoRefundMaxAmount` affects `guard:high_value_refund`, the `evaluate_rules -> handoff` transition, refund threshold policy, high-value handoff tests, and `handoff.requested` trace expectations.
 - `rules.refundPolicy.apiFailureStrategy` affects fail-closed fallback behavior, retry or handoff policy, API failure tests, and trace expectations.
 - `rules.responseStyle.tone` affects only generic demo template output.
+- `rules.approvalPolicy.lowRiskMaxAmount` affects approval threshold guards, review transitions, high-value approval test cases, and trace expectations.
+- `rules.approvalPolicy.highRiskStrategy` affects high-risk guards, human review transitions, policy summary, and handoff trace expectations.
 
 This metadata is explanatory. It does not compile DSL, change Runtime behavior, or define customer SOP.
 
 ## Sample Config
 
-`REQUEST_RESOLUTION_ECOMMERCE_BASIC_CONFIG` is a mock/demo sample.
+`REQUEST_RESOLUTION_ECOMMERCE_BASIC_CONFIG` and `APPROVAL_DECISION_BASIC_CONFIG` are mock/demo samples.
 
 It uses:
 

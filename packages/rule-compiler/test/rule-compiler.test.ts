@@ -1,5 +1,5 @@
 import { parseDsl, inspectDsl } from "@yutra/dsl";
-import { REQUEST_RESOLUTION_ECOMMERCE_BASIC_CONFIG, type PackConfig } from "@yutra/pack-config-core";
+import { APPROVAL_DECISION_BASIC_CONFIG, REQUEST_RESOLUTION_ECOMMERCE_BASIC_CONFIG, type PackConfig } from "@yutra/pack-config-core";
 import { describe, expect, it } from "vitest";
 import { compilePackConfig, compilerVersion, createCertificationReadinessPreview } from "../src/index";
 
@@ -137,11 +137,66 @@ describe("@yutra/rule-compiler", () => {
 
   it("unsupported archetype returns unsupported issue", () => {
     const config = cloneConfig({
-      archetypeId: "approval-decision"
+      archetypeId: "knowledge-answering"
     });
     const output = compilePackConfig({ config });
     expect(output.ok).toBe(false);
     expect(output.issues.some((issue) => issue.code === "RULE_COMPILER_UNSUPPORTED_ARCHETYPE")).toBe(true);
+  });
+
+  it("supports approval-decision demo config and returns 6 artifacts", () => {
+    const output = compilePackConfig({ config: APPROVAL_DECISION_BASIC_CONFIG });
+    expect(output.ok).toBe(true);
+    expect(output.report.archetypeId).toBe("approval-decision");
+    expect(output.artifacts?.agent.filename).toBe("agent.yutra.yaml");
+    expect(output.artifacts?.policy.filename).toBe("policy.yaml");
+    expect(output.artifacts?.adapterConfig.filename).toBe("adapter.config.json");
+    expect(output.artifacts?.templates.filename).toBe("templates.json");
+    expect(output.artifacts?.testCases.filename).toBe("test-cases.json");
+    expect(output.artifacts?.traceExpectation.filename).toBe("trace.expectation.json");
+  });
+
+  it("approval-decision generated DSL can be parsed and inspected by @yutra/dsl", () => {
+    const output = compilePackConfig({ config: APPROVAL_DECISION_BASIC_CONFIG });
+    expect(output.ok).toBe(true);
+    const raw = parseDsl(output.artifacts?.agent.content ?? "", "yaml");
+    const inspected = inspectDsl(raw, { format: "yaml" });
+    expect(inspected.issues).toEqual([]);
+    expect(inspected.canonical.agent).toBe("approval_decision_basic");
+    expect(Object.values(inspected.canonical.states).some((state) => state.handoff === true)).toBe(true);
+  });
+
+  it("approval-decision artifacts include fail-closed policy, templates, tests, and trace expectations", () => {
+    const output = compilePackConfig({ config: APPROVAL_DECISION_BASIC_CONFIG });
+    expect(output.ok).toBe(true);
+    expect(output.report.packConfigHash).toMatch(/^sha256:/);
+    expect(output.report.compilerVersion).toBe(compilerVersion);
+    expect(output.report.artifactHashes["agent.yutra.yaml"]).toMatch(/^sha256:/);
+    expect(output.artifacts?.policy.data.failClosedPolicy).toBe("enabled");
+
+    const adapters = output.artifacts?.adapterConfig.data.adapters as Array<Record<string, unknown>>;
+    expect(adapters.every((adapter) => adapter.containsRealEndpoint === false)).toBe(true);
+    expect(adapters.every((adapter) => adapter.containsSecret === false)).toBe(true);
+
+    expect(output.artifacts?.templates.data).toHaveProperty("ask_missing_evidence");
+    expect(output.artifacts?.templates.data).toHaveProperty("human_review_required");
+    const testCases = output.artifacts?.testCases.data.testCases as Array<Record<string, unknown>>;
+    expect(testCases.some((item) => item.testCaseId === "approval_high_risk_handoff" && item.expectedOutcome === "handoff")).toBe(true);
+    const expectedEvents = output.artifacts?.traceExpectation.data.expectedEventTypes as string[];
+    expect(expectedEvents).toContain("handoff.requested");
+  });
+
+  it("approval-decision artifacts contain no customer data, real endpoints, or secrets", () => {
+    const output = compilePackConfig({ config: APPROVAL_DECISION_BASIC_CONFIG });
+    expect(output.ok).toBe(true);
+    const combined = Object.values(output.artifacts ?? {})
+      .map((artifact) => artifact.content)
+      .join("\n")
+      .toLowerCase();
+    expect(combined).not.toContain("customer name");
+    expect(combined).not.toContain("api_key");
+    expect(combined).not.toContain("bearer ");
+    expect(combined).not.toContain("https://");
   });
 
   it("generated agent.yutra.yaml can be parsed and inspected by @yutra/dsl", () => {
