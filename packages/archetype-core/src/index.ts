@@ -1,4 +1,6 @@
 export type { CapabilityAtom, LocalizedText } from "./capability-atom";
+export type { BehaviorPrimitiveDefinition, BehaviorPrimitiveId, RuntimeStructureRef } from "./behavior-primitive";
+export { BEHAVIOR_PRIMITIVE_IDS, BUILTIN_BEHAVIOR_PRIMITIVES, isBehaviorPrimitiveId } from "./behavior-primitive";
 export type {
   ArchetypeCompositionContract,
   CompositionMode,
@@ -28,8 +30,8 @@ export {
 } from "./ids";
 export type { SideEffectLevel } from "./side-effect";
 export { SIDE_EFFECT_LEVELS, compareSideEffectLevel, isSideEffectAtLeast } from "./side-effect";
-export type { ArchetypeKind, ArchetypeManifest, PublicExposure } from "./types";
-export { archetypeManifestSchema, compositionContractSchema } from "./manifest-schema";
+export type { ArchetypeKind, ArchetypeLayer, ArchetypeManifest, ArchetypeTaxonomy, PublicExposure, TriggerPattern } from "./types";
+export { archetypeLayerSchema, archetypeManifestSchema, archetypeTaxonomySchema, compositionContractSchema, triggerPatternSchema } from "./manifest-schema";
 export { BUILTIN_ARCHETYPE_MANIFESTS } from "./builtin-archetypes";
 export { createArchetypeRegistry, type ArchetypeRegistry } from "./registry";
 export { validateArchetypeManifest, validateArchetypeRegistry, validateCompositionContract } from "./validate-archetype";

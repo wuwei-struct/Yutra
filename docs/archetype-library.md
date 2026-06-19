@@ -26,6 +26,8 @@ The main archetypes below are product-facing archetypes. They are differentiated
 
 中文说明：下面的 10 个主母型是面向创建体验和验收对象的产物型主母型，不是底层不可再分的行为原语。行为原语、产物型主母型与场景组合范式之间的关系见 [Archetype Taxonomy](./archetype-taxonomy.md)。
 
+`@yutra/archetype-core` now exposes this classification as manifest taxonomy metadata. The 10 main archetypes remain `product_archetype`; the 4 cross-cutting archetypes remain `cross_cutting_archetype`.
+
 ## Main Archetypes
 
 ### 1. `intake-collector` / 信息采集型

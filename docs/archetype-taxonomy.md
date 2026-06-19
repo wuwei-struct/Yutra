@@ -14,6 +14,8 @@ The 10 main archetypes are not primitive behavior atoms. They are product-facing
 
 Behavior Primitives are reusable engineering-level behavior capabilities. They are usually implemented through Action, Guard, Transition, Trace, or Policy structures, but they are not necessarily exposed directly to users as choices in Creator Workbench.
 
+`@yutra/archetype-core` exports these primitives as `BEHAVIOR_PRIMITIVE_IDS` and `BUILTIN_BEHAVIOR_PRIMITIVES`. They are taxonomy metadata only; they do not change Runtime, Action, Guard, Trace, or DSL semantics.
+
 | ID | 中文名 | Definition | Common Structure |
 | --- | --- | --- | --- |
 | `collect` | 收集 | Gather required information, evidence, or context before work can proceed. | Action, Guard, Transition, Trace |
@@ -38,6 +40,8 @@ Product Archetypes are the main user-facing creation units. They are differentia
 - side-effect profile / 副作用画像
 
 The main archetypes below are product-facing archetypes. They are differentiated by primary output, acceptance object, and governance focus, not by being mutually exclusive low-level primitives.
+
+Each builtin `ArchetypeManifest` now includes `taxonomy` metadata with `layer`, `primitiveRefs`, `primaryOutput`, `acceptanceObject`, `governanceFocus`, and `triggerPattern`. Creator Workbench can use these fields to guide archetype choice without treating primitives as customer-facing products.
 
 | Archetype | Primary Output | Acceptance Object | Governance Focus |
 | --------- | -------------- | ----------------- | ---------------- |

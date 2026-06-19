@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { BEHAVIOR_PRIMITIVE_IDS } from "./behavior-primitive";
 import { ALL_ARCHETYPE_IDS, CROSS_CUTTING_ARCHETYPE_IDS } from "./ids";
 import { SIDE_EFFECT_LEVELS } from "./side-effect";
 
@@ -69,6 +70,30 @@ export const publicExposureSchema = z.object({
   containsCommercialSop: z.literal(false)
 });
 
+export const archetypeLayerSchema = z.enum(["product_archetype", "cross_cutting_archetype"]);
+
+export const triggerPatternSchema = z.enum(["user_request", "system_event", "scheduled", "human_initiated", "mixed"]);
+
+export const archetypeTaxonomySchema = z.object({
+  layer: archetypeLayerSchema,
+  primitiveRefs: z.array(z.enum(BEHAVIOR_PRIMITIVE_IDS)).min(1),
+  primaryOutput: localizedTextSchema.optional(),
+  acceptanceObject: localizedTextSchema.optional(),
+  governanceFocus: z
+    .object({
+      en: z.array(z.string().min(1)),
+      zhCN: z.array(z.string().min(1))
+    })
+    .optional(),
+  triggerPattern: triggerPatternSchema.optional(),
+  scenarioPatternHints: z
+    .object({
+      en: z.array(z.string().min(1)).optional(),
+      zhCN: z.array(z.string().min(1)).optional()
+    })
+    .optional()
+});
+
 export const archetypeManifestSchema = z.object({
   archetypeId: z.enum(ALL_ARCHETYPE_IDS),
   archetypeVersion: z.string().regex(/^\d+\.\d+\.\d+([-.][A-Za-z0-9.]+)?$/),
@@ -89,6 +114,7 @@ export const archetypeManifestSchema = z.object({
   outputs: z.array(z.string().min(1)),
   compatibleCrossCutting: z.array(z.enum(CROSS_CUTTING_ARCHETYPE_IDS)).optional(),
   recommendedCompositions: z.array(compositionModeSchema).optional(),
+  taxonomy: archetypeTaxonomySchema,
   defaultGovernance: z.object({
     contextPolicy: contextPolicySchema,
     guardPolicy: guardPolicySchema,

@@ -1,13 +1,18 @@
 import { BUILTIN_ARCHETYPE_MANIFESTS } from "./builtin-archetypes";
 import { explainArchetype } from "./explain-archetype";
+import type { BehaviorPrimitiveId } from "./behavior-primitive";
 import type { ArchetypeId } from "./ids";
-import type { ArchetypeKind, ArchetypeManifest } from "./types";
+import type { ArchetypeKind, ArchetypeManifest, TriggerPattern } from "./types";
 import { validateArchetypeRegistry } from "./validate-archetype";
 
 export type ArchetypeRegistry = {
   list(): ArchetypeManifest[];
   listMain(): ArchetypeManifest[];
   listCrossCutting(): ArchetypeManifest[];
+  listProductArchetypes(): ArchetypeManifest[];
+  listCrossCuttingArchetypes(): ArchetypeManifest[];
+  listByPrimitive(primitiveId: BehaviorPrimitiveId): ArchetypeManifest[];
+  listByTriggerPattern(triggerPattern: TriggerPattern): ArchetypeManifest[];
   get(id: ArchetypeId): ArchetypeManifest | undefined;
   has(id: ArchetypeId): boolean;
   filterByKind(kind: ArchetypeKind): ArchetypeManifest[];
@@ -33,6 +38,10 @@ export function createArchetypeRegistry(manifests: ArchetypeManifest[] = BUILTIN
     list: () => [...ordered],
     listMain: () => ordered.filter((manifest) => manifest.kind === "main"),
     listCrossCutting: () => ordered.filter((manifest) => manifest.kind === "cross_cutting"),
+    listProductArchetypes: () => ordered.filter((manifest) => manifest.taxonomy.layer === "product_archetype"),
+    listCrossCuttingArchetypes: () => ordered.filter((manifest) => manifest.taxonomy.layer === "cross_cutting_archetype"),
+    listByPrimitive: (primitiveId) => ordered.filter((manifest) => manifest.taxonomy.primitiveRefs.includes(primitiveId)),
+    listByTriggerPattern: (triggerPattern) => ordered.filter((manifest) => manifest.taxonomy.triggerPattern === triggerPattern),
     get: (id) => byId.get(id),
     has: (id) => byId.has(id),
     filterByKind: (kind) => ordered.filter((manifest) => manifest.kind === kind),

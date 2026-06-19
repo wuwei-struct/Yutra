@@ -1,6 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
+import { BEHAVIOR_PRIMITIVE_IDS, BUILTIN_ARCHETYPE_MANIFESTS } from "../../packages/archetype-core/src";
 
 const root = resolve(__dirname, "..", "..");
 
@@ -43,5 +44,22 @@ describe("P6-08C archetype taxonomy conformance", () => {
     expect(read("README.md")).toContain("docs/archetype-taxonomy.md");
     expect(read("README.zh-CN.md")).toContain("docs/archetype-taxonomy.md");
     expect(read("docs/archetype-library.md")).toContain("./archetype-taxonomy.md");
+  });
+
+  it("archetype-core exports taxonomy metadata", () => {
+    expect(BEHAVIOR_PRIMITIVE_IDS).toHaveLength(10);
+    expect(BUILTIN_ARCHETYPE_MANIFESTS.every((manifest) => manifest.taxonomy)).toBe(true);
+    expect(BUILTIN_ARCHETYPE_MANIFESTS.find((manifest) => manifest.archetypeId === "request-resolution")?.taxonomy.layer).toBe(
+      "product_archetype"
+    );
+    expect(BUILTIN_ARCHETYPE_MANIFESTS.find((manifest) => manifest.archetypeId === "human-handoff")?.taxonomy.layer).toBe(
+      "cross_cutting_archetype"
+    );
+    expect(BUILTIN_ARCHETYPE_MANIFESTS.find((manifest) => manifest.archetypeId === "approval-decision")?.taxonomy.primaryOutput?.en).toContain(
+      "decision"
+    );
+    expect(BUILTIN_ARCHETYPE_MANIFESTS.find((manifest) => manifest.archetypeId === "monitoring-response")?.taxonomy.triggerPattern).toBe(
+      "system_event"
+    );
   });
 });

@@ -2,6 +2,7 @@ import type { ArchetypeCompositionContract } from "./composition-contract";
 import { compositionContractSchema, archetypeManifestSchema } from "./manifest-schema";
 import type { ArchetypeManifest } from "./types";
 import { isArchetypeId, isCrossCuttingArchetypeId, isMainArchetypeId } from "./ids";
+import { isBehaviorPrimitiveId } from "./behavior-primitive";
 import { compareSideEffectLevel } from "./side-effect";
 import type { ArchetypeIssue, ArchetypeValidationResult } from "./errors";
 import { makeResult } from "./errors";
@@ -47,11 +48,32 @@ export function validateCompositionContract(input: unknown): ArchetypeValidation
 
 export function validateArchetypeManifest(input: unknown): ArchetypeValidationResult {
   const issues: ArchetypeIssue[] = [];
+  const maybe = input as Partial<ArchetypeManifest> | undefined;
+
+  if (!maybe?.taxonomy) {
+    issues.push({
+      code: "ARCHETYPE_TAXONOMY_MISSING",
+      severity: "error",
+      message: "Archetype manifest must include taxonomy metadata.",
+      path: ["taxonomy"]
+    });
+  } else {
+    for (const primitive of maybe.taxonomy.primitiveRefs ?? []) {
+      if (typeof primitive !== "string" || !isBehaviorPrimitiveId(primitive)) {
+        issues.push({
+          code: "ARCHETYPE_PRIMITIVE_REF_INVALID",
+          severity: "error",
+          message: `Unknown behavior primitive ${String(primitive)}.`,
+          path: ["taxonomy", "primitiveRefs"]
+        });
+      }
+    }
+  }
+
   const parsed = archetypeManifestSchema.safeParse(input);
 
   if (!parsed.success) {
     issues.push(...zodIssues(parsed.error));
-    const maybe = input as Partial<ArchetypeManifest> | undefined;
     if (typeof maybe?.archetypeId === "string" && !isArchetypeId(maybe.archetypeId)) {
       issues.push({
         code: "ARCHETYPE_INVALID_ID",
@@ -93,6 +115,61 @@ export function validateArchetypeManifest(input: unknown): ArchetypeValidationRe
       severity: "error",
       message: `Main archetype cannot use cross-cutting id ${manifest.archetypeId}.`,
       path: ["archetypeId"]
+    });
+  }
+
+  if (manifest.kind === "main" && manifest.taxonomy.layer !== "product_archetype") {
+    issues.push({
+      code: "ARCHETYPE_LAYER_MISMATCH",
+      severity: "error",
+      message: "Main archetypes must use taxonomy layer product_archetype.",
+      path: ["taxonomy", "layer"]
+    });
+  }
+
+  if (manifest.kind === "cross_cutting" && manifest.taxonomy.layer !== "cross_cutting_archetype") {
+    issues.push({
+      code: "ARCHETYPE_LAYER_MISMATCH",
+      severity: "error",
+      message: "Cross-cutting archetypes must use taxonomy layer cross_cutting_archetype.",
+      path: ["taxonomy", "layer"]
+    });
+  }
+
+  if (manifest.taxonomy.primitiveRefs.length < 2) {
+    issues.push({
+      code: "ARCHETYPE_PRIMITIVE_REF_INVALID",
+      severity: "error",
+      message: "Archetype taxonomy must reference at least two behavior primitives.",
+      path: ["taxonomy", "primitiveRefs"]
+    });
+  }
+
+  if (manifest.kind === "main" && !manifest.taxonomy.primaryOutput) {
+    issues.push({
+      code: "ARCHETYPE_PRIMARY_OUTPUT_MISSING",
+      severity: "error",
+      message: "Product archetypes must define a primary output.",
+      path: ["taxonomy", "primaryOutput"]
+    });
+  }
+
+  if (manifest.kind === "main" && !manifest.taxonomy.acceptanceObject) {
+    issues.push({
+      code: "ARCHETYPE_ACCEPTANCE_OBJECT_MISSING",
+      severity: "error",
+      message: "Product archetypes must define an acceptance object.",
+      path: ["taxonomy", "acceptanceObject"]
+    });
+  }
+
+  const governanceFocus = manifest.taxonomy.governanceFocus;
+  if (!governanceFocus || governanceFocus.en.length === 0 || governanceFocus.zhCN.length === 0) {
+    issues.push({
+      code: "ARCHETYPE_GOVERNANCE_FOCUS_MISSING",
+      severity: "error",
+      message: "Archetype taxonomy must define governance focus in English and Chinese.",
+      path: ["taxonomy", "governanceFocus"]
     });
   }
 

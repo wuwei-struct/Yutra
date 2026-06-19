@@ -43,6 +43,7 @@ Implemented today:
 - Rule Compiler CLI
 - Creator Workbench Compile Preview
 - Creator Workbench UI flow polish
+- Archetype Taxonomy metadata in `@yutra/archetype-core`
 - Rule Impact Explanation
 - Certification Readiness Preview
 - Compiled DSL manual bridge

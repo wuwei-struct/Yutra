@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
   ALL_ARCHETYPE_IDS,
+  BEHAVIOR_PRIMITIVE_IDS,
   BUILTIN_ARCHETYPE_MANIFESTS,
+  BUILTIN_BEHAVIOR_PRIMITIVES,
   CROSS_CUTTING_ARCHETYPE_IDS,
   MAIN_ARCHETYPE_IDS,
   createArchetypeRegistry,
@@ -20,6 +22,22 @@ describe("@yutra/archetype-core", () => {
     expect(CROSS_CUTTING_ARCHETYPE_IDS).toContain("human-handoff");
   });
 
+  it("exports the 10 behavior primitives and definitions", () => {
+    expect(BEHAVIOR_PRIMITIVE_IDS).toEqual([
+      "collect",
+      "retrieve",
+      "evaluate",
+      "execute",
+      "generate",
+      "route",
+      "monitor",
+      "handoff",
+      "audit",
+      "feedback"
+    ]);
+    expect(BUILTIN_BEHAVIOR_PRIMITIVES).toHaveLength(10);
+  });
+
   it("builtin manifests count is 14 and all validate successfully", () => {
     expect(BUILTIN_ARCHETYPE_MANIFESTS).toHaveLength(14);
     const validation = validateArchetypeRegistry(BUILTIN_ARCHETYPE_MANIFESTS);
@@ -31,6 +49,32 @@ describe("@yutra/archetype-core", () => {
     const registry = createArchetypeRegistry();
     expect(registry.get("request-resolution")?.kind).toBe("main");
     expect(registry.get("human-handoff")?.kind).toBe("cross_cutting");
+    expect(registry.get("request-resolution")?.taxonomy.layer).toBe("product_archetype");
+    expect(registry.get("human-handoff")?.taxonomy.layer).toBe("cross_cutting_archetype");
+  });
+
+  it("builtin manifests include taxonomy for product and cross-cutting archetypes", () => {
+    const main = BUILTIN_ARCHETYPE_MANIFESTS.filter((manifest) => manifest.kind === "main");
+    const crossCutting = BUILTIN_ARCHETYPE_MANIFESTS.filter((manifest) => manifest.kind === "cross_cutting");
+    expect(main).toHaveLength(10);
+    expect(crossCutting).toHaveLength(4);
+    for (const manifest of main) {
+      expect(manifest.taxonomy.layer).toBe("product_archetype");
+      expect(manifest.taxonomy.primaryOutput?.en).toBeTruthy();
+      expect(manifest.taxonomy.acceptanceObject?.en).toBeTruthy();
+      expect(manifest.taxonomy.governanceFocus?.en.length).toBeGreaterThan(0);
+    }
+    for (const manifest of crossCutting) {
+      expect(manifest.taxonomy.layer).toBe("cross_cutting_archetype");
+      expect(manifest.taxonomy.governanceFocus?.en.length).toBeGreaterThan(0);
+    }
+  });
+
+  it("key builtin taxonomy metadata matches the documented model", () => {
+    const registry = createArchetypeRegistry();
+    expect(registry.get("request-resolution")?.taxonomy.primitiveRefs).toEqual(expect.arrayContaining(["evaluate", "execute"]));
+    expect(registry.get("approval-decision")?.taxonomy.primitiveRefs).toEqual(expect.arrayContaining(["evaluate", "route", "audit"]));
+    expect(registry.get("monitoring-response")?.taxonomy.triggerPattern).toBe("system_event");
   });
 
   it("request-resolution declares compatible governance-ready cross-cutting archetypes", () => {
@@ -61,6 +105,29 @@ describe("@yutra/archetype-core", () => {
     expect(validation.issues.some((issue) => issue.code === "ARCHETYPE_PUBLIC_EXPOSURE_UNSAFE")).toBe(true);
   });
 
+  it("taxonomy validation catches missing primary output and invalid primitive refs", () => {
+    const base = BUILTIN_ARCHETYPE_MANIFESTS.find((manifest) => manifest.archetypeId === "request-resolution")!;
+    const missingPrimaryOutput = validateArchetypeManifest({
+      ...base,
+      taxonomy: {
+        ...base.taxonomy,
+        primaryOutput: undefined
+      }
+    });
+    expect(missingPrimaryOutput.ok).toBe(false);
+    expect(missingPrimaryOutput.issues.some((issue) => issue.code === "ARCHETYPE_PRIMARY_OUTPUT_MISSING")).toBe(true);
+
+    const invalidPrimitive = validateArchetypeManifest({
+      ...base,
+      taxonomy: {
+        ...base.taxonomy,
+        primitiveRefs: ["evaluate", "unknown"]
+      }
+    });
+    expect(invalidPrimitive.ok).toBe(false);
+    expect(invalidPrimitive.issues.some((issue) => issue.code === "ARCHETYPE_PRIMITIVE_REF_INVALID")).toBe(true);
+  });
+
   it("duplicate registry ids fail validation and registry construction", () => {
     const duplicate = [BUILTIN_ARCHETYPE_MANIFESTS[0]!, BUILTIN_ARCHETYPE_MANIFESTS[0]!];
     const validation = validateArchetypeRegistry(duplicate);
@@ -86,6 +153,10 @@ describe("@yutra/archetype-core", () => {
     const registry = createArchetypeRegistry();
     expect(registry.listMain()).toHaveLength(10);
     expect(registry.listCrossCutting()).toHaveLength(4);
+    expect(registry.listProductArchetypes()).toHaveLength(10);
+    expect(registry.listCrossCuttingArchetypes()).toHaveLength(4);
+    expect(registry.listByPrimitive("evaluate").map((manifest) => manifest.archetypeId)).toContain("approval-decision");
+    expect(registry.listByTriggerPattern("system_event").map((manifest) => manifest.archetypeId)).toContain("monitoring-response");
     expect(registry.has("request-resolution")).toBe(true);
     expect(registry.getCompatibleCrossCutting("request-resolution").map((manifest) => manifest.archetypeId)).toEqual([
       "human-handoff",
@@ -96,8 +167,12 @@ describe("@yutra/archetype-core", () => {
     const english = registry.explain("request-resolution", "en");
     const chinese = registry.explain("request-resolution", "zh-CN");
     expect(english).toContain("Request Resolution");
+    expect(english).toContain("Primary Output");
+    expect(english).toContain("business action result");
     expect(english).toContain("This is an archetype manifest, not an executable Agent");
     expect(chinese).toContain("请求处理型");
+    expect(chinese).toContain("主要产出物");
+    expect(chinese).toContain("业务动作结果");
     expect(chinese).toContain("这只是 archetype manifest");
   });
 

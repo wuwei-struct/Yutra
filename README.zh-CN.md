@@ -51,6 +51,7 @@ Yutra 关注这些问题：
 - Rule Compiler CLI。
 - Creator Workbench Compile Preview。
 - Creator Workbench UI 信息架构整理。
+- `@yutra/archetype-core` 中的 Archetype Taxonomy metadata。
 - Rule Impact Explanation。
 - Certification Readiness Preview。
 - Compiled DSL manual bridge。

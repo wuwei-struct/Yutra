@@ -18,6 +18,8 @@ This package does not compile DSL, generate Pack Config, connect Runtime, or inc
 - composition contract
 - side-effect policy helpers
 - builtin public base manifests
+- behavior primitive taxonomy metadata
+- manifest taxonomy metadata for product and cross-cutting archetypes
 - local in-memory registry
 - validation and explain helpers
 
@@ -36,8 +38,23 @@ Key fields:
 - `commonRules`: rule type overview only.
 - `capabilities`: capability atoms.
 - `compatibleCrossCutting`: cross-cutting archetypes that commonly compose with this archetype.
+- `taxonomy`: layer, primitive references, primary output, acceptance object, governance focus, trigger pattern, and scenario pattern hints.
 - `defaultGovernance`: conservative context, guard, failure, trace, and side-effect policy defaults.
 - `publicExposure`: explicit public safety declaration.
+
+## Taxonomy Metadata
+
+`@yutra/archetype-core` exports the public taxonomy metadata described in [Archetype Taxonomy](archetype-taxonomy.md):
+
+- `BEHAVIOR_PRIMITIVE_IDS`
+- `BUILTIN_BEHAVIOR_PRIMITIVES`
+- `ArchetypeTaxonomy`
+- `ArchetypeLayer`
+- `TriggerPattern`
+
+The 10 main archetypes are marked as `product_archetype`. The 4 cross-cutting archetypes are marked as `cross_cutting_archetype`.
+
+Taxonomy metadata is contract metadata. It does not compile DSL, connect Runtime, alter trace events, or add new behavior semantics.
 
 `publicExposure` must always declare:
 

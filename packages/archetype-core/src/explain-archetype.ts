@@ -11,6 +11,13 @@ export function explainArchetype(manifest: ArchetypeManifest, options: { locale?
     flow: useZh ? "核心流程" : "Core Flow",
     scenarios: useZh ? "适用场景" : "Common Scenarios",
     rules: useZh ? "常见规则类型" : "Common Rule Types",
+    taxonomy: useZh ? "分类学元数据" : "Taxonomy Metadata",
+    primitives: useZh ? "行为原语" : "Behavior Primitives",
+    primaryOutput: useZh ? "主要产出物" : "Primary Output",
+    acceptanceObject: useZh ? "验收对象" : "Acceptance Object",
+    governanceFocus: useZh ? "治理重点" : "Governance Focus",
+    triggerPattern: useZh ? "触发方式" : "Trigger Pattern",
+    scenarioPatternHints: useZh ? "场景组合提示" : "Scenario Pattern Hints",
     cross: useZh ? "可组合横切母型" : "Compatible Cross-cutting Archetypes",
     governance: useZh ? "默认治理策略" : "Default Governance",
     note: useZh ? "说明" : "Note"
@@ -33,6 +40,29 @@ export function explainArchetype(manifest: ArchetypeManifest, options: { locale?
     `## ${label.rules}`,
     ...manifest.commonRules.map((item) => `- ${item}`),
     "",
+    `## ${label.taxonomy}`,
+    `- layer: ${manifest.taxonomy.layer}`,
+    `- ${label.primitives}: ${manifest.taxonomy.primitiveRefs.join(", ")}`,
+    ...(manifest.taxonomy.primaryOutput
+      ? [`- ${label.primaryOutput}: ${useZh ? manifest.taxonomy.primaryOutput.zhCN : manifest.taxonomy.primaryOutput.en}`]
+      : []),
+    ...(manifest.taxonomy.acceptanceObject
+      ? [`- ${label.acceptanceObject}: ${useZh ? manifest.taxonomy.acceptanceObject.zhCN : manifest.taxonomy.acceptanceObject.en}`]
+      : []),
+    ...(manifest.taxonomy.governanceFocus
+      ? [
+          `- ${label.governanceFocus}:`,
+          ...(useZh ? manifest.taxonomy.governanceFocus.zhCN : manifest.taxonomy.governanceFocus.en).map((item) => `  - ${item}`)
+        ]
+      : []),
+    ...(manifest.taxonomy.triggerPattern ? [`- ${label.triggerPattern}: ${manifest.taxonomy.triggerPattern}`] : []),
+    ...((useZh ? manifest.taxonomy.scenarioPatternHints?.zhCN : manifest.taxonomy.scenarioPatternHints?.en)?.length
+      ? [
+          `- ${label.scenarioPatternHints}:`,
+          ...(useZh ? manifest.taxonomy.scenarioPatternHints!.zhCN! : manifest.taxonomy.scenarioPatternHints!.en!).map((item) => `  - ${item}`)
+        ]
+      : []),
+    "",
     `## ${label.cross}`,
     ...((manifest.compatibleCrossCutting ?? []).length > 0 ? manifest.compatibleCrossCutting!.map((id) => `- ${id}`) : ["- none"]),
     "",
@@ -43,6 +73,6 @@ export function explainArchetype(manifest: ArchetypeManifest, options: { locale?
     `- trace policy: ${manifest.defaultGovernance.tracePolicy}`,
     `- max auto side effect: ${manifest.defaultGovernance.sideEffectPolicy.maxAutoSideEffect}`,
     "",
-    `${label.note}: ${note}`
+    `${label.note}: ${note} ${useZh ? "上述分类学信息是元数据，不代表 Runtime 行为。" : "The taxonomy information above is metadata, not Runtime behavior."}`
   ].join("\n");
 }
