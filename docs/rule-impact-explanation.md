@@ -16,6 +16,12 @@ Rule Impact metadata makes the mapping inspectable without executing Runtime.
 
 P6-06B uses this metadata as one input to Certification Readiness Preview counts, but readiness preview still does not run Runtime or execute test cases.
 
+Rule Impact Explanation connects Product Archetype fields to lower-level Behavior Primitives and generated Guard / Action / Transition / Policy / Trace Expectation structures.
+
+The same Behavior Primitive can be reused by multiple Product Archetypes. For example, `evaluate` is used for rule eligibility in `request-resolution` and for approval policy judgment in `approval-decision`.
+
+See [Archetype Taxonomy](archetype-taxonomy.md).
+
 ## Current Scope
 
 The current public implementation covers request-resolution and approval-decision demo/basic fields, and both are visible in Creator Workbench demo UI:

@@ -37,6 +37,22 @@ Choose a business action structure such as `request-resolution`, `approval-decis
 
 The UI should explain what the archetype does, what rules it needs, and what outputs it can generate.
 
+Creator Workbench should guide users with the question:
+
+```text
+What is the primary output of this agent?
+```
+
+中文：这个 Agent 的主要产出物是什么？
+
+Users select a Product Archetype, not a low-level Behavior Primitive. Complex business scenarios can be represented as Scenario Patterns that combine multiple archetypes.
+
+For example, customer complaint is a Scenario Pattern rather than a new main archetype. Explaining policy may use `knowledge-answering`; compensation handling may combine `request-resolution` and `approval-decision`; public signal response may start from `monitoring-response`.
+
+`approval-decision` remains a Product Archetype because its primary output is an authorization decision.
+
+See [Archetype Taxonomy](archetype-taxonomy.md).
+
 ### 2. Scenario Variant
 
 Choose a specific variant within the archetype.

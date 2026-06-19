@@ -33,6 +33,18 @@ Runtime still executes canonical IR.
 
 DSL remains important, but it becomes the intermediate layer behind the creation workflow rather than the primary customer-facing interface.
 
+## Archetype System Layers
+
+The vNext archetype system has three layers:
+
+1. Behavior Primitives
+2. Product Archetypes
+3. Scenario Patterns
+
+Creator Workbench should primarily present Product Archetypes and Scenario Patterns to users. The Primitive layer is mainly for compiler, runtime, trace, and policy implementation.
+
+This separation prevents Yutra from turning every business scenario into a new archetype ID. See [Archetype Taxonomy](archetype-taxonomy.md).
+
 ## Core Formula
 
 ```text

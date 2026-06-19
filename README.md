@@ -16,6 +16,8 @@ vNext direction:
 Yutra is evolving toward a fuller Agent Creation Layer:
 Archetype Library + Business Rule Configuration + Rule Compiler + Creator Workbench.
 
+Yutra separates behavior primitives, product archetypes, and scenario patterns to avoid turning every business scenario into a new archetype.
+
 Current status and vNext direction are intentionally separate: the open-source core exists today; full enterprise SaaS, marketplace, hosted console, and real customer API integration are not implemented in this repository.
 
 Builder Core now exists as `@yutra/builder-core` for form-to-spec and Chinese DSL draft generation.
@@ -181,6 +183,7 @@ Start here:
 
 - [vNext Charter](docs/vnext-charter.md)
 - [Agent Archetype Library](docs/archetype-library.md)
+- [Archetype Taxonomy](docs/archetype-taxonomy.md)
 - [Archetype Core](docs/archetype-core.md)
 - [Business Rule Config](docs/business-rule-config.md)
 - [Pack Config Core](docs/pack-config-core.md)
@@ -321,6 +324,7 @@ Yutra is currently not:
 
 - [vNext Charter](docs/vnext-charter.md)
 - [Agent Archetype Library](docs/archetype-library.md)
+- [Archetype Taxonomy](docs/archetype-taxonomy.md)
 - [Archetype Core](docs/archetype-core.md)
 - [Business Rule Configuration](docs/business-rule-config.md)
 - [Pack Config Core](docs/pack-config-core.md)

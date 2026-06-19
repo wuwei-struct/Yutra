@@ -10,6 +10,22 @@ This document defines the vNext library direction. `@yutra/archetype-core` now p
 
 See [Archetype Core](archetype-core.md) for the TypeScript manifest, validation, registry, and explain API.
 
+## Archetype Layering
+
+The 10 main archetypes in this document are Product Archetypes, not Primitive behavior atoms.
+
+Yutra separates three layers:
+
+1. Behavior Primitives / 行为原语
+2. Product Archetypes / 产物型主母型
+3. Scenario Patterns / 场景组合范式
+
+See: [Archetype Taxonomy](./archetype-taxonomy.md)
+
+The main archetypes below are product-facing archetypes. They are differentiated by primary output, acceptance object, and governance focus, not by being mutually exclusive low-level primitives.
+
+中文说明：下面的 10 个主母型是面向创建体验和验收对象的产物型主母型，不是底层不可再分的行为原语。行为原语、产物型主母型与场景组合范式之间的关系见 [Archetype Taxonomy](./archetype-taxonomy.md)。
+
 ## Main Archetypes
 
 ### 1. `intake-collector` / 信息采集型
