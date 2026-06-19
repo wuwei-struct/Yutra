@@ -1,15 +1,134 @@
 # Project Charter
 
-## 濡炪倕婀卞ú鎵偓瑙勭煯缁?
-Yutra is an Agent Execution Standard and Reference Runtime.
+## 1. Project Positioning
 
-## 鐟滅増鎸告晶鐘绘⒓閼告鍞介柣鈺婂枟閻?
-鐟滅増鎸告晶鐘绘⒓閼告鍞藉ù鐘叉噹閻ｎ剟骞嬮幇鑸偓宥夋儎椤旇法鐝堕柣锝呭缁楀苯顔忛妷褉鏌ら柛鈺勬椤㈠懐鎷嬮悙顒佺參闁告帗绻傞～鎰板礌閺嶇數绀夊☉鎾崇Т閻ゅ嫰鎮虫０浣虹懝闁告棑绻濋埀顒佹缁额偊骞嬮弽顒傜閻炴稑鏈鍌炴嚄閽樺顫旈柕?
-## 闁哄牜鍓濋悿鍡樼閵堝嫮甯涢柣?
-- pnpm monorepo 濞?TypeScript/Node.js 闁糕晞娅ｉ、鍛存煀瀹ュ洨鏋傞柕?- packages闁靛棔韬瑇amples闁靛棔榫歰cs 闁烩晩鍠栫紞宥嗩殽閵婏妇浠搁柕?- 婵絽绻嬮柌婊呪偓娑欏姇鐎垫﹢鎯?`package.json` 濞?`src/index.ts` 闁告濮崇紞鍛村Υ?- 闁哄秴婀辨?README 濞戞挸瀛╅悥锝夊礄閸℃ɑ鐎俊妤嬬到閿涙捇濡?
-## 闁哄嫬娴烽垾姗€妫冮悙鍨獥闁?
-- 濞戞挸绉撮悿鍕偝?runtime闁靛棔榫歴l parser闁靛棔鎭璴i 闁告稒鍨濋幎銈夊Υ娑旂磧ace viewer 濡炪倗鏁诲浼村Υ?- 濞戞挸绉撮悿鍕偝?tools/knowledge/llm provider 闁汇劌瀚﹢锛勨偓鍦仜椤曨噣骞掗妷鈹惧亾閺勫繒甯嗛柕?- 濞戞挸绉甸崸濠囧礉閻樿櫕娈堕柟璇″枛缁ㄩ亶濡存稊鍒 Server闁靛棔绀侀ˇ璺ㄧ矓閻旂鐓曢柕鍡曠閹宕ｉ懜顑藉亾娴ｆ垝鍠婂鍨涙櫅閿涙挾鈧稒鍔戦埀?
-## 濞戞挸顦板顖氼嚕閳ь剟宕ｉ幋锔芥儌鐎?
-1. 闁稿繐鐗嗛崯鎾诲冀閸パ冩珯闁挎稑鑻崯鈧柛鎰懆缁诲秶鎮扮仦鐐槯闁挎稑鑻崯鈧柛鎰懅閵囨碍绗熺€ｃ劉鍋?2. 濞戞挸绉崇拹鐔哥閸℃瑦绠欓悹褔鏀卞闈涱嚕閸濆嫬绠甸柛鏃傚Т婵盯鎳楁慨鎰ㄥ亾?3. 濞寸姾顔婄紞宥夊棘閺夋鏉绘俊顖椻偓铏仴闂侇喖鈧噥娲ｉ柛蹇撶墕閸ㄤ粙寮銊х獥闁哄嫷鍨板﹢顏勵嚕閸濆嫬顕ч柡宥呮搐閸ｎ垶鏁嶅畝鍐闁哄嫷鍨辨俊鍛娿亜閸︻厽绐楅柟宄邦槸濞叉牠鐛崘鎻掗叡婵炲鍎插Ч鐔煎Υ?
-## 閺夆晩鍘洪崬顒傜棯椤忓嫮浼?
-- 濞戞挴鍋撴繛?PR 闁告瑯浜滄禒娑欑▔閳ь剚绋夐鍛闁搞儰鍕橀埀?- 濞戞挸绉撮崢鎴犳媼閹间降鈧酣骞嶇€ｎ偄鈷?scope闁?- 婵炲矉绻濋悰娆戞嫚娴ｅ憡鐨戝☉鎾崇Х閸忔﹢宕樺▎灞稿亾濠婂啫鍤掗梺顐ｄ亢缁诲啴鍨惧┑鍕ㄥ亾?
+Yutra is an open-source governed Agent Creation & Execution Framework.
+
+Yutra turns business rules into executable, traceable, and auditable agents through:
+
+- Agent Archetypes
+- Pack Config
+- Rule Compiler
+- DSL / Canonical IR
+- Runtime
+- Trace / Audit
+- Certification
+- Creator Workbench
+
+## 2. Current Open-source Core
+
+The public repository currently provides the open-source core:
+
+- DSL and Canonical IR
+- Reference Runtime
+- Trace / Audit / Certification
+- Skill Core and Skill Runtime
+- Archetype Core
+- Pack Config Core
+- Rule Compiler Core
+- Rule Compiler CLI
+- Yutra Studio
+- Creator Workbench demo flows
+- Mock / demo examples
+
+## 3. Core Principle
+
+Yutra is not a prompt-first agent framework.
+
+Yutra follows an execution-first architecture:
+
+```text
+Business Rules
+-> Pack Config
+-> Rule Compiler
+-> DSL / Policy / Templates / Test Cases / Trace Expectations
+-> Runtime
+-> Trace / Audit / Certification
+```
+
+LLM can assist with drafts, but it must not bypass schema validation, compiler gates, runtime governance, trace, or certification.
+
+## 4. What Yutra Is For
+
+Yutra is designed to answer:
+
+- How is an agent behavior defined?
+- Which business rule produced which Guard / Action / Transition?
+- Which DSL / Policy / Template / Test Case was generated?
+- Why did the agent enter a state?
+- Why did it execute an action?
+- Why did it request handoff?
+- Can the execution be traced, audited, replayed, and certified?
+
+## 5. What Yutra Is Not
+
+Yutra is currently not:
+
+- a marketplace
+- a remote registry
+- an install workflow
+- a multi-tenant SaaS platform
+- a customer service backend
+- a BI / analytics platform
+- a full no-code workflow platform
+- a real customer API integration package
+- a hosted enterprise console
+
+## 6. Open-source Boundary
+
+The public repository contains open-source core and mock/demo examples.
+
+The following are not part of the public core:
+
+- real customer adapters
+- customer-specific SOP
+- production integration assets
+- pricing / proposal templates
+- UAT / rollout playbooks
+- private deployment assets
+- enterprise policy packs
+- hosted enterprise dashboards
+
+## 7. Supported Creation Flow
+
+The current Creator Workbench flow supports:
+
+- request-resolution
+- approval-decision
+
+Both are demo/mock flows.
+
+The workbench can:
+
+- select an archetype
+- edit demo Pack Config
+- explain rule impact
+- compile preview artifacts
+- show certification readiness preview
+- send generated `agent.yutra.yaml` to DSL Editor
+- inspect DSL manually
+- apply DSL as run source manually
+- run preview manually
+- inspect Trace / Audit evidence
+
+It does not automatically run Runtime, publish agents, or claim production readiness.
+
+## 8. Development Discipline
+
+Every future module must answer:
+
+- Does it strengthen the execution standard?
+- Does it preserve traceability?
+- Does it improve governance?
+- Does it keep LLM as assistant rather than runtime decision maker?
+- Does it avoid turning Yutra into a generic SaaS platform?
+
+## 9. Next Direction
+
+Near-term development should focus on:
+
+- Creator Workbench polish
+- rule explanation and readiness UX
+- second / third archetype validation
+- public demo boundary
+- private commercial implementation assets outside the public repo
