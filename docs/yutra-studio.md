@@ -26,6 +26,7 @@ Builder Core
 - Certification Readiness Preview for demo/mock compile output.
 - Manual Run Preview Evidence for showing user-triggered run evidence in the readiness panel.
 - Manual bridge from compiled `agent.yutra.yaml` to the DSL Editor.
+- Creator Workflow guidance for Select archetype -> Configure business rules -> Review rule impact -> Compile preview -> Send to DSL editor -> Inspect DSL manually -> Apply DSL manually -> Run Preview manually -> Review Trace / Audit.
 - AgentSpec JSON preview.
 - Inspect panel for validation, normalized DSL structure, canonical IR, and structure overview.
 - Run Preview through local builder-runner.
@@ -61,6 +62,7 @@ pnpm builder:dev
 - Rule Impact Explanation is demo/basic metadata only and does not change compiler output or Runtime behavior.
 - Certification Readiness Preview is not official certification, does not run Runtime, does not execute test cases, and does not claim production readiness.
 - Compiled DSL sent to the editor is not trusted until it passes Inspect DSL.
+- Creator Workflow is a UI guide only; it does not automate Runtime, Inspect, Apply, or Run Preview steps.
 
 DSL Source execution is now supported:
 
@@ -138,6 +140,16 @@ This panel is a preview only. It does not automatically execute Runtime, does no
 Manual Run Preview evidence does not make the official certification gate ready.
 If the DSL changes after evidence capture, the evidence becomes stale.
 
+P6-08A polishes the Creator Workbench information architecture into five visible areas:
+
+- Header / current workbench status
+- Archetype & Business Rules
+- Rule Explanation
+- Compile Preview
+- Readiness & Evidence
+
+See [Creator Workbench UI](creator-workbench-ui.md).
+
 Relevant vNext docs:
 
 - [vNext Charter](vnext-charter.md)
@@ -145,6 +157,7 @@ Relevant vNext docs:
 - [Business Rule Config](business-rule-config.md)
 - [Rule Compiler Overview](rule-compiler-overview.md)
 - [Creator Workbench](creator-workbench.md)
+- [Creator Workbench UI](creator-workbench-ui.md)
 - [vNext Roadmap](vnext-roadmap.md)
 
 ## Roadmap

@@ -36,7 +36,7 @@ describe("P6-05A Creator Workbench MVP conformance", () => {
 
   it("builder contains send compiled DSL bridge function", () => {
     expect(read("apps/builder/src/lib/studio-state.ts")).toContain("sendCompiledDslToEditor");
-    expect(read("apps/builder/src/components/creator/CreatorWorkbenchPanel.tsx")).toContain(
+    expect(read("apps/builder/src/components/creator/CompileArtifactsPanel.tsx")).toContain(
       "Send agent.yutra.yaml to DSL Editor"
     );
   });

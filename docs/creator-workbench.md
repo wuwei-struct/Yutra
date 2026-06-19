@@ -7,6 +7,16 @@ It is not a generic DSL editor. It is not a complex visual workflow canvas. It i
 This document describes the vNext direction and the current MVP boundary.
 P6-05A adds a first local Compile Preview inside Yutra Studio, but it remains demo/mock only.
 
+P6-08A organizes the Studio surface into a clearer Creator Workbench UI:
+
+- Header / current workbench status
+- Archetype & Business Rules
+- Rule Explanation
+- Compile Preview
+- Readiness & Evidence
+
+See [Creator Workbench UI](creator-workbench-ui.md).
+
 ## Main Entry
 
 ```text
@@ -110,6 +120,24 @@ This evidence only updates the `manual_runtime_run` gate display. It does not ru
 - First version should not use a complex drag-and-drop canvas.
 - No login, multi-tenant SaaS backend, marketplace, remote registry, or production publishing system in the first creator iteration.
 
+## Creator Workflow
+
+The Studio UI shows this manual workflow:
+
+1. Select archetype
+2. Configure business rules
+3. Review rule impact
+4. Compile preview
+5. Send `agent.yutra.yaml` to DSL editor
+6. Inspect DSL manually
+7. Apply DSL as run source manually
+8. Run Preview manually
+9. Review Trace / Audit
+
+This is a workflow guide only. It does not run Runtime automatically, does not inspect DSL automatically, does not apply DSL automatically, and does not represent production readiness.
+
+Boundary label: No automatic Runtime execution.
+
 ## Relationship to Current Studio
 
 Current Yutra Studio is an early workbench prototype:
@@ -149,6 +177,8 @@ The request-resolution and approval-decision forms edit public demo/mock Pack Co
 - response style basics
 
 Each editable field shows source provenance, affected artifact chips, and an Impact control that opens the Rule Impact Explanation panel.
+
+The UI now separates business rules, rule explanation, compile output, and readiness evidence into distinct sections so the workbench reads as an Agent Creation Workbench rather than a stacked feature panel.
 
 Adapters remain fixed to `mock`. The UI does not expose secret fields, real endpoints, customer adapter mappings, or customer SOP fields.
 

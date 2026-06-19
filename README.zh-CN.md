@@ -48,6 +48,7 @@ Yutra 关注这些问题：
 - Rule Compiler Core。
 - Rule Compiler CLI。
 - Creator Workbench Compile Preview。
+- Creator Workbench UI 信息架构整理。
 - Rule Impact Explanation。
 - Certification Readiness Preview。
 - Compiled DSL manual bridge。
@@ -116,6 +117,7 @@ Yutra Studio 是本地单用户工作台原型，用于把 Builder Core、AI Dra
 - 左侧导航栏与顶部操作栏
 - AI Draft Assistant
 - Creator Workbench Compile Preview：基于公开 `request-resolution` 与 `approval-decision` demo Pack Config 预览编译产物
+- Creator Workflow：选择母型 -> 配置业务规则 -> 查看规则影响 -> 编译预览 -> 发送到 DSL 编辑器 -> 手动检查 DSL -> 手动应用 DSL -> 手动运行预览 -> 查看 Trace / Audit
 - Rule Impact Explanation：解释公开 `request-resolution` 与 `approval-decision` demo 字段会影响哪些 Guard / Action / Transition / Policy / Trace Expectation
 - Certification Readiness Preview：基于 demo/mock compile output 展示认证准备度；不运行 Runtime，也不声明生产就绪
 - 手动 Run Preview Evidence：用户手动运行预览后展示 runId / event count / trace / audit evidence；不让正式认证门禁变为 ready
@@ -174,6 +176,7 @@ LLM 可以生成配置草案，但不能绕过 Compiler、Runtime、Trace、Audi
 - [Certification Readiness Preview](docs/certification-readiness-preview.md)
 - [Approval Decision Basic Demo](docs/approval-decision-basic.md)
 - [Creator Workbench](docs/creator-workbench.md)
+- [Creator Workbench UI](docs/creator-workbench-ui.md)
 - [vNext Roadmap](docs/vnext-roadmap.md)
 
 本地 demo/mock artifact 导出：
@@ -187,6 +190,7 @@ pnpm exec yutra compile examples/approval-decision-basic/pack.config.json --out 
 
 该命令只导出 compiler artifacts，不运行 Runtime，也不发布 Agent。
 `approval-decision` 现在已在 Creator Workbench 中 demo-enabled。它仍仅限 mock/demo，不连接真实审批系统，并且仍需手动发送到 DSL Editor、Inspect、Apply 与 Run。
+Creator Workbench UI 已整理为 Header、母型与业务规则、规则解释、编译预览、准备度与证据五个区域。它仍仅限 demo/mock，不会自动运行 Runtime，也不代表生产就绪。
 
 ## Skill-based Demo
 
@@ -284,6 +288,7 @@ Yutra 当前不是：
 - [Certification Readiness Preview](docs/certification-readiness-preview.md)
 - [Approval Decision Basic Demo](docs/approval-decision-basic.md)
 - [Creator Workbench](docs/creator-workbench.md)
+- [Creator Workbench UI](docs/creator-workbench-ui.md)
 - [vNext Roadmap](docs/vnext-roadmap.md)
 
 ### E-commerce Pack

@@ -223,12 +223,151 @@ button:disabled {
 .creator-workbench-panel {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
   background: #fbfdff;
 }
 
 .creator-section {
   background: #ffffff;
+}
+
+.creator-hero {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  border: 1px solid #c5d8ec;
+  border-radius: 12px;
+  padding: 14px;
+  background:
+    linear-gradient(135deg, rgba(235, 245, 255, 0.95), rgba(255, 255, 255, 0.9)),
+    #ffffff;
+}
+
+.creator-hero h2 {
+  margin: 0 0 6px;
+}
+
+.creator-hero p {
+  margin: 0;
+}
+
+.creator-hero-status {
+  display: flex;
+  align-content: flex-start;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-width: 220px;
+}
+
+.eyebrow {
+  margin: 0 0 5px;
+  color: #476f9f;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.creator-boundary-notice {
+  border: 1px solid #e8c36a;
+  border-radius: 10px;
+  padding: 12px;
+  background: #fff8df;
+}
+
+.creator-boundary-notice p {
+  margin: 6px 0 10px;
+  color: #5e4c13;
+}
+
+.creator-workflow-stepper {
+  border: 1px solid #d5dde7;
+  border-radius: 10px;
+  padding: 12px;
+  background: #ffffff;
+}
+
+.creator-workflow-stepper ol {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.workflow-step {
+  display: grid;
+  grid-template-columns: 26px 1fr;
+  gap: 8px;
+  align-items: center;
+  border: 1px solid #d8e0ea;
+  border-radius: 8px;
+  padding: 8px;
+  background: #f8fafc;
+  color: #667789;
+  font-size: 12px;
+}
+
+.workflow-step span {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background: #d8e0ea;
+  color: #243142;
+  font-weight: 800;
+}
+
+.workflow-step.active {
+  border-color: #9ac9a9;
+  background: #eef8f1;
+  color: #243142;
+}
+
+.workflow-step.active span {
+  background: #1d6b39;
+  color: #ffffff;
+}
+
+.creator-workbench-layout {
+  display: grid;
+  grid-template-columns: minmax(360px, 1fr) minmax(300px, 0.75fr);
+  gap: 12px;
+  align-items: start;
+}
+
+.creator-stage-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border: 1px solid #d5dde7;
+  border-radius: 12px;
+  padding: 12px;
+  background: #f8fbff;
+}
+
+.creator-stage-card[aria-label="Business Rules"],
+.creator-stage-card[aria-label="Compile Preview Panel"] {
+  grid-column: 1;
+}
+
+.creator-stage-card[aria-label="Rule Explanation"],
+.creator-stage-card[aria-label="Readiness & Evidence"] {
+  grid-column: 2;
+}
+
+.creator-stage-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.creator-stage-header h3 {
+  margin: 0;
 }
 
 .creator-archetype-list {
@@ -774,5 +913,16 @@ pre,
 @media (max-width: 980px) {
   .studio-shell {
     grid-template-columns: 210px minmax(980px, 1fr);
+  }
+
+  .creator-workbench-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .creator-stage-card[aria-label="Business Rules"],
+  .creator-stage-card[aria-label="Compile Preview Panel"],
+  .creator-stage-card[aria-label="Rule Explanation"],
+  .creator-stage-card[aria-label="Readiness & Evidence"] {
+    grid-column: 1;
   }
 }

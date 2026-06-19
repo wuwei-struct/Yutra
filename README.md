@@ -40,6 +40,7 @@ Implemented today:
 - Rule Compiler Core
 - Rule Compiler CLI
 - Creator Workbench Compile Preview
+- Creator Workbench UI flow polish
 - Rule Impact Explanation
 - Certification Readiness Preview
 - Compiled DSL manual bridge
@@ -133,6 +134,7 @@ It includes:
 - left navigation and top operation bar
 - AI Draft Assistant
 - Creator Workbench Compile Preview for public `request-resolution` and `approval-decision` demo Pack Configs
+- Creator Workflow: Select archetype -> Configure business rules -> Review rule impact -> Compile preview -> Send to DSL editor -> Inspect DSL manually -> Apply DSL manually -> Run Preview manually -> Review Trace / Audit
 - Rule Impact Explanation for public `request-resolution` and `approval-decision` demo fields
 - Certification Readiness Preview for demo/mock compile output; it does not run Runtime or claim production readiness
 - Manual Run Preview Evidence after a user-triggered Run Preview; it does not make official certification ready
@@ -185,6 +187,7 @@ Start here:
 - [Certification Readiness Preview](docs/certification-readiness-preview.md)
 - [Approval Decision Basic Demo](docs/approval-decision-basic.md)
 - [Creator Workbench](docs/creator-workbench.md)
+- [Creator Workbench UI](docs/creator-workbench-ui.md)
 - [vNext Roadmap](docs/vnext-roadmap.md)
 
 Local demo/mock artifact export:
@@ -198,6 +201,7 @@ pnpm exec yutra compile examples/approval-decision-basic/pack.config.json --out 
 
 This exports compiler artifacts only. It does not run Runtime or publish an Agent.
 `approval-decision` is now demo-enabled in Creator Workbench. It remains mock/demo only, does not connect a real approval system, and still requires manual Send to DSL Editor / Inspect / Apply / Run.
+The Creator Workbench UI is organized into Header, Archetype & Business Rules, Rule Explanation, Compile Preview, and Readiness & Evidence sections. It remains demo/mock only, does not run Runtime automatically, and does not represent production readiness.
 
 ## Skill-based Demo
 
@@ -322,6 +326,7 @@ Yutra is currently not:
 - [Certification Readiness Preview](docs/certification-readiness-preview.md)
 - [Approval Decision Basic Demo](docs/approval-decision-basic.md)
 - [Creator Workbench](docs/creator-workbench.md)
+- [Creator Workbench UI](docs/creator-workbench-ui.md)
 - [vNext Roadmap](docs/vnext-roadmap.md)
 
 ### E-commerce Pack

@@ -399,7 +399,18 @@ describe("@yutra/builder Studio UI", () => {
   it("Creator Workbench panel renders", () => {
     renderStudio();
     expect(screen.getByLabelText("Creator Workbench")).toBeTruthy();
-    expect(screen.getByText("Compile Preview only / does not run Runtime")).toBeTruthy();
+    expect(screen.getByLabelText("Creator Workbench Header")).toBeTruthy();
+    expect(screen.getByLabelText("Creator Boundary Notice").textContent).toContain("No automatic Runtime execution");
+    expect(screen.getByLabelText("Compile Preview Panel")).toBeTruthy();
+  });
+
+  it("Creator Workflow stepper renders the manual creation flow", () => {
+    renderStudio();
+    const workflow = screen.getByLabelText("Creator Workflow");
+    expect(workflow.textContent).toContain("Select archetype");
+    expect(workflow.textContent).toContain("Configure business rules");
+    expect(workflow.textContent).toContain("Send to DSL editor");
+    expect(workflow.textContent).toContain("Run preview manually");
   });
 
   it("request-resolution and approval-decision are enabled and other archetypes are disabled", () => {
