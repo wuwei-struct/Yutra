@@ -173,6 +173,10 @@ The goal is to let users configure business rules instead of writing DSL directl
 The vNext direction keeps Runtime execution-first. Customers should configure business rules; Yutra should generate DSL, policy, templates, tests, and trace expectations behind the scenes.
 LLMs may draft configuration, but they must not bypass the Compiler, Runtime, Trace, Audit, or Certification path.
 
+## vNext Preview Release Notes
+
+- [vNext Preview Release Notes](docs/release-notes-vnext-preview.md)
+
 Start here:
 
 - [vNext Charter](docs/vnext-charter.md)
@@ -185,6 +189,7 @@ Start here:
 - [Rule Compiler CLI](docs/rule-compiler-cli.md)
 - [Rule Impact Explanation](docs/rule-impact-explanation.md)
 - [Certification Readiness Preview](docs/certification-readiness-preview.md)
+- [vNext Preview Release Notes](docs/release-notes-vnext-preview.md)
 - [Approval Decision Basic Demo](docs/approval-decision-basic.md)
 - [Creator Workbench](docs/creator-workbench.md)
 - [Creator Workbench UI](docs/creator-workbench-ui.md)
@@ -324,6 +329,7 @@ Yutra is currently not:
 - [Rule Compiler CLI](docs/rule-compiler-cli.md)
 - [Rule Impact Explanation](docs/rule-impact-explanation.md)
 - [Certification Readiness Preview](docs/certification-readiness-preview.md)
+- [vNext Preview Release Notes](docs/release-notes-vnext-preview.md)
 - [Approval Decision Basic Demo](docs/approval-decision-basic.md)
 - [Creator Workbench](docs/creator-workbench.md)
 - [Creator Workbench UI](docs/creator-workbench-ui.md)

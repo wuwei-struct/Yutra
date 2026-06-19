@@ -1,5 +1,30 @@
 # Changelog
 
+## Unreleased / vNext Preview
+
+### Included
+
+- README positioning update to open-source governed Agent Creation & Execution Framework.
+- Public exposure cleanup for ecommerce delivery-oriented public docs.
+- Project charter mojibake fix.
+- `@yutra/archetype-core`.
+- `@yutra/pack-config-core`.
+- `@yutra/rule-compiler`.
+- Rule Compiler CLI.
+- Creator Workbench Compile Preview.
+- Rule Impact Explanation.
+- Certification Readiness Preview.
+- Manual Run Preview Evidence.
+- approval-decision second archetype support.
+
+### Intentionally Excluded
+
+- Git tag or GitHub Release publication.
+- npm package publication.
+- Real customer API integration.
+- Marketplace, remote registry, hosted console, or multi-tenant SaaS.
+- Customer-specific SOP, pricing, proposal, UAT, rollout, or delivery playbooks.
+
 ## v0.2.0-rc.1
 
 ### Included

@@ -1,12 +1,12 @@
-# Yutra Agent Execution Standard (Shell)
+# Yutra Agent Execution Standard
 
-## 闁哄秴娲ら崳顖滀沪閸屾碍鍊崇紒?
-Yutra Agent Execution Standard
+Yutra defines an execution-first standard for governed agents.
 
-## 閺夆晜鍔橀、鎴﹀籍鐠虹儤鍊崇紒?
-Yutra Runtime
+The standard describes how an agent moves through states, evaluates guards, invokes actions, records trace events, and produces audit evidence.
 
-## 闁哄秶顭堢缓鍓р偓鐢殿攰閽栧嫰宕￠悩杈╃Т
+## Scope
+
+The execution standard covers:
 
 - Agent
 - State
@@ -16,5 +16,34 @@ Yutra Runtime
 - Context
 - TraceEvent
 
-## 閻犲洤鐡ㄥΣ?
-閻庢稒顨嗛宀€鈧鐭粻鐔轰焊閸℃韬?PR-01 闁解偓閽樺鍕鹃柨娑樻湰濠€鐗堟姜椤旇崵鐟濋柟缁樺姇婢х娀骞嶉埡浣烘綌闁?
+## Reference Runtime
+
+`@yutra/runtime` is the reference implementation of the execution standard.
+
+The runtime is intentionally deterministic. It should not become a prompt-first control loop, and it should not bypass guard, policy, trace, or audit boundaries.
+
+## Relationship to vNext
+
+In the vNext creation flow, Pack Config and Rule Compiler sit above the execution standard:
+
+```text
+Business Rules
+-> Pack Config
+-> Rule Compiler
+-> DSL / Canonical IR
+-> Runtime
+-> Trace / Audit / Certification
+```
+
+DSL remains the deterministic intermediate layer consumed by the runtime.
+
+## Boundaries
+
+The execution standard does not include:
+
+- marketplace
+- remote registry
+- hosted observability platform
+- multi-tenant SaaS control plane
+- real customer API integration
+- LLM-first runtime decision making
