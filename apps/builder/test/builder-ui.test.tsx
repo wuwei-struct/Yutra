@@ -321,11 +321,32 @@ describe("@yutra/builder Studio UI", () => {
     expect(screen.getByLabelText("Adapter Mode Summary").textContent).toContain("containsRealEndpoint=false");
   });
 
+  it("Creator Workbench renders rule impact controls", () => {
+    renderStudio();
+    expect(screen.getByLabelText("Rule Impact Panel")).toBeTruthy();
+    expect(screen.getAllByRole("button", { name: "Impact" }).length).toBeGreaterThan(0);
+    expect(screen.getByLabelText("Rule Impact Panel").textContent).toContain("autoRefundMaxAmount");
+  });
+
+  it("clicking autoRefundMaxAmount impact shows high_value_refund and affected artifacts", () => {
+    renderStudio();
+    const amountInput = screen.getByLabelText("autoRefundMaxAmount");
+    const amountRow = amountInput.closest(".creator-field-row");
+    const impactButton = amountRow?.querySelector("button");
+    expect(impactButton).toBeTruthy();
+    fireEvent.click(impactButton!);
+    expect(screen.getByLabelText("Rule Impact Panel").textContent).toContain("high_value_refund");
+    expect(screen.getByLabelText("Rule Impact Panel").textContent).toContain("policy.yaml");
+    expect(screen.getByLabelText("Rule Impact Panel").textContent).toContain("trace.expectation.json");
+  });
+
   it("editing autoRefundMaxAmount updates Pack Config state and source confirmedByUser", () => {
     renderStudio();
     fireEvent.change(screen.getByLabelText("autoRefundMaxAmount"), { target: { value: "450" } });
     expect(screen.getByLabelText("PackConfig Preview").textContent).toContain('"value": 450');
     expect(screen.getByLabelText("PackConfig Preview").textContent).toContain('"source": "confirmedByUser"');
+    const amountRow = screen.getByLabelText("autoRefundMaxAmount").closest(".creator-field-row");
+    expect(amountRow?.textContent).toContain("Confirmed by user");
   });
 
   it("Compile Preview calls runner and renders artifact tabs", async () => {
@@ -346,6 +367,7 @@ describe("@yutra/builder Studio UI", () => {
     await waitFor(() => expect(screen.getByLabelText("Compile Report").textContent).toContain("sha256:config"));
     expect(screen.getByLabelText("Compile Report").textContent).toContain("enabled");
     expect(screen.getByLabelText("Compile Report").textContent).toContain("fallback_covered");
+    expect(screen.getByLabelText("Rule Impact Summary").textContent).toContain("explained fields");
   });
 
   it("compile issues render errors and warnings", async () => {

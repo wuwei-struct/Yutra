@@ -1,5 +1,10 @@
-import { useMemo, useState } from "react";
-import type { PackConfig } from "@yutra/pack-config-core";
+import { useMemo, useState, type ReactNode } from "react";
+import type { ConfigField, ConfigFieldSource, PackConfig } from "@yutra/pack-config-core";
+import {
+  getRuleImpact,
+  listRuleImpacts,
+  type RuleImpactDefinition
+} from "../../../../../packages/pack-config-core/src/rule-impact";
 import type { RuleCompilerIssue } from "@yutra/rule-compiler";
 import type { CreatorCompilePreviewResponse } from "../../types";
 import { compileCreatorPreview } from "../../lib/creator-client";
@@ -10,6 +15,8 @@ import {
   updateConfigField,
   type CreatorArtifactTab
 } from "../../lib/creator-state";
+import { useI18n, type MessageKey } from "../../i18n";
+import { RuleImpactPanel } from "./RuleImpactPanel";
 
 function fieldValue<T>(config: PackConfig, key: string, fallback: T): T {
   return (config.rules[key]?.value as T | undefined) ?? fallback;
@@ -42,6 +49,92 @@ function updateCapability(config: PackConfig, key: string, value: boolean): Pack
   };
 }
 
+const sourceLabelKeys: Record<ConfigFieldSource, MessageKey> = {
+  confirmedByUser: "creator.impact.confirmedByUser",
+  defaultFromPack: "creator.impact.defaultFromPack",
+  inferredByAI: "creator.impact.inferredByAI",
+  migrated: "creator.impact.migrated",
+  requiredButMissing: "creator.impact.requiredButMissing"
+};
+
+function fullRulePath(key: string): string {
+  return `rules.${key}`;
+}
+
+function getConfigField(config: PackConfig, fieldPath: string): ConfigField | undefined {
+  if (fieldPath.startsWith("capabilities.")) {
+    return config.capabilities[fieldPath.replace("capabilities.", "")];
+  }
+  if (fieldPath.startsWith("rules.")) {
+    return config.rules[fieldPath.replace("rules.", "")];
+  }
+  return undefined;
+}
+
+function FieldMeta(props: {
+  config: PackConfig;
+  fieldPath: string;
+  onSelectImpact: (fieldPath: string) => void;
+}) {
+  const { t } = useI18n();
+  const impact = getRuleImpact(props.fieldPath);
+  const field = getConfigField(props.config, props.fieldPath);
+
+  return (
+    <div className="field-meta-row">
+      <span className="status-pill">
+        {t("creator.impact.source")}: {field?.source ? t(sourceLabelKeys[field.source]) : "-"}
+      </span>
+      {impact?.artifacts.slice(0, 3).map((artifact) => (
+        <span key={artifact} className="status-pill">
+          {artifact}
+        </span>
+      ))}
+      {impact && impact.artifacts.length > 3 ? <span className="status-pill">+{impact.artifacts.length - 3}</span> : null}
+      <button type="button" className="impact-button" onClick={() => props.onSelectImpact(props.fieldPath)}>
+        {t("creator.impact.impact")}
+      </button>
+    </div>
+  );
+}
+
+function ImpactCheckbox(props: {
+  config: PackConfig;
+  fieldPath: string;
+  label: string;
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+  onSelectImpact: (fieldPath: string) => void;
+}) {
+  return (
+    <div className="creator-field-row">
+      <label className="checkbox-item">
+        <input type="checkbox" checked={props.checked} onChange={(event) => props.onChange(event.target.checked)} />
+        <span>{props.label}</span>
+      </label>
+      <FieldMeta config={props.config} fieldPath={props.fieldPath} onSelectImpact={props.onSelectImpact} />
+    </div>
+  );
+}
+
+function ImpactField(props: {
+  config: PackConfig;
+  fieldPath: string;
+  label: string;
+  children: ReactNode;
+  onSelectImpact: (fieldPath: string) => void;
+}) {
+  return (
+    <div className="creator-field-row">
+      <label className="field">
+        {props.label}
+        {props.children}
+      </label>
+      <FieldMeta config={props.config} fieldPath={props.fieldPath} onSelectImpact={props.onSelectImpact} />
+    </div>
+  );
+}
+
 function ArchetypeSelector() {
   return (
     <section className="creator-section" aria-label="Archetype Selector">
@@ -59,8 +152,12 @@ function ArchetypeSelector() {
   );
 }
 
-function RequestResolutionConfigEditor(props: { config: PackConfig; onChange: (config: PackConfig) => void }) {
-  const { config, onChange } = props;
+function RequestResolutionConfigEditor(props: {
+  config: PackConfig;
+  onChange: (config: PackConfig) => void;
+  onSelectImpact: (fieldPath: string) => void;
+}) {
+  const { config, onChange, onSelectImpact } = props;
   const capabilityIds = ["orderLookup", "shippingLookup", "refundRequest", "returnRequest", "handoff"];
 
   return (
@@ -71,37 +168,46 @@ function RequestResolutionConfigEditor(props: { config: PackConfig; onChange: (c
       <h4>Capabilities</h4>
       <div className="list">
         {capabilityIds.map((id) => (
-          <label key={id} className="checkbox-item">
-            <input
-              type="checkbox"
-              checked={Boolean(config.capabilities[id]?.value)}
-              onChange={(event) => onChange(updateCapability(config, id, event.target.checked))}
-            />
-            <span>{id}</span>
-          </label>
+          <ImpactCheckbox
+            key={id}
+            config={config}
+            fieldPath={`capabilities.${id}`}
+            label={id}
+            checked={Boolean(config.capabilities[id]?.value)}
+            onChange={(checked) => onChange(updateCapability(config, id, checked))}
+            onSelectImpact={onSelectImpact}
+          />
         ))}
       </div>
 
       <h4>Refund Policy</h4>
-      <label className="checkbox-item">
-        <input
-          type="checkbox"
-          checked={fieldValue(config, "refundPolicy.autoRefundWhenNotShipped", false)}
-          onChange={(event) => onChange(updateRule(config, "refundPolicy.autoRefundWhenNotShipped", event.target.checked))}
-        />
-        <span>autoRefundWhenNotShipped</span>
-      </label>
-      <label className="field">
-        autoRefundMaxAmount
+      <ImpactCheckbox
+        config={config}
+        fieldPath={fullRulePath("refundPolicy.autoRefundWhenNotShipped")}
+        label="autoRefundWhenNotShipped"
+        checked={fieldValue(config, "refundPolicy.autoRefundWhenNotShipped", false)}
+        onChange={(checked) => onChange(updateRule(config, "refundPolicy.autoRefundWhenNotShipped", checked))}
+        onSelectImpact={onSelectImpact}
+      />
+      <ImpactField
+        config={config}
+        fieldPath={fullRulePath("refundPolicy.autoRefundMaxAmount")}
+        label="autoRefundMaxAmount"
+        onSelectImpact={onSelectImpact}
+      >
         <input
           aria-label="autoRefundMaxAmount"
           type="number"
           value={fieldValue(config, "refundPolicy.autoRefundMaxAmount", 0)}
           onChange={(event) => onChange(updateRule(config, "refundPolicy.autoRefundMaxAmount", Number(event.target.value)))}
         />
-      </label>
-      <label className="field">
-        shippedOrderStrategy
+      </ImpactField>
+      <ImpactField
+        config={config}
+        fieldPath={fullRulePath("refundPolicy.shippedOrderStrategy")}
+        label="shippedOrderStrategy"
+        onSelectImpact={onSelectImpact}
+      >
         <select
           value={fieldValue(config, "refundPolicy.shippedOrderStrategy", "require_return_first")}
           onChange={(event) => onChange(updateRule(config, "refundPolicy.shippedOrderStrategy", event.target.value))}
@@ -110,9 +216,13 @@ function RequestResolutionConfigEditor(props: { config: PackConfig; onChange: (c
           <option value="handoff">handoff</option>
           <option value="reject_with_template">reject_with_template</option>
         </select>
-      </label>
-      <label className="field">
-        expiredAfterSaleStrategy
+      </ImpactField>
+      <ImpactField
+        config={config}
+        fieldPath={fullRulePath("refundPolicy.expiredAfterSaleStrategy")}
+        label="expiredAfterSaleStrategy"
+        onSelectImpact={onSelectImpact}
+      >
         <select
           value={fieldValue(config, "refundPolicy.expiredAfterSaleStrategy", "ask_for_more_info")}
           onChange={(event) => onChange(updateRule(config, "refundPolicy.expiredAfterSaleStrategy", event.target.value))}
@@ -121,9 +231,13 @@ function RequestResolutionConfigEditor(props: { config: PackConfig; onChange: (c
           <option value="handoff">handoff</option>
           <option value="ask_for_more_info">ask_for_more_info</option>
         </select>
-      </label>
-      <label className="field">
-        apiFailureStrategy
+      </ImpactField>
+      <ImpactField
+        config={config}
+        fieldPath={fullRulePath("refundPolicy.apiFailureStrategy")}
+        label="apiFailureStrategy"
+        onSelectImpact={onSelectImpact}
+      >
         <select
           value={fieldValue(config, "refundPolicy.apiFailureStrategy", "retry_then_handoff")}
           onChange={(event) => onChange(updateRule(config, "refundPolicy.apiFailureStrategy", event.target.value))}
@@ -132,31 +246,40 @@ function RequestResolutionConfigEditor(props: { config: PackConfig; onChange: (c
           <option value="handoff">handoff</option>
           <option value="fail_closed_error">fail_closed_error</option>
         </select>
-      </label>
+      </ImpactField>
 
       <h4>Handoff Policy</h4>
       {["highValueRefund", "complaint", "orderNotFound", "ruleConflict"].map((name) => (
-        <label key={name} className="checkbox-item">
-          <input
-            type="checkbox"
-            checked={fieldValue(config, `handoffPolicy.${name}`, false)}
-            onChange={(event) => onChange(updateRule(config, `handoffPolicy.${name}`, event.target.checked))}
-          />
-          <span>{name}</span>
-        </label>
+        <ImpactCheckbox
+          key={name}
+          config={config}
+          fieldPath={fullRulePath(`handoffPolicy.${name}`)}
+          label={name}
+          checked={fieldValue(config, `handoffPolicy.${name}`, false)}
+          onChange={(checked) => onChange(updateRule(config, `handoffPolicy.${name}`, checked))}
+          onSelectImpact={onSelectImpact}
+        />
       ))}
-      <label className="field">
-        maxUserRetryCount
+      <ImpactField
+        config={config}
+        fieldPath={fullRulePath("handoffPolicy.maxUserRetryCount")}
+        label="maxUserRetryCount"
+        onSelectImpact={onSelectImpact}
+      >
         <input
           type="number"
           value={fieldValue(config, "handoffPolicy.maxUserRetryCount", 0)}
           onChange={(event) => onChange(updateRule(config, "handoffPolicy.maxUserRetryCount", Number(event.target.value)))}
         />
-      </label>
+      </ImpactField>
 
       <h4>Response Style</h4>
-      <label className="field">
-        tone
+      <ImpactField
+        config={config}
+        fieldPath={fullRulePath("responseStyle.tone")}
+        label="tone"
+        onSelectImpact={onSelectImpact}
+      >
         <select
           value={fieldValue(config, "responseStyle.tone", "warm_professional")}
           onChange={(event) => onChange(updateRule(config, "responseStyle.tone", event.target.value))}
@@ -165,16 +288,17 @@ function RequestResolutionConfigEditor(props: { config: PackConfig; onChange: (c
           <option value="warm_professional">warm_professional</option>
           <option value="concise">concise</option>
         </select>
-      </label>
+      </ImpactField>
       {["includeReason", "includeHumanSupportEntry"].map((name) => (
-        <label key={name} className="checkbox-item">
-          <input
-            type="checkbox"
-            checked={fieldValue(config, `responseStyle.${name}`, false)}
-            onChange={(event) => onChange(updateRule(config, `responseStyle.${name}`, event.target.checked))}
-          />
-          <span>{name}</span>
-        </label>
+        <ImpactCheckbox
+          key={name}
+          config={config}
+          fieldPath={fullRulePath(`responseStyle.${name}`)}
+          label={name}
+          checked={fieldValue(config, `responseStyle.${name}`, false)}
+          onChange={(checked) => onChange(updateRule(config, `responseStyle.${name}`, checked))}
+          onSelectImpact={onSelectImpact}
+        />
       ))}
 
       <div className="creator-adapter-summary" aria-label="Adapter Mode Summary">
@@ -220,6 +344,21 @@ function CompileIssuesPanel(props: { issues: RuleCompilerIssue[] }) {
 
 function CompileReportPanel(props: { response: CreatorCompilePreviewResponse }) {
   const report = props.response.report;
+  const { t } = useI18n();
+  const impacts = listRuleImpacts();
+  const artifactCounts = impacts.reduce<Record<string, number>>((counts, impactItem) => {
+    for (const artifact of impactItem.artifacts) {
+      counts[artifact] = (counts[artifact] ?? 0) + 1;
+    }
+    return counts;
+  }, {});
+  const failClosedFields = impacts.filter((impactItem) =>
+    impactItem.safetyNotes?.en?.some((note) => note.toLowerCase().includes("fail-closed"))
+  );
+  const handoffFields = impacts.filter((impactItem) =>
+    impactItem.affects.some((target) => target.id.toLowerCase().includes("handoff"))
+  );
+
   return (
     <section className="creator-section" aria-label="Compile Report">
       <h3>Compile Report</h3>
@@ -243,6 +382,28 @@ function CompileReportPanel(props: { response: CreatorCompilePreviewResponse }) 
           <pre>{JSON.stringify(report.coverage, null, 2)}</pre>
           <h4>Artifact Hashes</h4>
           <pre>{JSON.stringify(report.artifactHashes, null, 2)}</pre>
+          <h4>{t("creator.impact.summary")}</h4>
+          <div className="impact-summary-grid" aria-label="Rule Impact Summary">
+            <div>
+              <strong>{impacts.length}</strong>
+              <span>{t("creator.impact.explainedFields")}</span>
+            </div>
+            <div>
+              <strong>{failClosedFields.length}</strong>
+              <span>{t("creator.impact.failClosedFields")}</span>
+            </div>
+            <div>
+              <strong>{handoffFields.length}</strong>
+              <span>{t("creator.impact.handoffFields")}</span>
+            </div>
+          </div>
+          <div className="artifact-chip-row">
+            {Object.entries(artifactCounts).map(([artifact, count]) => (
+              <span key={artifact} className="status-pill">
+                {artifact}: {count}
+              </span>
+            ))}
+          </div>
         </>
       ) : (
         <p className="hint">Compile report unavailable.</p>
@@ -322,6 +483,9 @@ export function CreatorWorkbenchPanel(props: {
   onSendCompiledDslToEditor?: (dslText: string, meta?: SendCompiledDslMeta) => void;
 }) {
   const [config, setConfig] = useState<PackConfig>(() => createRequestResolutionDemoConfig());
+  const [selectedImpact, setSelectedImpact] = useState<RuleImpactDefinition | undefined>(() =>
+    getRuleImpact("rules.refundPolicy.autoRefundMaxAmount")
+  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [response, setResponse] = useState<CreatorCompilePreviewResponse | undefined>(undefined);
@@ -355,7 +519,12 @@ export function CreatorWorkbenchPanel(props: {
       <p className="hint">Configure public demo business rules, compile in memory, and inspect generated artifacts. No save, no publish, no disk write.</p>
 
       <ArchetypeSelector />
-      <RequestResolutionConfigEditor config={config} onChange={setConfig} />
+      <RequestResolutionConfigEditor
+        config={config}
+        onChange={setConfig}
+        onSelectImpact={(fieldPath) => setSelectedImpact(getRuleImpact(fieldPath))}
+      />
+      <RuleImpactPanel impact={selectedImpact} />
       <PackConfigPreview config={config} />
 
       <div className="button-row wrap-row">

@@ -61,11 +61,21 @@ describe("P6-05A Creator Workbench MVP conformance", () => {
     expect(docs).toContain("not trusted until it passes Inspect DSL");
   });
 
+  it("docs mention rule impact explanation without runtime auto-execution", () => {
+    const docs = `${read("docs/creator-workbench.md")}\n${read("docs/pack-config-core.md")}\n${read("docs/rule-impact-explanation.md")}`;
+    expect(docs).toContain("Rule Impact Explanation");
+    expect(docs).toContain("Guard");
+    expect(docs).toContain("Trace Expectation");
+    expect(docs).toContain("does not run Runtime");
+    expect(docs).toContain("customer SOP");
+  });
+
   it("README does not claim Creator Workbench auto-runs Runtime", () => {
     const readme = `${read("README.md")}\n${read("README.zh-CN.md")}`;
     expect(readme).toContain("compiled `agent.yutra.yaml` to the DSL Editor");
     expect(readme).toContain("compiled DSL must be inspected");
     expect(readme).toContain("Compile Preview does not run Runtime");
+    expect(readme).toContain("Rule Impact Explanation");
     expect(readme).not.toContain("Creator Workbench auto-runs Runtime");
   });
 

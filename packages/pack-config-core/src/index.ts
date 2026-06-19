@@ -26,6 +26,18 @@ export {
   REQUEST_RESOLUTION_FIELD_DEFINITIONS,
   REQUEST_RESOLUTION_FIELD_IDS
 } from "./request-resolution-config";
+export type {
+  RuleImpactArtifact,
+  RuleImpactDefinition,
+  RuleImpactTarget,
+  RuleImpactTargetKind
+} from "./rule-impact";
+export {
+  REQUEST_RESOLUTION_RULE_IMPACTS,
+  explainRuleImpact,
+  getRuleImpact,
+  listRuleImpacts
+} from "./rule-impact";
 export { REQUEST_RESOLUTION_ECOMMERCE_BASIC_CONFIG } from "./sample-configs";
 export { createPackConfigFingerprint, stripFieldVolatileMetadata } from "./config-fingerprint";
 export {

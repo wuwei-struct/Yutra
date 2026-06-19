@@ -2,10 +2,13 @@ import { describe, expect, it } from "vitest";
 import {
   REQUEST_RESOLUTION_ECOMMERCE_BASIC_CONFIG,
   REQUEST_RESOLUTION_FIELD_DEFINITIONS,
+  REQUEST_RESOLUTION_RULE_IMPACTS,
   canPublishPackConfig,
   collectUnconfirmedFields,
   createPackConfigFingerprint,
   explainPackConfig,
+  explainRuleImpact,
+  getRuleImpact,
   validatePackConfig,
   validateRequestResolutionConfig
 } from "../src";
@@ -148,5 +151,38 @@ describe("@yutra/pack-config-core", () => {
     expect(serialized).not.toContain("https://");
     expect(serialized).not.toContain("api.");
     expect(REQUEST_RESOLUTION_ECOMMERCE_BASIC_CONFIG.adapters.every((adapter) => adapter.mode === "mock")).toBe(true);
+  });
+
+  it("request-resolution rule impacts include high-value refund guard and trace artifacts", () => {
+    expect(REQUEST_RESOLUTION_RULE_IMPACTS.length).toBeGreaterThan(0);
+    const impact = getRuleImpact("rules.refundPolicy.autoRefundMaxAmount");
+    expect(impact?.affects.some((target) => target.kind === "guard" && target.id === "high_value_refund")).toBe(true);
+    expect(impact?.artifacts).toContain("trace.expectation.json");
+  });
+
+  it("api failure impact explains fail-closed safety", () => {
+    const impact = getRuleImpact("rules.refundPolicy.apiFailureStrategy");
+    expect(impact?.safetyNotes?.en?.join(" ").toLowerCase()).toContain("fail-closed");
+    expect(impact?.affects.some((target) => target.id.includes("api_failed") || target.id.includes("api failure"))).toBe(true);
+  });
+
+  it("response tone impact only affects template-style outputs", () => {
+    const impact = getRuleImpact("rules.responseStyle.tone");
+    expect(impact?.artifacts).toEqual(["templates.json"]);
+    expect(impact?.affects.every((target) => target.kind === "template")).toBe(true);
+  });
+
+  it("explainRuleImpact returns deterministic en and zh-CN text", () => {
+    const en = explainRuleImpact("rules.refundPolicy.autoRefundMaxAmount", "en");
+    const zh = explainRuleImpact("rules.refundPolicy.autoRefundMaxAmount", "zh-CN");
+    expect(en).toContain("Auto refund max amount");
+    expect(en).toContain("high_value_refund");
+    expect(zh).toContain("自动退款金额上限");
+    expect(zh).toContain("high_value_refund");
+  });
+
+  it("unknown rule impact returns undefined", () => {
+    expect(getRuleImpact("rules.unknown")).toBeUndefined();
+    expect(explainRuleImpact("rules.unknown", "en")).toBeUndefined();
   });
 });

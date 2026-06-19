@@ -48,6 +48,7 @@ Yutra 关注这些问题：
 - Rule Compiler Core。
 - Rule Compiler CLI。
 - Creator Workbench Compile Preview。
+- Rule Impact Explanation。
 - Compiled DSL manual bridge。
 
 ## 开源边界
@@ -111,6 +112,7 @@ Yutra Studio 是本地单用户工作台原型，用于把 Builder Core、AI Dra
 - 左侧导航栏与顶部操作栏
 - AI Draft Assistant
 - Creator Workbench Compile Preview：基于公开 `request-resolution` demo Pack Config 预览编译产物
+- Rule Impact Explanation：解释公开 `request-resolution` demo 字段会影响哪些 Guard / Action / Transition / Policy / Trace Expectation
 - 可将编译出的 `agent.yutra.yaml` 手动发送到 DSL 编辑器
 - DSL 编辑器：Validate DSL、Inspect DSL、Apply DSL as Run Source
 - AgentSpec JSON 预览
@@ -162,6 +164,7 @@ LLM 可以生成配置草案，但不能绕过 Compiler、Runtime、Trace、Audi
 - [Rule Compiler Overview](docs/rule-compiler-overview.md)
 - [Rule Compiler Core](docs/rule-compiler-core.md)
 - [Rule Compiler CLI](docs/rule-compiler-cli.md)
+- [Rule Impact Explanation](docs/rule-impact-explanation.md)
 - [Creator Workbench](docs/creator-workbench.md)
 - [vNext Roadmap](docs/vnext-roadmap.md)
 
@@ -266,6 +269,7 @@ Yutra 当前不是：
 - [Rule Compiler Overview](docs/rule-compiler-overview.md)
 - [Rule Compiler Core](docs/rule-compiler-core.md)
 - [Rule Compiler CLI](docs/rule-compiler-cli.md)
+- [Rule Impact Explanation](docs/rule-impact-explanation.md)
 - [Creator Workbench](docs/creator-workbench.md)
 - [vNext Roadmap](docs/vnext-roadmap.md)
 

@@ -15,6 +15,7 @@ It does not connect Runtime directly and does not connect Studio UI directly.
 
 P6-04B adds a thin CLI/export layer on top of this core package. See [Rule Compiler CLI](rule-compiler-cli.md).
 P6-05A adds a local Studio Compile Preview through builder-runner. That preview calls this package in memory and still does not execute Runtime or write artifacts.
+P6-06A adds Rule Impact Explanation in the Creator Workbench using Pack Config metadata. That layer explains field impact but does not change compiler output.
 
 ## Position in the vNext Chain
 
@@ -101,6 +102,17 @@ It maps public field groups:
 - response style basics
 
 It intentionally avoids customer SOP, real adapter mappings, and complete industry rule matrices.
+
+## Rule Impact Explanation Relationship
+
+Rule Impact metadata lives in `@yutra/pack-config-core`. It explains how a business field can affect Guard, Action, Transition, Policy, Template, Test Case, and Trace Expectation targets.
+
+The Rule Compiler remains deterministic and artifact-focused:
+
+- impact metadata does not execute Runtime
+- impact metadata does not change generated artifact content
+- impact metadata does not bypass compile gates
+- impact metadata does not introduce customer SOP or real adapter mapping
 
 ## Current Non-goals
 

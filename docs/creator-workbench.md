@@ -44,6 +44,7 @@ Example: order lookup, shipping check, refund eligibility, return request creati
 Configure business rules in customer language.
 
 Every rule item should explain what Guard, Action, Transition, Policy, Template, or Test it will affect.
+P6-06A adds Rule Impact Explanation for public `request-resolution` demo fields so users can inspect how a Pack Config field maps to Guard, Action, Transition, Policy, Template, Test Case, and Trace Expectation targets.
 
 ### 5. System Integration
 
@@ -137,6 +138,8 @@ The request-resolution form edits a public demo/mock Pack Config:
 - handoff policy basics
 - response style basics
 
+Each editable field shows source provenance, affected artifact chips, and an Impact control that opens the Rule Impact Explanation panel.
+
 Adapters remain fixed to `mock`. The UI does not expose secret fields, real endpoints, customer adapter mappings, or customer SOP fields.
 
 Compile Preview calls the local builder-runner endpoint:
@@ -165,6 +168,19 @@ Important boundaries:
 - sending to DSL Editor does not run Runtime
 - compiled DSL must pass `/dsl/inspect` before it can be used as a run source
 - Studio does not write compiled artifacts to disk
+
+## Rule Impact Explanation
+
+The Creator Workbench includes a Rule Impact panel for the public `request-resolution` demo config.
+
+The panel explains:
+
+- business meaning of the selected field
+- affected Guard / Action / Transition / Policy / Template / Test Case / Trace Expectation targets
+- affected artifact files
+- safety notes such as fail-closed or handoff requirements
+
+This is explanation metadata only. It does not change Rule Compiler output, does not run Runtime, and does not contain customer SOP or real adapter mapping.
 
 ## Current Boundary
 

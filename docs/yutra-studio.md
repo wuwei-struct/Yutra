@@ -22,6 +22,7 @@ Builder Core
 - Manual Apply to Editor.
 - DSL editor with Validate DSL, Inspect DSL, Apply DSL as Run Source, Reset from Builder, and Copy DSL.
 - Creator Workbench Compile Preview for the public `request-resolution` demo Pack Config.
+- Rule Impact Explanation for public `request-resolution` demo fields.
 - Manual bridge from compiled `agent.yutra.yaml` to the DSL Editor.
 - AgentSpec JSON preview.
 - Inspect panel for validation, normalized DSL structure, canonical IR, and structure overview.
@@ -55,6 +56,7 @@ pnpm builder:dev
 - AI Draft does not auto-run Runtime.
 - Creator Compile Preview does not auto-run Runtime, does not write artifacts, and does not publish an Agent.
 - Creator Compile Preview is demo/mock only and does not include real adapters, real endpoints, customer SOP, or customer configuration.
+- Rule Impact Explanation is demo/basic metadata only and does not change compiler output or Runtime behavior.
 - Compiled DSL sent to the editor is not trusted until it passes Inspect DSL.
 
 DSL Source execution is now supported:
@@ -106,6 +108,16 @@ compiled agent.yutra.yaml
 ```
 
 The bridge does not call Runtime, does not call `/dsl/inspect` automatically, does not auto-apply source mode, and does not write artifacts to disk.
+
+P6-06A adds Rule Impact Explanation:
+
+```text
+Pack Config field
+-> affected Guard / Action / Transition / Policy / Template / Test Case / Trace Expectation
+-> affected compiler artifacts
+```
+
+This explanation layer helps users understand generated behavior. It does not run Runtime, does not auto-apply DSL, and does not include customer SOP.
 
 Relevant vNext docs:
 
