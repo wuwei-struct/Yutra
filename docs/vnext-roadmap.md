@@ -70,7 +70,7 @@ Field types:
 
 Goal: compile Pack Config into executable and certifiable assets.
 
-Current status: `@yutra/rule-compiler` provides public demo/mock compilers for `request-resolution` and `approval-decision`. `yutra compile` can export those artifacts locally. It does not connect Runtime or Studio.
+Current status: `@yutra/rule-compiler` provides public demo/mock compilers for `request-resolution` and `approval-decision`. `yutra compile` can export those artifacts locally. Creator Workbench demo UI supports both archetypes, but still does not connect Runtime or real systems.
 
 Scope:
 
@@ -87,7 +87,7 @@ Compiler must be deterministic. AI may draft configuration but must not directly
 
 Goal: prove the creation layer using a public request-resolution demo pack without exposing customer-ready SOP or implementation playbooks.
 
-Current status: P6-05A adds the first Yutra Studio Creator Workbench Compile Preview for `request-resolution`. It can edit basic demo Pack Config fields and show the six Rule Compiler artifacts plus compile report. It does not run Runtime, save artifacts, publish, or connect real adapters.
+Current status: Yutra Studio Creator Workbench Compile Preview supports `request-resolution` and `approval-decision` demo Pack Configs. It can edit basic demo fields and show the six Rule Compiler artifacts plus compile report. It does not run Runtime, save artifacts, publish, or connect real adapters.
 
 Focus:
 
@@ -137,8 +137,8 @@ Goal: prove that Creator Workbench is not a single ecommerce hard-code.
 
 Current status:
 
-- `approval-decision` Pack Config, Rule Impact metadata, Rule Compiler, and CLI demo are supported.
-- Creator Workbench UI is not enabled for `approval-decision` yet.
+- `approval-decision` Pack Config, Rule Impact metadata, Rule Compiler, CLI demo, and Creator Workbench demo UI are supported.
+- Studio UI remains demo/mock only and does not model real approval systems.
 
 Expected proof:
 

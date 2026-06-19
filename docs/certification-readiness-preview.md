@@ -72,6 +72,6 @@ It does not include customer SOP, real adapter mapping, production UAT criteria,
 
 ## Current Scope
 
-P6-06B supports the request-resolution demo/mock compile preview path only.
+P6-07B supports request-resolution and approval-decision demo/mock compile preview paths in Creator Workbench.
 
-Future iterations may attach official certification summaries, but this preview remains separate from automatic Runtime execution.
+Future iterations may attach official certification summaries, but this preview remains separate from automatic Runtime execution and does not claim production readiness.

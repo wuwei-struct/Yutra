@@ -44,7 +44,7 @@ Implemented today:
 - Certification Readiness Preview
 - Compiled DSL manual bridge
 - Manual Run Preview Evidence in the readiness panel
-- approval-decision second archetype core support (Pack Config + Rule Compiler + CLI; Studio UI not enabled yet)
+- approval-decision second archetype support (Pack Config + Rule Compiler + CLI + Creator Workbench demo-enabled UI)
 
 ## Why Yutra
 
@@ -132,8 +132,8 @@ Yutra Studio is the local single-user Agent Editor Workbench prototype.
 It includes:
 - left navigation and top operation bar
 - AI Draft Assistant
-- Creator Workbench Compile Preview for the public `request-resolution` demo Pack Config
-- Rule Impact Explanation for public `request-resolution` demo fields
+- Creator Workbench Compile Preview for public `request-resolution` and `approval-decision` demo Pack Configs
+- Rule Impact Explanation for public `request-resolution` and `approval-decision` demo fields
 - Certification Readiness Preview for demo/mock compile output; it does not run Runtime or claim production readiness
 - Manual Run Preview Evidence after a user-triggered Run Preview; it does not make official certification ready
 - manual bridge from compiled `agent.yutra.yaml` to the DSL Editor
@@ -197,7 +197,7 @@ pnpm exec yutra compile examples/approval-decision-basic/pack.config.json --out 
 ```
 
 This exports compiler artifacts only. It does not run Runtime or publish an Agent.
-`approval-decision` is currently supported at Pack Config, Rule Compiler, and CLI level only; Creator Workbench UI remains disabled / coming later for this archetype.
+`approval-decision` is now demo-enabled in Creator Workbench. It remains mock/demo only, does not connect a real approval system, and still requires manual Send to DSL Editor / Inspect / Apply / Run.
 
 ## Skill-based Demo
 

@@ -21,8 +21,8 @@ Builder Core
 - AI Draft Assistant with mock provider by default.
 - Manual Apply to Editor.
 - DSL editor with Validate DSL, Inspect DSL, Apply DSL as Run Source, Reset from Builder, and Copy DSL.
-- Creator Workbench Compile Preview for the public `request-resolution` demo Pack Config.
-- Rule Impact Explanation for public `request-resolution` demo fields.
+- Creator Workbench Compile Preview for public `request-resolution` and `approval-decision` demo Pack Configs.
+- Rule Impact Explanation for public `request-resolution` and `approval-decision` demo fields.
 - Certification Readiness Preview for demo/mock compile output.
 - Manual Run Preview Evidence for showing user-triggered run evidence in the readiness panel.
 - Manual bridge from compiled `agent.yutra.yaml` to the DSL Editor.
@@ -92,7 +92,7 @@ The DSL Editor remains valuable as an advanced inspection and override surface, 
 P6-05A is the first step in that direction:
 
 ```text
-request-resolution Pack Config
+request-resolution or approval-decision Pack Config
 -> /creator/compile-preview
 -> six demo/mock compiler artifacts
 -> compile report
@@ -120,7 +120,7 @@ Pack Config field
 -> affected compiler artifacts
 ```
 
-This explanation layer helps users understand generated behavior. It does not run Runtime, does not auto-apply DSL, and does not include customer SOP.
+This explanation layer helps users understand generated behavior for request-resolution and approval-decision demo configs. It does not run Runtime, does not auto-apply DSL, and does not include customer SOP or real approval procedures.
 
 P6-06B adds Certification Readiness Preview:
 

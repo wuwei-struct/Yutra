@@ -29,12 +29,12 @@ pnpm exec yutra compile examples/approval-decision-basic/pack.config.json --out 
 
 ## Current Boundary
 
-This is public demo/mock standard-layer support only.
+This is public demo/mock standard-layer support only. Creator Workbench UI is demo-enabled for editing the basic approval-decision Pack Config and previewing compiler artifacts.
 
 It does not:
 
-- enable Creator Workbench UI for `approval-decision`
-- connect Runtime
+- connect a real approval system from Creator Workbench UI
+- automatically run Runtime
 - automatically execute generated DSL
 - execute test cases
 - run official certification as a user action
@@ -45,6 +45,8 @@ It does not:
 - include real approval hierarchy
 - include customer SOP
 - include pricing, UAT, rollout, or delivery playbooks
+
+It does not include customer SOP, does not include real approval system adapters, and does not include real organization data.
 
 ## Demo Fields
 

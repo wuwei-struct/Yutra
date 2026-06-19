@@ -104,7 +104,7 @@ It is demo/mock only:
 - no customer SOP
 - no real organization data or approval hierarchy
 
-`approval-decision` is supported by the compiler core and CLI. It is not enabled in Creator Workbench UI yet.
+`approval-decision` is supported by the compiler core, CLI, and Creator Workbench demo UI. The UI remains demo/mock only and does not connect a real approval system.
 
 ## Non-goals
 

@@ -147,7 +147,7 @@ It generates the same six artifacts as request-resolution:
 
 It intentionally avoids real enterprise approval procedures, real approval hierarchy, production adapter mappings, organization data, customer SOP, and delivery templates.
 
-Creator Workbench UI is not enabled for `approval-decision` yet. The current support is Pack Config + Rule Compiler + CLI only.
+Creator Workbench UI is demo-enabled for `approval-decision`. The current support remains demo/mock only: Pack Config + Rule Compiler + CLI + Compile Preview UI, with no Runtime execution or real approval system integration.
 
 ## Rule Impact Explanation Relationship
 

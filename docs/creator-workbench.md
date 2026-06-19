@@ -69,7 +69,7 @@ Show generated assets and mapping:
 - test cases
 - canonical IR summary
 
-In the current MVP, Compile Preview displays the six Rule Compiler artifacts for the public `request-resolution` demo config:
+In the current MVP, Compile Preview displays the six Rule Compiler artifacts for public `request-resolution` and `approval-decision` demo configs:
 
 - `agent.yutra.yaml`
 - `policy.yaml`
@@ -130,17 +130,18 @@ The same execution foundation remains:
 Generated assets -> Canonical IR -> Runtime -> Trace / Audit / Certification
 ```
 
-P6-05A only previews generated assets. It does not run Runtime, write artifacts to disk, publish an Agent, or save customer configuration.
+Creator Workbench only previews generated assets. It does not run Runtime, write artifacts to disk, publish an Agent, or save customer configuration.
 P6-05B adds a manual bridge from the compiled `agent.yutra.yaml` artifact to the existing DSL Editor. The bridge only copies text into the editor.
 
 ## Current MVP: Compile Preview
 
-The current Creator Workbench MVP supports only one archetype:
+The current Creator Workbench MVP supports two archetypes:
 
 - enabled: `request-resolution`
+- enabled: `approval-decision`
 - disabled / coming later: all other main and cross-cutting archetypes
 
-The request-resolution form edits a public demo/mock Pack Config:
+The request-resolution and approval-decision forms edit public demo/mock Pack Configs:
 
 - capabilities
 - refund policy basics
@@ -180,7 +181,7 @@ Important boundaries:
 
 ## Rule Impact Explanation
 
-The Creator Workbench includes a Rule Impact panel for the public `request-resolution` demo config.
+The Creator Workbench includes a Rule Impact panel for public `request-resolution` and `approval-decision` demo configs.
 
 The panel explains:
 

@@ -52,7 +52,7 @@ Yutra 关注这些问题：
 - Certification Readiness Preview。
 - Compiled DSL manual bridge。
 - Certification Readiness Panel 中的手动 Run Preview Evidence。
-- approval-decision 第二母型 core 支持（Pack Config + Rule Compiler + CLI；Studio UI 尚未启用）。
+- approval-decision 第二母型支持（Pack Config + Rule Compiler + CLI + Creator Workbench demo UI）。
 
 ## 开源边界
 
@@ -115,8 +115,8 @@ Yutra Studio 是本地单用户工作台原型，用于把 Builder Core、AI Dra
 
 - 左侧导航栏与顶部操作栏
 - AI Draft Assistant
-- Creator Workbench Compile Preview：基于公开 `request-resolution` demo Pack Config 预览编译产物
-- Rule Impact Explanation：解释公开 `request-resolution` demo 字段会影响哪些 Guard / Action / Transition / Policy / Trace Expectation
+- Creator Workbench Compile Preview：基于公开 `request-resolution` 与 `approval-decision` demo Pack Config 预览编译产物
+- Rule Impact Explanation：解释公开 `request-resolution` 与 `approval-decision` demo 字段会影响哪些 Guard / Action / Transition / Policy / Trace Expectation
 - Certification Readiness Preview：基于 demo/mock compile output 展示认证准备度；不运行 Runtime，也不声明生产就绪
 - 手动 Run Preview Evidence：用户手动运行预览后展示 runId / event count / trace / audit evidence；不让正式认证门禁变为 ready
 - 可将编译出的 `agent.yutra.yaml` 手动发送到 DSL 编辑器
@@ -186,7 +186,7 @@ pnpm exec yutra compile examples/approval-decision-basic/pack.config.json --out 
 ```
 
 该命令只导出 compiler artifacts，不运行 Runtime，也不发布 Agent。
-`approval-decision` 当前仅支持 Pack Config、Rule Compiler 与 CLI 层；Creator Workbench UI 仍保持 disabled / coming later。
+`approval-decision` 现在已在 Creator Workbench 中 demo-enabled。它仍仅限 mock/demo，不连接真实审批系统，并且仍需手动发送到 DSL Editor、Inspect、Apply 与 Run。
 
 ## Skill-based Demo
 

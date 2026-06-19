@@ -120,7 +120,10 @@ function mockDslInspectFailure() {
   });
 }
 
-function mockCompilePreviewSuccess() {
+function mockCompilePreviewSuccess(options?: { agentName?: string; archetypeId?: string; packConfigId?: string }) {
+  const agentName = options?.agentName ?? "request-resolution-ecommerce-basic";
+  const archetypeId = options?.archetypeId ?? "request-resolution";
+  const packConfigId = options?.packConfigId ?? "request-resolution:ecommerce-basic-demo";
   vi.mocked(compileCreatorPreview).mockResolvedValue({
     ok: true,
     compileId: "compile:test",
@@ -130,8 +133,8 @@ function mockCompilePreviewSuccess() {
       agent: {
         filename: "agent.yutra.yaml",
         kind: "agent",
-        data: "agent: request-resolution-ecommerce-basic",
-        content: "agent: request-resolution-ecommerce-basic\n",
+        data: `agent: ${agentName}`,
+        content: `agent: ${agentName}\n`,
         contentType: "text/yaml",
         hash: "sha256:agent"
       },
@@ -178,9 +181,9 @@ function mockCompilePreviewSuccess() {
     },
     report: {
       status: "passed",
-      archetypeId: "request-resolution",
+      archetypeId,
       archetypeVersion: "0.1.0",
-      packConfigId: "request-resolution:ecommerce-basic-demo",
+      packConfigId,
       packConfigVersion: "0.1.0",
       packConfigHash: "sha256:config",
       compilerVersion: "0.1.0",
@@ -399,10 +402,11 @@ describe("@yutra/builder Studio UI", () => {
     expect(screen.getByText("Compile Preview only / does not run Runtime")).toBeTruthy();
   });
 
-  it("request-resolution is enabled and other archetypes are disabled", () => {
+  it("request-resolution and approval-decision are enabled and other archetypes are disabled", () => {
     renderStudio();
     expect((screen.getByRole("button", { name: /request-resolution/ }) as HTMLButtonElement).disabled).toBe(false);
-    expect((screen.getByRole("button", { name: /approval-decision/ }) as HTMLButtonElement).disabled).toBe(true);
+    expect((screen.getByRole("button", { name: /approval-decision/ }) as HTMLButtonElement).disabled).toBe(false);
+    expect(screen.getByRole("button", { name: /request-resolution/ }).textContent).toContain("selected");
     expect(screen.getAllByText("coming soon").length).toBeGreaterThan(0);
   });
 
@@ -410,6 +414,17 @@ describe("@yutra/builder Studio UI", () => {
     renderStudio();
     expect(screen.getByLabelText("Request Resolution Config Editor")).toBeTruthy();
     expect(screen.getByLabelText("autoRefundMaxAmount")).toBeTruthy();
+    expect(screen.getByLabelText("Adapter Mode Summary").textContent).toContain("containsRealEndpoint=false");
+  });
+
+  it("approval-decision config editor renders Approval Policy and Risk Policy", () => {
+    renderStudio();
+    fireEvent.click(screen.getByRole("button", { name: /approval-decision/ }));
+    expect(screen.getByLabelText("Approval Decision Config Editor")).toBeTruthy();
+    expect(screen.getByText("Approval Policy")).toBeTruthy();
+    expect(screen.getByText("Risk Policy")).toBeTruthy();
+    expect(screen.getByLabelText("lowRiskMaxAmount")).toBeTruthy();
+    expect(screen.getByLabelText("PackConfig Preview").textContent).toContain('"archetypeId": "approval-decision"');
     expect(screen.getByLabelText("Adapter Mode Summary").textContent).toContain("containsRealEndpoint=false");
   });
 
@@ -441,6 +456,30 @@ describe("@yutra/builder Studio UI", () => {
     expect(amountRow?.textContent).toContain("Confirmed by user");
   });
 
+  it("editing lowRiskMaxAmount updates approval-decision source confirmedByUser", () => {
+    renderStudio();
+    fireEvent.click(screen.getByRole("button", { name: /approval-decision/ }));
+    fireEvent.change(screen.getByLabelText("lowRiskMaxAmount"), { target: { value: "450" } });
+    expect(screen.getByLabelText("PackConfig Preview").textContent).toContain('"value": 450');
+    expect(screen.getByLabelText("PackConfig Preview").textContent).toContain('"source": "confirmedByUser"');
+    const amountRow = screen.getByLabelText("lowRiskMaxAmount").closest(".creator-field-row");
+    expect(amountRow?.textContent).toContain("Confirmed by user");
+  });
+
+  it("clicking lowRiskMaxAmount impact shows approval-decision review guards", () => {
+    renderStudio();
+    fireEvent.click(screen.getByRole("button", { name: /approval-decision/ }));
+    const amountInput = screen.getByLabelText("lowRiskMaxAmount");
+    const amountRow = amountInput.closest(".creator-field-row");
+    const impactButton = amountRow?.querySelector("button");
+    expect(impactButton).toBeTruthy();
+    fireEvent.click(impactButton!);
+    const panelText = screen.getByLabelText("Rule Impact Panel").textContent ?? "";
+    expect(panelText).toContain("high_value_review_required");
+    expect(panelText).toContain("evaluate_policy -> auto_approved / human_review");
+    expect(panelText).toContain("trace.expectation.json");
+  });
+
   it("Compile Preview calls runner and renders artifact tabs", async () => {
     mockCompilePreviewSuccess();
     renderStudio();
@@ -450,6 +489,52 @@ describe("@yutra/builder Studio UI", () => {
     expect(screen.getByRole("button", { name: "agent.yutra.yaml (not executed)" })).toBeTruthy();
     expect(screen.getByRole("button", { name: /adapter.config.json/ })).toBeTruthy();
     expect(screen.getByLabelText("Compiled Artifact Content").textContent).toContain("request-resolution-ecommerce-basic");
+  });
+
+  it("approval-decision Compile Preview calls runner and renders artifacts", async () => {
+    mockCompilePreviewSuccess({
+      agentName: "approval-decision-basic",
+      archetypeId: "approval-decision",
+      packConfigId: "approval-decision:basic-demo"
+    });
+    renderStudio();
+    fireEvent.click(screen.getByRole("button", { name: /approval-decision/ }));
+    fireEvent.click(screen.getByRole("button", { name: "Compile Preview" }));
+    await waitFor(() => expect(compileCreatorPreview).toHaveBeenCalledWith(expect.objectContaining({
+      config: expect.objectContaining({ archetypeId: "approval-decision" })
+    })));
+    await waitFor(() => expect(screen.getByLabelText("Artifact Preview")).toBeTruthy());
+    expect(screen.getByLabelText("Compiled Artifact Content").textContent).toContain("approval-decision-basic");
+    expect(screen.getByLabelText("Certification Readiness Panel")).toBeTruthy();
+  });
+
+  it("approval-decision agent artifact can be sent to DSL Editor without auto inspect apply or run", async () => {
+    mockCompilePreviewSuccess({
+      agentName: "approval-decision-basic",
+      archetypeId: "approval-decision",
+      packConfigId: "approval-decision:basic-demo"
+    });
+    renderStudio();
+    fireEvent.click(screen.getByRole("button", { name: /approval-decision/ }));
+    fireEvent.click(screen.getByRole("button", { name: "Compile Preview" }));
+    await waitFor(() => expect(screen.getByRole("button", { name: "Send agent.yutra.yaml to DSL Editor" })).toBeTruthy());
+
+    fireEvent.click(screen.getByRole("button", { name: "Send agent.yutra.yaml to DSL Editor" }));
+
+    expect((screen.getByLabelText("DSL Editor Text") as HTMLTextAreaElement).value).toBe("agent: approval-decision-basic\n");
+    expect(screen.getByLabelText("Compiled DSL Metadata").textContent).toContain("Not inspected yet");
+    expect(screen.getByText("Builder Source active")).toBeTruthy();
+    expect(runPreview).not.toHaveBeenCalled();
+  });
+
+  it("switching back to request-resolution resets the request-resolution form", () => {
+    renderStudio();
+    fireEvent.click(screen.getByRole("button", { name: /approval-decision/ }));
+    expect(screen.getByLabelText("Approval Decision Config Editor")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: /request-resolution/ }));
+    expect(screen.getByLabelText("Request Resolution Config Editor")).toBeTruthy();
+    expect(screen.getByLabelText("autoRefundMaxAmount")).toBeTruthy();
+    expect(screen.queryByLabelText("lowRiskMaxAmount")).toBeNull();
   });
 
   it("Compile report renders failClosedPolicy and configHash", async () => {

@@ -18,7 +18,7 @@ P6-06B uses this metadata as one input to Certification Readiness Preview counts
 
 ## Current Scope
 
-The current public implementation covers request-resolution and approval-decision demo/basic fields:
+The current public implementation covers request-resolution and approval-decision demo/basic fields, and both are visible in Creator Workbench demo UI:
 
 - capabilities
 - refund policy basics
