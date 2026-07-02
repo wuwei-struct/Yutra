@@ -6,7 +6,7 @@ It compiles a validated Pack Config into a fixed set of demo/mock artifacts.
 
 Current scope is intentionally narrow:
 
-- archetypes: `request-resolution` and `approval-decision`
+- archetypes: `request-resolution`, `approval-decision`, and `knowledge-answering`
 - input: public demo Pack Config from `@yutra/pack-config-core`
 - output: six deterministic artifacts
 - mode: `preview` and `publish` gates
@@ -148,6 +148,30 @@ It generates the same six artifacts as request-resolution:
 It intentionally avoids real enterprise approval procedures, real approval hierarchy, production adapter mappings, organization data, customer SOP, and delivery templates.
 
 Creator Workbench UI is demo-enabled for `approval-decision`. The current support remains demo/mock only: Pack Config + Rule Compiler + CLI + Compile Preview UI, with no Runtime execution or real approval system integration.
+
+## Knowledge-answering Basic Compiler
+
+The third compiler supports the public `knowledge-answering` basic config.
+
+It maps public field groups:
+
+- capabilities
+- knowledge policy basics
+- source citation policy basics
+- response style basics
+
+It generates the same six artifacts:
+
+- `agent.yutra.yaml`
+- `policy.yaml`
+- `adapter.config.json`
+- `templates.json`
+- `test-cases.json`
+- `trace.expectation.json`
+
+It intentionally avoids real answer generation, real knowledge base content, real retrieval provider configuration, real source endpoints, customer knowledge assets, customer SOP, and delivery templates.
+
+Creator Workbench UI is not enabled for `knowledge-answering` yet. Current support is Pack Config + Rule Impact metadata + Rule Compiler + CLI only.
 
 ## Rule Impact Explanation Relationship
 

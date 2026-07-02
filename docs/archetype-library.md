@@ -45,6 +45,7 @@ The main archetypes below are product-facing archetypes. They are differentiated
 - Use cases: FAQ assistant, policy explanation, internal knowledge lookup, customer self-service.
 - Common rules: allowed sources, confidence threshold, no-answer behavior, citation requirement, stale content policy.
 - Composable cross-cutting archetypes: `human-handoff`, `policy-guard`, `feedback-optimization`.
+- Current support: `@yutra/pack-config-core` and `@yutra/rule-compiler` include a public demo/mock knowledge-answering core chain. CLI compile/export is supported. Creator Workbench UI is not enabled for this archetype yet.
 
 ### 3. `request-resolution` / 请求处理型
 
@@ -177,3 +178,17 @@ It currently proves the shared vNext pattern at the standard layer:
 - six demo/mock artifacts
 
 It does not include Runtime execution, real approval systems, real organization data, customer SOP, approval hierarchy, pricing, UAT, rollout, or delivery playbooks.
+
+## Third Archetype Core Chain
+
+`knowledge-answering` is the third public core chain after `request-resolution` and `approval-decision`.
+
+It currently proves the shared vNext pattern for governed knowledge answering:
+
+- Pack Config contract
+- Rule Impact metadata
+- deterministic Rule Compiler
+- CLI compile/export path
+- six demo/mock artifacts
+
+It does not include Creator Workbench UI integration yet, Runtime execution, real LLM calls, real knowledge base content, retrieval provider configuration, real source endpoints, customer SOP, or delivery templates.

@@ -25,6 +25,8 @@ This package only defines and validates Pack Config. It does not compile DSL and
 - request-resolution public rule impact metadata
 - approval-decision public base field definitions
 - approval-decision public rule impact metadata
+- knowledge-answering public base field definitions
+- knowledge-answering public rule impact metadata
 - demo-only sample config
 - publish gate validation
 - deterministic config fingerprint
@@ -104,9 +106,22 @@ Fields cover:
 
 These fields are public demo/basic contract fields. They are not a real enterprise approval policy, not a real approval hierarchy, not organization data, and not customer SOP.
 
+## Knowledge-answering Base Config
+
+The package now includes public base field definitions for `knowledge-answering`.
+
+Fields cover:
+
+- capabilities: question intake, mock knowledge retrieval, confidence evaluation, source citation, answer generation, clarification, handoff
+- knowledge policy basics
+- source citation policy basics
+- response style basics
+
+These fields are public demo/basic contract fields. They are not a real knowledge base, not real FAQ content, not real document content, not real retrieval provider configuration, and not customer SOP.
+
 ## Rule Impact Metadata
 
-`REQUEST_RESOLUTION_RULE_IMPACTS` and `APPROVAL_DECISION_RULE_IMPACTS` explain how public demo/basic fields affect generated governed behavior.
+`REQUEST_RESOLUTION_RULE_IMPACTS`, `APPROVAL_DECISION_RULE_IMPACTS`, and `KNOWLEDGE_ANSWERING_RULE_IMPACTS` explain how public demo/basic fields affect generated governed behavior.
 
 Examples:
 
@@ -115,12 +130,14 @@ Examples:
 - `rules.responseStyle.tone` affects only generic demo template output.
 - `rules.approvalPolicy.lowRiskMaxAmount` affects approval threshold guards, review transitions, high-value approval test cases, and trace expectations.
 - `rules.approvalPolicy.highRiskStrategy` affects high-risk guards, human review transitions, policy summary, and handoff trace expectations.
+- `rules.knowledgePolicy.minConfidence` affects confidence guards, clarification or handoff transitions, low-confidence tests, and trace expectations.
+- `rules.sourcePolicy.requireSourceCitation` affects citation policy, generic answer templates, source-reference tests, and trace expectations.
 
 This metadata is explanatory. It does not compile DSL, change Runtime behavior, or define customer SOP.
 
 ## Sample Config
 
-`REQUEST_RESOLUTION_ECOMMERCE_BASIC_CONFIG` and `APPROVAL_DECISION_BASIC_CONFIG` are mock/demo samples.
+`REQUEST_RESOLUTION_ECOMMERCE_BASIC_CONFIG`, `APPROVAL_DECISION_BASIC_CONFIG`, and `KNOWLEDGE_ANSWERING_BASIC_CONFIG` are mock/demo samples.
 
 It uses:
 

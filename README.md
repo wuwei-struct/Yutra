@@ -50,6 +50,7 @@ Implemented today:
 - Compiled DSL manual bridge
 - Manual Run Preview Evidence in the readiness panel
 - approval-decision second archetype support (Pack Config + Rule Compiler + CLI + Creator Workbench demo-enabled UI)
+- knowledge-answering third archetype core support (Pack Config + Rule Impact + Rule Compiler + CLI; Studio UI not enabled yet)
 
 ## Why Yutra
 
@@ -126,6 +127,7 @@ pnpm exec yutra run examples/it-helpdesk/agent.yutra.yaml --input examples/it-he
 pnpm exec yutra compile examples/request-resolution-ecommerce-basic/pack.config.json --out .tmp/compiled-request-resolution --dry-run
 pnpm exec yutra compile examples/request-resolution-ecommerce-basic/pack.config.json --out .tmp/compiled-request-resolution --force
 pnpm exec yutra compile examples/approval-decision-basic/pack.config.json --out .tmp/compiled-approval-decision --dry-run
+pnpm exec yutra compile examples/knowledge-answering-basic/pack.config.json --out .tmp/compiled-knowledge-answering --dry-run
 pnpm builder:runner
 pnpm builder:dev
 ```
@@ -139,7 +141,7 @@ It includes:
 - AI Draft Assistant
 - Creator Workbench Compile Preview for public `request-resolution` and `approval-decision` demo Pack Configs
 - Creator Workflow: Select archetype -> Configure business rules -> Review rule impact -> Compile preview -> Send to DSL editor -> Inspect DSL manually -> Apply DSL manually -> Run Preview manually -> Review Trace / Audit
-- Rule Impact Explanation for public `request-resolution` and `approval-decision` demo fields
+- Rule Impact Explanation for public `request-resolution`, `approval-decision`, and `knowledge-answering` demo fields
 - Certification Readiness Preview for demo/mock compile output; it does not run Runtime or claim production readiness
 - Manual Run Preview Evidence after a user-triggered Run Preview; it does not make official certification ready
 - manual bridge from compiled `agent.yutra.yaml` to the DSL Editor
@@ -197,6 +199,7 @@ Start here:
 - [Certification Readiness Preview](docs/certification-readiness-preview.md)
 - [vNext Preview Release Notes](docs/release-notes-vnext-preview.md)
 - [Approval Decision Basic Demo](docs/approval-decision-basic.md)
+- [Knowledge Answering Basic Demo](docs/knowledge-answering-basic.md)
 - [Creator Workbench](docs/creator-workbench.md)
 - [Creator Workbench UI](docs/creator-workbench-ui.md)
 - [vNext Roadmap](docs/vnext-roadmap.md)
@@ -208,10 +211,12 @@ pnpm exec yutra compile examples/request-resolution-ecommerce-basic/pack.config.
 pnpm exec yutra compile examples/request-resolution-ecommerce-basic/pack.config.json --out .tmp/compiled-request-resolution --dry-run
 pnpm exec yutra compile examples/request-resolution-ecommerce-basic/pack.config.json --out .tmp/compiled-request-resolution --force
 pnpm exec yutra compile examples/approval-decision-basic/pack.config.json --out .tmp/compiled-approval-decision --dry-run
+pnpm exec yutra compile examples/knowledge-answering-basic/pack.config.json --out .tmp/compiled-knowledge-answering --dry-run
 ```
 
 This exports compiler artifacts only. It does not run Runtime or publish an Agent.
 `approval-decision` is now demo-enabled in Creator Workbench. It remains mock/demo only, does not connect a real approval system, and still requires manual Send to DSL Editor / Inspect / Apply / Run.
+`knowledge-answering` is supported by Pack Config, Rule Impact metadata, Rule Compiler, and CLI. Creator Workbench UI is not enabled for it yet, and it does not call a real LLM or connect a real knowledge provider.
 The Creator Workbench UI is organized into Header, Archetype & Business Rules, Rule Explanation, Compile Preview, and Readiness & Evidence sections. It remains demo/mock only, does not run Runtime automatically, and does not represent production readiness.
 
 ## Skill-based Demo
@@ -261,6 +266,7 @@ It is the implementation unit behind a Yutra Action.
 - `examples/it-helpdesk` - basic stateful support flow.
 - `examples/ecommerce-support` - Skill-based e-commerce support pack.
 - `examples/approval-decision-basic` - demo/mock Pack Config for the approval-decision compiler chain.
+- `examples/knowledge-answering-basic` - demo/mock Pack Config for the knowledge-answering compiler chain.
 - `examples/approval-agent` - approval and human-in-the-loop flow.
 - `starters/minimal-agent-pack` - minimal starter pack.
 - `starters/support-pack` - support-oriented starter pack.
@@ -339,6 +345,7 @@ Yutra is currently not:
 - [Certification Readiness Preview](docs/certification-readiness-preview.md)
 - [vNext Preview Release Notes](docs/release-notes-vnext-preview.md)
 - [Approval Decision Basic Demo](docs/approval-decision-basic.md)
+- [Knowledge Answering Basic Demo](docs/knowledge-answering-basic.md)
 - [Creator Workbench](docs/creator-workbench.md)
 - [Creator Workbench UI](docs/creator-workbench-ui.md)
 - [vNext Roadmap](docs/vnext-roadmap.md)

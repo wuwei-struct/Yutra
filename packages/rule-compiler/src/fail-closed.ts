@@ -1,6 +1,7 @@
 import {
   canPublishPackConfig,
   validateApprovalDecisionConfig,
+  validateKnowledgeAnsweringConfig,
   validatePackConfig,
   validateRequestResolutionConfig,
   type PackConfig,
@@ -38,6 +39,9 @@ function validateArchetypeSpecificConfig(config: PackConfig): PackConfigIssue[] 
   if (config.archetypeId === "approval-decision") {
     return validateApprovalDecisionConfig(config).issues;
   }
+  if (config.archetypeId === "knowledge-answering") {
+    return validateKnowledgeAnsweringConfig(config).issues;
+  }
   return [];
 }
 
@@ -49,11 +53,15 @@ export function validateCompileInput(input: RuleCompilerInput): RuleCompilerIssu
   issues.push(...base.issues.map(mapPackIssue));
   issues.push(...archetypeSpecific.filter((issue) => !base.issues.includes(issue)).map(mapPackIssue));
 
-  if (input.config.archetypeId !== "request-resolution" && input.config.archetypeId !== "approval-decision") {
+  if (
+    input.config.archetypeId !== "request-resolution" &&
+    input.config.archetypeId !== "approval-decision" &&
+    input.config.archetypeId !== "knowledge-answering"
+  ) {
     issues.push({
       code: "RULE_COMPILER_UNSUPPORTED_ARCHETYPE",
       severity: "error",
-      message: `Unsupported archetype ${input.config.archetypeId}. This compiler supports request-resolution and approval-decision.`,
+      message: `Unsupported archetype ${input.config.archetypeId}. This compiler supports request-resolution, approval-decision, and knowledge-answering.`,
       path: ["archetypeId"]
     });
   }

@@ -5,6 +5,7 @@ import { resolveCompileOptions } from "./compile-options";
 import { hasCompilerErrors, type RuleCompilerIssue } from "./errors";
 import { validateCompileInput } from "./fail-closed";
 import { approvalDecisionCompiler } from "./approval-decision-compiler";
+import { knowledgeAnsweringCompiler } from "./knowledge-answering-compiler";
 import { requestResolutionCompiler } from "./request-resolution-compiler";
 import { sha256, stableJson } from "./serialize-artifacts";
 import type { RuleCompilerInput, RuleCompilerOutput } from "./types";
@@ -91,7 +92,11 @@ export function compilePackConfig(input: RuleCompilerInput): RuleCompilerOutput 
     };
   }
 
-  if (input.config.archetypeId !== "request-resolution" && input.config.archetypeId !== "approval-decision") {
+  if (
+    input.config.archetypeId !== "request-resolution" &&
+    input.config.archetypeId !== "approval-decision" &&
+    input.config.archetypeId !== "knowledge-answering"
+  ) {
     const issues: RuleCompilerIssue[] = [
       {
         code: "RULE_COMPILER_UNSUPPORTED_ARCHETYPE",
@@ -113,6 +118,8 @@ export function compilePackConfig(input: RuleCompilerInput): RuleCompilerOutput 
   const artifacts =
     input.config.archetypeId === "approval-decision"
       ? approvalDecisionCompiler(input.config, options.locale)
+      : input.config.archetypeId === "knowledge-answering"
+        ? knowledgeAnsweringCompiler(input.config)
       : requestResolutionCompiler(input.config, options.locale);
   const outputShell: RuleCompilerOutput = {
     ok: true,

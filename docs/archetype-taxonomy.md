@@ -133,3 +133,4 @@ Rule: if the main archetype cannot be selected within 10 minutes, the scenario i
 - Behavior Primitives are for engineering implementation, Product Archetypes are for creation experience, and Scenario Patterns are for business composition.
 - Cross-cutting archetypes support governance, collaboration, integration, and feedback. They do not usually represent a complete business output by themselves.
 - Keep customer SOP, real adapter mapping, pricing, UAT, rollout, and delivery playbooks outside the public archetype taxonomy.
+- Keep real knowledge bases, real FAQ content, real retrieval provider settings, and source endpoints outside the public archetype taxonomy.

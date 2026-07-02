@@ -24,13 +24,15 @@ See [Archetype Taxonomy](archetype-taxonomy.md).
 
 ## Current Scope
 
-The current public implementation covers request-resolution and approval-decision demo/basic fields, and both are visible in Creator Workbench demo UI:
+The current public implementation covers request-resolution, approval-decision, and knowledge-answering demo/basic fields. request-resolution and approval-decision are visible in Creator Workbench demo UI; knowledge-answering is core/CLI only for now:
 
 - capabilities
 - refund policy basics
 - handoff policy basics
 - approval policy basics
 - risk policy basics
+- knowledge policy basics
+- source citation policy basics
 - response style basics
 
 This is public demo metadata. It is not a customer SOP, not a complete industry rule matrix, and not a production adapter mapping.
@@ -68,6 +70,17 @@ rules.approvalPolicy.lowRiskMaxAmount
 -> policy: approval threshold
 -> test_case: high-value approval requires review
 -> trace_expectation: guard.evaluated + handoff.requested
+```
+
+Example:
+
+```text
+rules.knowledgePolicy.minConfidence
+-> guard: confidence_threshold
+-> transition: evaluate_confidence -> answer / ask_clarification / handoff
+-> policy: minimum confidence threshold
+-> test_case: low-confidence question path
+-> trace_expectation: guard.evaluated + clarification.requested
 ```
 
 ## Relationship to Rule Compiler

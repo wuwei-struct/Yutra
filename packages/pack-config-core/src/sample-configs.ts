@@ -207,3 +207,218 @@ export const APPROVAL_DECISION_BASIC_CONFIG: PackConfig = {
     containsOrganizationData: false
   }
 };
+
+export const KNOWLEDGE_ANSWERING_BASIC_CONFIG: PackConfig = {
+  packConfigId: "knowledge-answering:basic-demo",
+  packConfigVersion: "0.1.0",
+  archetypeId: "knowledge-answering",
+  archetypeVersion: "0.1.0",
+  variantId: "basic-demo",
+  variantVersion: "0.1.0",
+  locale: "en",
+  capabilities: {
+    questionIntake: { value: true, source: "confirmedByUser", required: true },
+    knowledgeRetrieval: { value: true, source: "confirmedByUser", required: true },
+    confidenceEvaluation: { value: true, source: "confirmedByUser", required: true },
+    sourceCitation: { value: true, source: "confirmedByUser" },
+    answerGeneration: { value: true, source: "confirmedByUser", required: true },
+    clarification: { value: true, source: "confirmedByUser" },
+    handoff: { value: true, source: "confirmedByUser", required: true }
+  },
+  businessObjects: [
+    {
+      objectId: "question",
+      label: { en: "Question", zhCN: "问题" },
+      fields: ["question_id", "question_text", "topic"]
+    },
+    {
+      objectId: "demo_knowledge_snippet",
+      label: { en: "Demo knowledge snippet", zhCN: "演示知识片段" },
+      fields: ["demo_snippet_id", "demo_title", "freshness_label"]
+    }
+  ],
+  rules: {
+    "knowledgePolicy.minConfidence": {
+      value: 0.72,
+      source: "defaultFromPack",
+      required: true,
+      label: { en: "Minimum confidence", zhCN: "最低置信度" }
+    },
+    "knowledgePolicy.lowConfidenceStrategy": {
+      value: "ask_clarification",
+      source: "defaultFromPack",
+      required: true,
+      label: { en: "Low confidence strategy", zhCN: "低置信度策略" }
+    },
+    "knowledgePolicy.noAnswerStrategy": {
+      value: "no_answer_with_reason",
+      source: "defaultFromPack",
+      required: true,
+      label: { en: "No answer strategy", zhCN: "无答案策略" }
+    },
+    "knowledgePolicy.staleKnowledgeStrategy": {
+      value: "warn_user",
+      source: "defaultFromPack",
+      required: true,
+      label: { en: "Stale knowledge strategy", zhCN: "过期知识策略" }
+    },
+    "knowledgePolicy.sensitiveQuestionStrategy": {
+      value: "handoff",
+      source: "defaultFromPack",
+      required: true,
+      label: { en: "Sensitive question strategy", zhCN: "敏感问题策略" }
+    },
+    "sourcePolicy.requireSourceCitation": {
+      value: true,
+      source: "defaultFromPack",
+      required: true,
+      label: { en: "Require source citation", zhCN: "要求来源引用" }
+    },
+    "sourcePolicy.minSourceCount": {
+      value: 1,
+      source: "defaultFromPack",
+      required: true,
+      label: { en: "Minimum source count", zhCN: "最低来源数量" }
+    },
+    "sourcePolicy.allowUnverifiedAnswer": {
+      value: false,
+      source: "defaultFromPack",
+      required: true,
+      label: { en: "Allow unverified answer", zhCN: "允许未验证回答" }
+    },
+    "sourcePolicy.showSourceSummary": {
+      value: true,
+      source: "defaultFromPack",
+      required: false,
+      label: { en: "Show source summary", zhCN: "显示来源摘要" }
+    },
+    "responseStyle.tone": {
+      value: "neutral",
+      source: "defaultFromPack",
+      required: true,
+      label: { en: "Response tone", zhCN: "回答语气" }
+    },
+    "responseStyle.includeSources": {
+      value: true,
+      source: "defaultFromPack",
+      required: false,
+      label: { en: "Include sources", zhCN: "包含来源" }
+    },
+    "responseStyle.includeUncertainty": {
+      value: true,
+      source: "defaultFromPack",
+      required: false,
+      label: { en: "Include uncertainty", zhCN: "包含不确定性说明" }
+    },
+    "responseStyle.includeNextSteps": {
+      value: true,
+      source: "defaultFromPack",
+      required: false,
+      label: { en: "Include next steps", zhCN: "包含下一步" }
+    }
+  },
+  policies: {
+    "knowledgeAnswering.failClosed": {
+      value: true,
+      source: "defaultFromPack",
+      label: { en: "Knowledge-answering fail-closed", zhCN: "知识回答 fail-closed" }
+    },
+    "sourceCitation.required": {
+      value: true,
+      source: "defaultFromPack",
+      label: { en: "Source citation required", zhCN: "要求来源引用" }
+    }
+  },
+  adapters: [
+    {
+      adapterId: "demo-knowledge-provider",
+      mode: "mock",
+      contractRef: "contracts/demo-knowledge-provider-contract.md",
+      fieldMappings: {
+        questionText: "question_text",
+        demoSnippetId: "demo_snippet_id",
+        demoTitle: "demo_title"
+      },
+      containsRealEndpoint: false,
+      containsSecret: false
+    },
+    {
+      adapterId: "demo-citation-store",
+      mode: "mock",
+      contractRef: "contracts/demo-citation-store-contract.md",
+      fieldMappings: {
+        requiredSourceCount: "min_source_count",
+        sourceSummary: "demo_source_summary"
+      },
+      containsRealEndpoint: false,
+      containsSecret: false
+    }
+  ],
+  templates: [
+    {
+      templateId: "answer_with_sources",
+      purpose: "Render a generic demo answer with source placeholders.",
+      text: {
+        value: "Demo answer template with source placeholders.",
+        source: "defaultFromPack"
+      }
+    },
+    {
+      templateId: "low_confidence_clarification",
+      purpose: "Ask a generic clarification when answer confidence is too low.",
+      text: {
+        value: "Demo clarification template for low confidence.",
+        source: "defaultFromPack"
+      }
+    },
+    {
+      templateId: "no_answer_with_reason",
+      purpose: "Explain that the demo flow cannot answer safely.",
+      text: {
+        value: "Demo no-answer template for governed fallback.",
+        source: "defaultFromPack"
+      }
+    }
+  ],
+  tests: [
+    {
+      testCaseId: "known_question_answer_with_sources",
+      title: "Known question answer with sources",
+      input: {
+        question_id: "DEMO-Q-KNOWN",
+        question_text: "demo governed answer question",
+        confidence_score: 0.86,
+        demo_source_count: 1
+      },
+      expectedOutcome: "answer_with_sources"
+    },
+    {
+      testCaseId: "low_confidence_asks_clarification",
+      title: "Low confidence asks clarification",
+      input: {
+        question_id: "DEMO-Q-LOW",
+        question_text: "demo ambiguous question",
+        confidence_score: 0.41,
+        demo_source_count: 1
+      },
+      expectedOutcome: "ask_clarification"
+    }
+  ],
+  governance: {
+    environment: "demo",
+    publishable: false,
+    requiresHumanReview: true,
+    unconfirmedFieldPolicy: "block_publish",
+    missingFieldPolicy: "block_compile",
+    sideEffectPolicy: {
+      maxAutoSideEffect: "read",
+      requiresPolicyGuardFrom: "write"
+    }
+  },
+  metadata: {
+    publicDemo: true,
+    containsCustomerData: false,
+    containsRealKnowledgeAssets: false,
+    containsRealProviderConfig: false
+  }
+};

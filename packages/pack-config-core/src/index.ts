@@ -27,6 +27,10 @@ export {
   APPROVAL_DECISION_FIELD_IDS
 } from "./approval-decision-config";
 export {
+  KNOWLEDGE_ANSWERING_FIELD_DEFINITIONS,
+  KNOWLEDGE_ANSWERING_FIELD_IDS
+} from "./knowledge-answering-config";
+export {
   REQUEST_RESOLUTION_FIELD_DEFINITIONS,
   REQUEST_RESOLUTION_FIELD_IDS
 } from "./request-resolution-config";
@@ -38,16 +42,22 @@ export type {
 } from "./rule-impact";
 export {
   APPROVAL_DECISION_RULE_IMPACTS,
+  KNOWLEDGE_ANSWERING_RULE_IMPACTS,
   REQUEST_RESOLUTION_RULE_IMPACTS,
   explainRuleImpact,
   getRuleImpact,
   listRuleImpacts
 } from "./rule-impact";
-export { APPROVAL_DECISION_BASIC_CONFIG, REQUEST_RESOLUTION_ECOMMERCE_BASIC_CONFIG } from "./sample-configs";
+export {
+  APPROVAL_DECISION_BASIC_CONFIG,
+  KNOWLEDGE_ANSWERING_BASIC_CONFIG,
+  REQUEST_RESOLUTION_ECOMMERCE_BASIC_CONFIG
+} from "./sample-configs";
 export { createPackConfigFingerprint, stripFieldVolatileMetadata } from "./config-fingerprint";
 export {
   canPublishPackConfig,
   validateApprovalDecisionConfig,
+  validateKnowledgeAnsweringConfig,
   validatePackConfig,
   validateRequestResolutionConfig
 } from "./validate-pack-config";

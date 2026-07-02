@@ -3,6 +3,9 @@ import {
   APPROVAL_DECISION_BASIC_CONFIG,
   APPROVAL_DECISION_FIELD_DEFINITIONS,
   APPROVAL_DECISION_RULE_IMPACTS,
+  KNOWLEDGE_ANSWERING_BASIC_CONFIG,
+  KNOWLEDGE_ANSWERING_FIELD_DEFINITIONS,
+  KNOWLEDGE_ANSWERING_RULE_IMPACTS,
   REQUEST_RESOLUTION_ECOMMERCE_BASIC_CONFIG,
   REQUEST_RESOLUTION_FIELD_DEFINITIONS,
   REQUEST_RESOLUTION_RULE_IMPACTS,
@@ -13,6 +16,7 @@ import {
   explainRuleImpact,
   getRuleImpact,
   validateApprovalDecisionConfig,
+  validateKnowledgeAnsweringConfig,
   validatePackConfig,
   validateRequestResolutionConfig
 } from "../src";
@@ -236,5 +240,56 @@ describe("@yutra/pack-config-core", () => {
     expect(serialized).not.toContain("customer_name");
     expect(APPROVAL_DECISION_BASIC_CONFIG.adapters.every((adapter) => adapter.mode === "mock")).toBe(true);
     expect(APPROVAL_DECISION_BASIC_CONFIG.adapters.every((adapter) => adapter.containsRealEndpoint === false && adapter.containsSecret === false)).toBe(true);
+  });
+
+  it("knowledge-answering basic config validates", () => {
+    expect(validatePackConfig(KNOWLEDGE_ANSWERING_BASIC_CONFIG).ok).toBe(true);
+    expect(validateKnowledgeAnsweringConfig(KNOWLEDGE_ANSWERING_BASIC_CONFIG).ok).toBe(true);
+  });
+
+  it("knowledge-answering fields include confidence, source, and response basics", () => {
+    const ids = KNOWLEDGE_ANSWERING_FIELD_DEFINITIONS.map((field) => field.fieldId);
+    expect(ids).toContain("rules.knowledgePolicy.minConfidence");
+    expect(ids).toContain("rules.knowledgePolicy.lowConfidenceStrategy");
+    expect(ids).toContain("rules.sourcePolicy.requireSourceCitation");
+    expect(ids).toContain("rules.sourcePolicy.allowUnverifiedAnswer");
+    expect(ids).toContain("rules.responseStyle.tone");
+  });
+
+  it("knowledge-answering fingerprint is deterministic", () => {
+    const first = createPackConfigFingerprint(KNOWLEDGE_ANSWERING_BASIC_CONFIG);
+    const second = createPackConfigFingerprint(KNOWLEDGE_ANSWERING_BASIC_CONFIG);
+    expect(first).toBe(second);
+    expect(first).toMatch(/^sha256:/);
+  });
+
+  it("knowledge-answering rule impacts explain confidence and source boundaries", () => {
+    expect(KNOWLEDGE_ANSWERING_RULE_IMPACTS.length).toBeGreaterThan(0);
+
+    const minConfidence = getRuleImpact("rules.knowledgePolicy.minConfidence");
+    expect(minConfidence?.affects.some((target) => target.kind === "guard" && target.id === "confidence_threshold")).toBe(true);
+    expect(minConfidence?.artifacts).toContain("trace.expectation.json");
+
+    const lowConfidence = getRuleImpact("rules.knowledgePolicy.lowConfidenceStrategy");
+    expect(lowConfidence?.affects.some((target) => target.id.includes("ask_clarification"))).toBe(true);
+
+    const requireCitation = getRuleImpact("rules.sourcePolicy.requireSourceCitation");
+    expect(requireCitation?.affects.some((target) => target.kind === "policy" && target.id === "citation requirement")).toBe(true);
+
+    const zh = explainRuleImpact("rules.knowledgePolicy.minConfidence", "zh-CN");
+    expect(zh).toContain("置信度");
+  });
+
+  it("knowledge-answering sample contains no real endpoint, secret, customer data, or real source markers", () => {
+    const serialized = JSON.stringify(KNOWLEDGE_ANSWERING_BASIC_CONFIG).toLowerCase();
+    expect(serialized).not.toContain("https://");
+    expect(serialized).not.toContain("api_key");
+    expect(serialized).not.toContain("bearer ");
+    expect(serialized).not.toContain("customer_name");
+    expect(serialized).not.toContain("sourceurl");
+    expect(serialized).not.toContain("documentid");
+    expect(serialized).not.toContain("knowledgebase");
+    expect(KNOWLEDGE_ANSWERING_BASIC_CONFIG.adapters.every((adapter) => adapter.mode === "mock")).toBe(true);
+    expect(KNOWLEDGE_ANSWERING_BASIC_CONFIG.adapters.every((adapter) => adapter.containsRealEndpoint === false && adapter.containsSecret === false)).toBe(true);
   });
 });

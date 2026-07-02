@@ -45,7 +45,7 @@ Non-goal:
 
 Goal: define Pack Config as the customer-facing configuration model.
 
-Current status: `@yutra/pack-config-core` provides the Pack Config contract, field provenance, validation, publish gate, fingerprint, and demo-only `request-resolution` plus `approval-decision` samples.
+Current status: `@yutra/pack-config-core` provides the Pack Config contract, field provenance, validation, publish gate, fingerprint, and demo-only `request-resolution`, `approval-decision`, and `knowledge-answering` samples.
 
 Scope:
 
@@ -70,7 +70,7 @@ Field types:
 
 Goal: compile Pack Config into executable and certifiable assets.
 
-Current status: `@yutra/rule-compiler` provides public demo/mock compilers for `request-resolution` and `approval-decision`. `yutra compile` can export those artifacts locally. Creator Workbench demo UI supports both archetypes, but still does not connect Runtime or real systems.
+Current status: `@yutra/rule-compiler` provides public demo/mock compilers for `request-resolution`, `approval-decision`, and `knowledge-answering`. `yutra compile` can export those artifacts locally. Creator Workbench demo UI supports request-resolution and approval-decision; knowledge-answering is not enabled in Studio UI yet.
 
 Scope:
 
@@ -138,6 +138,7 @@ Goal: prove that Creator Workbench is not a single ecommerce hard-code.
 Current status:
 
 - `approval-decision` Pack Config, Rule Impact metadata, Rule Compiler, CLI demo, and Creator Workbench demo UI are supported.
+- `knowledge-answering` Pack Config, Rule Impact metadata, Rule Compiler, and CLI demo are supported. Creator Workbench UI is not enabled for it yet.
 - Studio UI remains demo/mock only and does not model real approval systems.
 
 Expected proof:

@@ -436,7 +436,143 @@ export const APPROVAL_DECISION_RULE_IMPACTS: RuleImpactDefinition[] = [
   })
 ];
 
-const ALL_RULE_IMPACTS = [...REQUEST_RESOLUTION_RULE_IMPACTS, ...APPROVAL_DECISION_RULE_IMPACTS];
+export const KNOWLEDGE_ANSWERING_RULE_IMPACTS: RuleImpactDefinition[] = [
+  impact({
+    fieldPath: "rules.knowledgePolicy.minConfidence",
+    label: { en: "Minimum confidence", zhCN: "最低置信度" },
+    summary: {
+      en: "Defines the confidence threshold for returning a governed demo answer.",
+      zhCN: "定义返回受治理 demo 回答的置信度阈值。"
+    },
+    affects: [
+      target("guard", "confidence_threshold", "Confidence threshold guard", "置信度阈值 Guard"),
+      target(
+        "transition",
+        "evaluate_confidence -> answer / ask_clarification / handoff",
+        "Confidence decision transition",
+        "置信度决策转移"
+      ),
+      target("policy", "minimum confidence threshold", "Minimum confidence threshold", "最低置信度阈值"),
+      target("test_case", "low-confidence question path", "Low-confidence question path", "低置信度问题路径"),
+      target("trace_expectation", "guard.evaluated", "Confidence guard trace", "置信度 Guard trace"),
+      target("trace_expectation", "clarification.requested", "Clarification trace", "澄清请求 trace")
+    ],
+    artifacts: ["agent.yutra.yaml", "policy.yaml", "test-cases.json", "trace.expectation.json"],
+    safetyNotes: failClosedNotes
+  }),
+  impact({
+    fieldPath: "rules.knowledgePolicy.lowConfidenceStrategy",
+    label: { en: "Low confidence strategy", zhCN: "低置信度策略" },
+    summary: {
+      en: "Controls the fail-closed path when answer confidence is below the demo threshold.",
+      zhCN: "控制回答置信度低于 demo 阈值时的 fail-closed 路径。"
+    },
+    affects: [
+      target(
+        "transition",
+        "evaluate_confidence -> ask_clarification / handoff / no_answer",
+        "Low confidence fallback",
+        "低置信度兜底"
+      ),
+      target("template", "low_confidence_clarification", "Low confidence response", "低置信度回复"),
+      target("test_case", "low confidence fallback", "Low confidence fallback test", "低置信度兜底测试"),
+      target("trace_expectation", "transition.resolved", "Transition trace", "转移 trace")
+    ],
+    artifacts: ["agent.yutra.yaml", "templates.json", "test-cases.json", "trace.expectation.json"],
+    safetyNotes: failClosedNotes
+  }),
+  impact({
+    fieldPath: "rules.knowledgePolicy.noAnswerStrategy",
+    label: { en: "No answer strategy", zhCN: "无答案策略" },
+    summary: {
+      en: "Controls the governed path when demo retrieval cannot support an answer.",
+      zhCN: "控制 demo 检索无法支撑回答时的受治理路径。"
+    },
+    affects: [
+      target(
+        "transition",
+        "retrieve_knowledge -> ask_clarification / handoff / no_answer",
+        "No answer fallback",
+        "无答案兜底"
+      ),
+      target("template", "no_answer_with_reason", "No answer response", "无答案回复"),
+      target("trace_expectation", "fail_closed.no_answer", "Fail-closed no answer marker", "无答案 fail-closed 标记")
+    ],
+    artifacts: ["agent.yutra.yaml", "templates.json", "trace.expectation.json"],
+    safetyNotes: failClosedNotes
+  }),
+  impact({
+    fieldPath: "rules.knowledgePolicy.sensitiveQuestionStrategy",
+    label: { en: "Sensitive question strategy", zhCN: "敏感问题策略" },
+    summary: {
+      en: "Controls the policy boundary for sensitive or unsafe questions.",
+      zhCN: "控制敏感或不安全问题的策略边界。"
+    },
+    affects: [
+      target("guard", "sensitive_question", "Sensitive question guard", "敏感问题 Guard"),
+      target(
+        "transition",
+        "evaluate_policy -> handoff / no_answer / safe_answer",
+        "Sensitive question policy path",
+        "敏感问题策略路径"
+      ),
+      target("policy", "sensitive content boundary", "Sensitive content boundary", "敏感内容边界"),
+      target("trace_expectation", "guard.evaluated", "Sensitive guard trace", "敏感 Guard trace")
+    ],
+    artifacts: ["agent.yutra.yaml", "policy.yaml", "trace.expectation.json"],
+    safetyNotes: failClosedNotes
+  }),
+  impact({
+    fieldPath: "rules.sourcePolicy.requireSourceCitation",
+    label: { en: "Require source citation", zhCN: "要求来源引用" },
+    summary: {
+      en: "Requires source citation metadata before a governed demo answer is rendered.",
+      zhCN: "要求在渲染受治理 demo 回答前具备来源引用元数据。"
+    },
+    affects: [
+      target("template", "source citation", "Source citation template", "来源引用模板"),
+      target("policy", "citation requirement", "Citation requirement", "引用要求"),
+      target("test_case", "answer includes source reference", "Source reference test", "来源引用测试"),
+      target("trace_expectation", "source.checked", "Source checked trace", "来源检查 trace"),
+      target("trace_expectation", "evidence.attached", "Evidence attached trace", "证据附加 trace")
+    ],
+    artifacts: ["policy.yaml", "templates.json", "test-cases.json", "trace.expectation.json"]
+  }),
+  impact({
+    fieldPath: "rules.sourcePolicy.allowUnverifiedAnswer",
+    label: { en: "Allow unverified answer", zhCN: "允许未验证回答" },
+    summary: {
+      en: "Controls whether answers without verified demo sources are blocked or marked uncertain.",
+      zhCN: "控制没有验证 demo 来源的回答是被阻断还是标记为不确定。"
+    },
+    affects: [
+      target("guard", "source_verification", "Source verification guard", "来源验证 Guard"),
+      target("policy", "unverified answer boundary", "Unverified answer boundary", "未验证回答边界"),
+      target("trace_expectation", "guard.evaluated", "Source verification trace", "来源验证 trace")
+    ],
+    artifacts: ["agent.yutra.yaml", "policy.yaml", "trace.expectation.json"],
+    safetyNotes: {
+      en: ["Unverified answers should be blocked or clearly marked uncertain in governed settings."],
+      zhCN: ["在受治理场景中，未验证回答应被阻断或明确标记为不确定。"]
+    }
+  }),
+  impact({
+    fieldPath: "rules.responseStyle.tone",
+    label: { en: "Response tone", zhCN: "回答语气" },
+    summary: {
+      en: "Changes only the generic demo knowledge-answering template tone.",
+      zhCN: "仅影响通用 demo 知识回答模板语气。"
+    },
+    affects: [target("template", "knowledge response tone", "Knowledge response tone", "知识回答语气")],
+    artifacts: ["templates.json"]
+  })
+];
+
+const ALL_RULE_IMPACTS = [
+  ...KNOWLEDGE_ANSWERING_RULE_IMPACTS,
+  ...REQUEST_RESOLUTION_RULE_IMPACTS,
+  ...APPROVAL_DECISION_RULE_IMPACTS
+];
 const impactByPath = new Map(ALL_RULE_IMPACTS.map((definition) => [definition.fieldPath, definition]));
 
 export function getRuleImpact(fieldPath: string): RuleImpactDefinition | undefined {
