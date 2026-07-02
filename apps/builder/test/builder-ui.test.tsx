@@ -400,6 +400,7 @@ describe("@yutra/builder Studio UI", () => {
     renderStudio();
     expect(screen.getByLabelText("Creator Workbench")).toBeTruthy();
     expect(screen.getByLabelText("Creator Workbench Header")).toBeTruthy();
+    expect(screen.getByLabelText("Current Archetype Taxonomy Summary").textContent).toContain("business action result");
     expect(screen.getByLabelText("Creator Boundary Notice").textContent).toContain("No automatic Runtime execution");
     expect(screen.getByLabelText("Compile Preview Panel")).toBeTruthy();
   });
@@ -417,8 +418,36 @@ describe("@yutra/builder Studio UI", () => {
     renderStudio();
     expect((screen.getByRole("button", { name: /request-resolution/ }) as HTMLButtonElement).disabled).toBe(false);
     expect((screen.getByRole("button", { name: /approval-decision/ }) as HTMLButtonElement).disabled).toBe(false);
-    expect(screen.getByRole("button", { name: /request-resolution/ }).textContent).toContain("selected");
-    expect(screen.getAllByText("coming soon").length).toBeGreaterThan(0);
+    expect(screen.getByLabelText("Archetype Selector").textContent).toContain("selected");
+    expect(screen.getAllByText("Coming soon").length).toBeGreaterThan(0);
+  });
+
+  it("Archetype selector renders taxonomy cards and primitive chips", () => {
+    renderStudio();
+    const selector = screen.getByLabelText("Archetype Selector");
+    expect(selector.textContent).toContain("Primary Output");
+    expect(selector.textContent).toContain("business action result");
+    expect(selector.textContent).toContain("authorization decision");
+    expect(selector.textContent).toContain("Behavior Primitives");
+    expect(selector.textContent).toContain("evaluate");
+    expect(selector.textContent).toContain("Cross-cutting capability");
+    expect(selector.textContent).toContain("Not a standalone creator flow yet");
+  });
+
+  it("Archetype Detail Panel shows trigger pattern for focused archetype", () => {
+    renderStudio();
+    expect(screen.getByLabelText("Archetype Detail Panel").textContent).toContain("user_request");
+    fireEvent.click(screen.getByRole("button", { name: /approval-decision/ }));
+    expect(screen.getByLabelText("Archetype Detail Panel").textContent).toContain("approval-decision");
+    expect(screen.getByLabelText("Archetype Detail Panel").textContent).toContain("human_initiated");
+  });
+
+  it("Archetype Fit Test Panel renders selection guidance", () => {
+    renderStudio();
+    const fitTest = screen.getByLabelText("Archetype Fit Test Panel");
+    expect(fitTest.textContent).toContain("What is the primary output?");
+    expect(fitTest.textContent).toContain("If the output is a business action result");
+    expect(fitTest.textContent).toContain("If the output is an authorization decision");
   });
 
   it("request-resolution config editor renders fields and mock adapter summary", () => {

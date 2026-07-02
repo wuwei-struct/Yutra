@@ -43,6 +43,8 @@ The main archetypes below are product-facing archetypes. They are differentiated
 
 Each builtin `ArchetypeManifest` now includes `taxonomy` metadata with `layer`, `primitiveRefs`, `primaryOutput`, `acceptanceObject`, `governanceFocus`, and `triggerPattern`. Creator Workbench can use these fields to guide archetype choice without treating primitives as customer-facing products.
 
+Creator Workbench uses this metadata in its taxonomy-aware archetype selector. The selector keeps the user-facing decision anchored on `primaryOutput` and `acceptanceObject`, while still showing Behavior Primitive refs as implementation metadata.
+
 | Archetype | Primary Output | Acceptance Object | Governance Focus |
 | --------- | -------------- | ----------------- | ---------------- |
 | `intake-collector` | Complete intake package | Required information is collected and validated | Required fields, retry limit, missing-field strategy |

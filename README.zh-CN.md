@@ -51,6 +51,7 @@ Yutra 关注这些问题：
 - Rule Compiler CLI。
 - Creator Workbench Compile Preview。
 - Creator Workbench UI 信息架构整理。
+- Creator Workbench taxonomy-aware 母型选择体验。
 - `@yutra/archetype-core` 中的 Archetype Taxonomy metadata。
 - Rule Impact Explanation。
 - Certification Readiness Preview。
@@ -174,6 +175,7 @@ LLM 可以生成配置草案，但不能绕过 Compiler、Runtime、Trace、Audi
 - [vNext Charter](docs/vnext-charter.md)
 - [Agent Archetype Library](docs/archetype-library.md)
 - [Archetype Taxonomy](docs/archetype-taxonomy.md)
+- [Creator Archetype Selection](docs/creator-archetype-selection.md)
 - [Archetype Core](docs/archetype-core.md)
 - [Business Rule Config](docs/business-rule-config.md)
 - [Pack Config Core](docs/pack-config-core.md)
@@ -288,6 +290,7 @@ Yutra 当前不是：
 - [vNext Charter](docs/vnext-charter.md)
 - [Agent Archetype Library](docs/archetype-library.md)
 - [Archetype Taxonomy](docs/archetype-taxonomy.md)
+- [Creator Archetype Selection](docs/creator-archetype-selection.md)
 - [Archetype Core](docs/archetype-core.md)
 - [Business Rule Configuration](docs/business-rule-config.md)
 - [Pack Config Core](docs/pack-config-core.md)

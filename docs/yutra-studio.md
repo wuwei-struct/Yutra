@@ -26,6 +26,7 @@ Builder Core
 - Certification Readiness Preview for demo/mock compile output.
 - Manual Run Preview Evidence for showing user-triggered run evidence in the readiness panel.
 - Manual bridge from compiled `agent.yutra.yaml` to the DSL Editor.
+- Taxonomy-aware archetype selection showing primary output, acceptance object, governance focus, trigger pattern, Behavior Primitives, and Scenario Pattern hints.
 - Creator Workflow guidance for Select archetype -> Configure business rules -> Review rule impact -> Compile preview -> Send to DSL editor -> Inspect DSL manually -> Apply DSL manually -> Run Preview manually -> Review Trace / Audit.
 - AgentSpec JSON preview.
 - Inspect panel for validation, normalized DSL structure, canonical IR, and structure overview.
@@ -150,6 +151,17 @@ P6-08A polishes the Creator Workbench information architecture into five visible
 
 See [Creator Workbench UI](creator-workbench-ui.md).
 
+P6-08E adds taxonomy-aware archetype selection:
+
+```text
+@yutra/archetype-core taxonomy metadata
+-> Product Archetype / Cross-cutting Archetype cards
+-> Primary Output / Acceptance Object / Governance Focus
+-> Archetype Fit Test guidance
+```
+
+Only `request-resolution` and `approval-decision` are compile-enabled in Studio. Other archetypes remain visible as taxonomy metadata with coming-soon status.
+
 Relevant vNext docs:
 
 - [vNext Charter](vnext-charter.md)
@@ -158,6 +170,7 @@ Relevant vNext docs:
 - [Rule Compiler Overview](rule-compiler-overview.md)
 - [Creator Workbench](creator-workbench.md)
 - [Creator Workbench UI](creator-workbench-ui.md)
+- [Creator Archetype Selection](creator-archetype-selection.md)
 - [vNext Roadmap](vnext-roadmap.md)
 
 ## Roadmap

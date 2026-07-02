@@ -43,6 +43,7 @@ Implemented today:
 - Rule Compiler CLI
 - Creator Workbench Compile Preview
 - Creator Workbench UI flow polish
+- Taxonomy-aware Creator Workbench archetype selection
 - Archetype Taxonomy metadata in `@yutra/archetype-core`
 - Rule Impact Explanation
 - Certification Readiness Preview
@@ -185,6 +186,7 @@ Start here:
 - [vNext Charter](docs/vnext-charter.md)
 - [Agent Archetype Library](docs/archetype-library.md)
 - [Archetype Taxonomy](docs/archetype-taxonomy.md)
+- [Creator Archetype Selection](docs/creator-archetype-selection.md)
 - [Archetype Core](docs/archetype-core.md)
 - [Business Rule Config](docs/business-rule-config.md)
 - [Pack Config Core](docs/pack-config-core.md)
@@ -326,6 +328,7 @@ Yutra is currently not:
 - [vNext Charter](docs/vnext-charter.md)
 - [Agent Archetype Library](docs/archetype-library.md)
 - [Archetype Taxonomy](docs/archetype-taxonomy.md)
+- [Creator Archetype Selection](docs/creator-archetype-selection.md)
 - [Archetype Core](docs/archetype-core.md)
 - [Business Rule Configuration](docs/business-rule-config.md)
 - [Pack Config Core](docs/pack-config-core.md)

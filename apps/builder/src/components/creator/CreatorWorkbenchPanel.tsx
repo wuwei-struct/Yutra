@@ -9,6 +9,8 @@ import {
   getDefaultPackConfigForArchetype,
   type SupportedCreatorArchetype
 } from "../../lib/creator-state";
+import { ArchetypeDetailPanel } from "./ArchetypeDetailPanel";
+import { ArchetypeFitTestPanel } from "./ArchetypeFitTestPanel";
 import { useI18n } from "../../i18n";
 import { CertificationReadinessPanel } from "./CertificationReadinessPanel";
 import { CompileArtifactsPanel } from "./CompileArtifactsPanel";
@@ -21,6 +23,7 @@ import { CreatorWorkflowStepper } from "./CreatorWorkflowStepper";
 import { CreatorWorkbenchHeader } from "./CreatorWorkbenchHeader";
 import { PackConfigPreviewPanel } from "./PackConfigPreviewPanel";
 import { RuleImpactPanel } from "./RuleImpactPanel";
+import { getCreatorArchetypeManifest } from "./archetype-taxonomy-ui";
 import { getRuleImpactForArchetype, isSupportedCreatorArchetype, type SendCompiledDslMeta } from "./creator-ui-helpers";
 
 export function CreatorWorkbenchPanel(props: {
@@ -29,6 +32,7 @@ export function CreatorWorkbenchPanel(props: {
 }) {
   const { t } = useI18n();
   const [config, setConfig] = useState<PackConfig>(() => createRequestResolutionDemoConfig());
+  const [focusedArchetypeId, setFocusedArchetypeId] = useState("request-resolution");
   const [selectedImpact, setSelectedImpact] = useState<RuleImpactDefinition | undefined>(() =>
     getRuleImpactForArchetype("request-resolution", "rules.refundPolicy.autoRefundMaxAmount")
   );
@@ -42,6 +46,7 @@ export function CreatorWorkbenchPanel(props: {
 
   const setCreatorArchetype = (archetypeId: SupportedCreatorArchetype) => {
     const nextConfig = getDefaultPackConfigForArchetype(archetypeId);
+    setFocusedArchetypeId(archetypeId);
     setConfig(nextConfig);
     setSelectedImpact(getRuleImpactForArchetype(archetypeId, getDefaultImpactPathForArchetype(archetypeId)));
     setResponse(undefined);
@@ -79,7 +84,14 @@ export function CreatorWorkbenchPanel(props: {
             <h3>{t("creator.section.businessRules")}</h3>
             <span className="status-pill">{config.archetypeId}</span>
           </div>
-          <CreatorArchetypeSelector currentArchetypeId={config.archetypeId} onSelectArchetype={setCreatorArchetype} />
+          <CreatorArchetypeSelector
+            currentArchetypeId={config.archetypeId}
+            focusedArchetypeId={focusedArchetypeId}
+            onSelectArchetype={setCreatorArchetype}
+            onFocusArchetype={setFocusedArchetypeId}
+          />
+          <ArchetypeDetailPanel manifest={getCreatorArchetypeManifest(focusedArchetypeId)} />
+          <ArchetypeFitTestPanel />
           <CreatorConfigSection
             config={config}
             onChange={setConfig}

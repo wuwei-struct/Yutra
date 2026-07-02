@@ -53,6 +53,12 @@ For example, customer complaint is a Scenario Pattern rather than a new main arc
 
 See [Archetype Taxonomy](archetype-taxonomy.md).
 
+P6-08E adds taxonomy-aware archetype selection to the Studio UI. Each archetype card can show its layer, primary output, acceptance object, governance focus, trigger pattern, Behavior Primitive refs, and Scenario Pattern hints from `@yutra/archetype-core`.
+
+Cross-cutting archetypes are visible as taxonomy metadata, but they are marked as supporting capabilities rather than standalone creator flows.
+
+See [Creator Archetype Selection](creator-archetype-selection.md).
+
 ### 2. Scenario Variant
 
 Choose a specific variant within the archetype.
@@ -184,6 +190,8 @@ The current Creator Workbench MVP supports two archetypes:
 - enabled: `request-resolution`
 - enabled: `approval-decision`
 - disabled / coming later: all other main and cross-cutting archetypes
+
+The archetype selector is taxonomy-aware. It shows why `request-resolution` is appropriate for business action results and why `approval-decision` is appropriate for authorization decisions. It does not claim that all 14 archetypes are compile-enabled.
 
 The request-resolution and approval-decision forms edit public demo/mock Pack Configs:
 
