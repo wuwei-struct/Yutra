@@ -12,14 +12,15 @@ This keeps users focused on Product Archetypes instead of low-level Behavior Pri
 
 ## Current compile-enabled archetypes
 
-Creator Workbench currently enables two demo/mock Product Archetypes:
+Creator Workbench currently enables three demo/mock Product Archetypes:
 
 - `request-resolution`
 - `approval-decision`
+- `knowledge-answering`
 
 Other Product Archetypes and all Cross-cutting Archetypes are visible as taxonomy metadata, but they are still `coming soon` for Creator Workbench compile preview.
 
-## request-resolution vs approval-decision
+## request-resolution vs approval-decision vs knowledge-answering
 
 Use `request-resolution` when the primary output is a business action result.
 
@@ -37,6 +38,15 @@ Examples:
 - reject
 - require more evidence
 - request human review
+
+Use `knowledge-answering` when the primary output is a source-constrained answer.
+
+Examples:
+
+- answer with demo source references
+- ask clarification when confidence is low
+- return no-answer with reason when evidence is missing
+- hand off sensitive or unsafe questions
 
 If one real business case mixes multiple outputs, it is probably a Scenario Pattern rather than a new main archetype.
 

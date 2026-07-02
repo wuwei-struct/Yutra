@@ -1,6 +1,7 @@
 import type { ConfigField, ConfigFieldSource, PackConfig } from "@yutra/pack-config-core";
 import {
   APPROVAL_DECISION_RULE_IMPACTS,
+  KNOWLEDGE_ANSWERING_RULE_IMPACTS,
   REQUEST_RESOLUTION_RULE_IMPACTS,
   type RuleImpactDefinition
 } from "../../../../../packages/pack-config-core/src/rule-impact";
@@ -69,11 +70,17 @@ export function getConfigField(config: PackConfig, fieldPath: string): ConfigFie
 }
 
 export function isSupportedCreatorArchetype(archetypeId: string): archetypeId is SupportedCreatorArchetype {
-  return archetypeId === "request-resolution" || archetypeId === "approval-decision";
+  return archetypeId === "request-resolution" || archetypeId === "approval-decision" || archetypeId === "knowledge-answering";
 }
 
 export function getRuleImpactsForArchetype(archetypeId: string): RuleImpactDefinition[] {
-  return archetypeId === "approval-decision" ? APPROVAL_DECISION_RULE_IMPACTS : REQUEST_RESOLUTION_RULE_IMPACTS;
+  if (archetypeId === "approval-decision") {
+    return APPROVAL_DECISION_RULE_IMPACTS;
+  }
+  if (archetypeId === "knowledge-answering") {
+    return KNOWLEDGE_ANSWERING_RULE_IMPACTS;
+  }
+  return REQUEST_RESOLUTION_RULE_IMPACTS;
 }
 
 export function getRuleImpactForArchetype(archetypeId: string, fieldPath: string): RuleImpactDefinition | undefined {

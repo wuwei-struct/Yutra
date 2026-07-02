@@ -106,11 +106,12 @@ describe("P6-05A Creator Workbench MVP conformance", () => {
     expect(readme).not.toContain("production ready");
   });
 
-  it("docs state request-resolution and approval-decision are supported archetypes", () => {
+  it("docs state request-resolution, approval-decision, and knowledge-answering are supported archetypes", () => {
     const docs = read("docs/creator-workbench.md");
-    expect(docs).toContain("supports two archetypes");
+    expect(docs).toContain("supports three archetypes");
     expect(docs).toContain("request-resolution");
     expect(docs).toContain("approval-decision");
+    expect(docs).toContain("knowledge-answering");
     expect(docs).toContain("disabled / coming later");
   });
 

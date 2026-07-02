@@ -11,7 +11,10 @@ export type CreatorArchetypeOption = {
 export const creatorArchetypeOptions: CreatorArchetypeOption[] = BUILTIN_ARCHETYPE_MANIFESTS.map((manifest) => ({
   id: manifest.archetypeId,
   label: `${manifest.archetypeId} / ${manifest.name.zhCN}`,
-  enabled: manifest.archetypeId === "request-resolution" || manifest.archetypeId === "approval-decision",
+  enabled:
+    manifest.archetypeId === "request-resolution" ||
+    manifest.archetypeId === "approval-decision" ||
+    manifest.archetypeId === "knowledge-answering",
   manifest
 }));
 

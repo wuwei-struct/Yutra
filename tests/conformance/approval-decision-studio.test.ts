@@ -30,11 +30,12 @@ describe("P6-07B approval-decision Studio UI conformance", () => {
     expect(docs).toContain("does not include real organization data");
   });
 
-  it("Studio source enables approval-decision without enabling unsupported archetypes", () => {
+  it("Studio source enables approval-decision and leaves unsupported archetypes disabled", () => {
     const state = read("apps/builder/src/lib/creator-state.ts");
     expect(state).toContain('{ id: "approval-decision"');
     expect(state).toContain('label: "approval-decision / 审批裁决型", enabled: true');
     expect(state).toContain('{ id: "knowledge-answering"');
-    expect(state).toContain('label: "knowledge-answering / 知识问答型", enabled: false');
+    expect(state).toContain('label: "knowledge-answering / 知识问答型", enabled: true');
+    expect(state).toContain('label: "intake-collector / 信息采集型", enabled: false');
   });
 });

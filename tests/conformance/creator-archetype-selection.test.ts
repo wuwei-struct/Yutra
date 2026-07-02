@@ -31,7 +31,9 @@ describe("P6-08E taxonomy-aware Creator Workbench selection conformance", () => 
     const selector = read("apps/builder/src/components/creator/CreatorArchetypeSelector.tsx");
     const taxonomyUi = read("apps/builder/src/components/creator/archetype-taxonomy-ui.ts");
     expect(selector).toContain("comingSoon");
-    expect(taxonomyUi).toContain('manifest.archetypeId === "request-resolution" || manifest.archetypeId === "approval-decision"');
+    expect(taxonomyUi).toContain('manifest.archetypeId === "request-resolution"');
+    expect(taxonomyUi).toContain('manifest.archetypeId === "approval-decision"');
+    expect(taxonomyUi).toContain('manifest.archetypeId === "knowledge-answering"');
     expect(selector).not.toContain("all archetypes are compile-enabled");
   });
 });

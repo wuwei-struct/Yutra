@@ -11,7 +11,12 @@ export function ArchetypeFitTestPanel() {
     t("creator.fit.processQuestion")
   ];
 
-  const guidance = [t("creator.fit.businessActionGuidance"), t("creator.fit.authorizationGuidance"), t("creator.fit.scenarioPatternGuidance")];
+  const guidance = [
+    t("creator.fit.businessActionGuidance"),
+    t("creator.fit.authorizationGuidance"),
+    t("creator.fit.sourceConstrainedGuidance"),
+    t("creator.fit.scenarioPatternGuidance")
+  ];
 
   return (
     <section className="creator-section archetype-fit-test-panel" aria-label="Archetype Fit Test Panel">

@@ -414,10 +414,12 @@ describe("@yutra/builder Studio UI", () => {
     expect(workflow.textContent).toContain("Run preview manually");
   });
 
-  it("request-resolution and approval-decision are enabled and other archetypes are disabled", () => {
+  it("request-resolution, approval-decision, and knowledge-answering are enabled and other archetypes are disabled", () => {
     renderStudio();
     expect((screen.getByRole("button", { name: /request-resolution/ }) as HTMLButtonElement).disabled).toBe(false);
     expect((screen.getByRole("button", { name: /approval-decision/ }) as HTMLButtonElement).disabled).toBe(false);
+    expect((screen.getByRole("button", { name: /knowledge-answering/ }) as HTMLButtonElement).disabled).toBe(false);
+    expect((screen.getByRole("button", { name: /intake-collector/ }) as HTMLButtonElement).disabled).toBe(true);
     expect(screen.getByLabelText("Archetype Selector").textContent).toContain("selected");
     expect(screen.getAllByText("Coming soon").length).toBeGreaterThan(0);
   });
@@ -428,6 +430,7 @@ describe("@yutra/builder Studio UI", () => {
     expect(selector.textContent).toContain("Primary Output");
     expect(selector.textContent).toContain("business action result");
     expect(selector.textContent).toContain("authorization decision");
+    expect(selector.textContent).toContain("controlled answer");
     expect(selector.textContent).toContain("Behavior Primitives");
     expect(selector.textContent).toContain("evaluate");
     expect(selector.textContent).toContain("Cross-cutting capability");
@@ -448,6 +451,7 @@ describe("@yutra/builder Studio UI", () => {
     expect(fitTest.textContent).toContain("What is the primary output?");
     expect(fitTest.textContent).toContain("If the output is a business action result");
     expect(fitTest.textContent).toContain("If the output is an authorization decision");
+    expect(fitTest.textContent).toContain("If the output is a source-constrained answer");
   });
 
   it("request-resolution config editor renders fields and mock adapter summary", () => {
@@ -466,6 +470,17 @@ describe("@yutra/builder Studio UI", () => {
     expect(screen.getByLabelText("lowRiskMaxAmount")).toBeTruthy();
     expect(screen.getByLabelText("PackConfig Preview").textContent).toContain('"archetypeId": "approval-decision"');
     expect(screen.getByLabelText("Adapter Mode Summary").textContent).toContain("containsRealEndpoint=false");
+  });
+
+  it("knowledge-answering config editor renders Knowledge Policy and Source Policy", () => {
+    renderStudio();
+    fireEvent.click(screen.getByRole("button", { name: /knowledge-answering/ }));
+    expect(screen.getByLabelText("Knowledge Answering Config Editor")).toBeTruthy();
+    expect(screen.getByText("Knowledge Policy")).toBeTruthy();
+    expect(screen.getByText("Source Policy")).toBeTruthy();
+    expect(screen.getByLabelText("minConfidence")).toBeTruthy();
+    expect(screen.getByLabelText("PackConfig Preview").textContent).toContain('"archetypeId": "knowledge-answering"');
+    expect(screen.getByLabelText("Adapter Mode Summary").textContent).toContain("no real LLM");
   });
 
   it("Creator Workbench renders rule impact controls", () => {
@@ -520,6 +535,33 @@ describe("@yutra/builder Studio UI", () => {
     expect(panelText).toContain("trace.expectation.json");
   });
 
+  it("editing minConfidence updates knowledge-answering source confirmedByUser", () => {
+    renderStudio();
+    fireEvent.click(screen.getByRole("button", { name: /knowledge-answering/ }));
+    fireEvent.change(screen.getByLabelText("minConfidence"), { target: { value: "0.82" } });
+    expect(screen.getByLabelText("PackConfig Preview").textContent).toContain('"value": 0.82');
+    expect(screen.getByLabelText("PackConfig Preview").textContent).toContain('"source": "confirmedByUser"');
+    const confidenceRow = screen.getByLabelText("minConfidence").closest(".creator-field-row");
+    expect(confidenceRow?.textContent).toContain("Confirmed by user");
+  });
+
+  it("knowledge-answering impact buttons show confidence and source citation metadata", () => {
+    renderStudio();
+    fireEvent.click(screen.getByRole("button", { name: /knowledge-answering/ }));
+
+    const confidenceRow = screen.getByLabelText("minConfidence").closest(".creator-field-row");
+    expect(confidenceRow?.querySelector("button")).toBeTruthy();
+    fireEvent.click(confidenceRow!.querySelector("button")!);
+    expect(screen.getByLabelText("Rule Impact Panel").textContent).toContain("confidence_threshold");
+    expect(screen.getByLabelText("Rule Impact Panel").textContent).toContain("evaluate_confidence -> answer / ask_clarification / handoff");
+
+    const citationRow = screen.getByText("requireSourceCitation").closest(".creator-field-row");
+    expect(citationRow?.querySelector("button")).toBeTruthy();
+    fireEvent.click(citationRow!.querySelector("button")!);
+    expect(screen.getByLabelText("Rule Impact Panel").textContent).toContain("citation requirement");
+    expect(screen.getByLabelText("Rule Impact Panel").textContent).toContain("source.checked");
+  });
+
   it("Compile Preview calls runner and renders artifact tabs", async () => {
     mockCompilePreviewSuccess();
     renderStudio();
@@ -548,6 +590,27 @@ describe("@yutra/builder Studio UI", () => {
     expect(screen.getByLabelText("Certification Readiness Panel")).toBeTruthy();
   });
 
+  it("knowledge-answering Compile Preview calls runner and renders artifacts", async () => {
+    mockCompilePreviewSuccess({
+      agentName: "knowledge-answering-basic",
+      archetypeId: "knowledge-answering",
+      packConfigId: "knowledge-answering:basic-demo"
+    });
+    renderStudio();
+    fireEvent.click(screen.getByRole("button", { name: /knowledge-answering/ }));
+    fireEvent.click(screen.getByRole("button", { name: "Compile Preview" }));
+    await waitFor(() =>
+      expect(compileCreatorPreview).toHaveBeenCalledWith(
+        expect.objectContaining({
+          config: expect.objectContaining({ archetypeId: "knowledge-answering" })
+        })
+      )
+    );
+    await waitFor(() => expect(screen.getByLabelText("Artifact Preview")).toBeTruthy());
+    expect(screen.getByLabelText("Compiled Artifact Content").textContent).toContain("knowledge-answering-basic");
+    expect(screen.getByLabelText("Certification Readiness Panel")).toBeTruthy();
+  });
+
   it("approval-decision agent artifact can be sent to DSL Editor without auto inspect apply or run", async () => {
     mockCompilePreviewSuccess({
       agentName: "approval-decision-basic",
@@ -567,6 +630,25 @@ describe("@yutra/builder Studio UI", () => {
     expect(runPreview).not.toHaveBeenCalled();
   });
 
+  it("knowledge-answering agent artifact can be sent to DSL Editor without auto inspect apply or run", async () => {
+    mockCompilePreviewSuccess({
+      agentName: "knowledge-answering-basic",
+      archetypeId: "knowledge-answering",
+      packConfigId: "knowledge-answering:basic-demo"
+    });
+    renderStudio();
+    fireEvent.click(screen.getByRole("button", { name: /knowledge-answering/ }));
+    fireEvent.click(screen.getByRole("button", { name: "Compile Preview" }));
+    await waitFor(() => expect(screen.getByRole("button", { name: "Send agent.yutra.yaml to DSL Editor" })).toBeTruthy());
+
+    fireEvent.click(screen.getByRole("button", { name: "Send agent.yutra.yaml to DSL Editor" }));
+
+    expect((screen.getByLabelText("DSL Editor Text") as HTMLTextAreaElement).value).toBe("agent: knowledge-answering-basic\n");
+    expect(screen.getByLabelText("Compiled DSL Metadata").textContent).toContain("Not inspected yet");
+    expect(screen.getByText("Builder Source active")).toBeTruthy();
+    expect(runPreview).not.toHaveBeenCalled();
+  });
+
   it("switching back to request-resolution resets the request-resolution form", () => {
     renderStudio();
     fireEvent.click(screen.getByRole("button", { name: /approval-decision/ }));
@@ -575,6 +657,7 @@ describe("@yutra/builder Studio UI", () => {
     expect(screen.getByLabelText("Request Resolution Config Editor")).toBeTruthy();
     expect(screen.getByLabelText("autoRefundMaxAmount")).toBeTruthy();
     expect(screen.queryByLabelText("lowRiskMaxAmount")).toBeNull();
+    expect(screen.queryByLabelText("minConfidence")).toBeNull();
   });
 
   it("Compile report renders failClosedPolicy and configHash", async () => {

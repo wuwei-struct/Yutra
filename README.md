@@ -50,7 +50,7 @@ Implemented today:
 - Compiled DSL manual bridge
 - Manual Run Preview Evidence in the readiness panel
 - approval-decision second archetype support (Pack Config + Rule Compiler + CLI + Creator Workbench demo-enabled UI)
-- knowledge-answering third archetype core support (Pack Config + Rule Impact + Rule Compiler + CLI; Studio UI not enabled yet)
+- knowledge-answering third archetype support (Pack Config + Rule Impact + Rule Compiler + CLI + Creator Workbench demo-enabled UI)
 
 ## Why Yutra
 
@@ -139,7 +139,7 @@ Yutra Studio is the local single-user Agent Editor Workbench prototype.
 It includes:
 - left navigation and top operation bar
 - AI Draft Assistant
-- Creator Workbench Compile Preview for public `request-resolution` and `approval-decision` demo Pack Configs
+- Creator Workbench Compile Preview for public `request-resolution`, `approval-decision`, and `knowledge-answering` demo Pack Configs
 - Creator Workflow: Select archetype -> Configure business rules -> Review rule impact -> Compile preview -> Send to DSL editor -> Inspect DSL manually -> Apply DSL manually -> Run Preview manually -> Review Trace / Audit
 - Rule Impact Explanation for public `request-resolution`, `approval-decision`, and `knowledge-answering` demo fields
 - Certification Readiness Preview for demo/mock compile output; it does not run Runtime or claim production readiness
@@ -216,7 +216,7 @@ pnpm exec yutra compile examples/knowledge-answering-basic/pack.config.json --ou
 
 This exports compiler artifacts only. It does not run Runtime or publish an Agent.
 `approval-decision` is now demo-enabled in Creator Workbench. It remains mock/demo only, does not connect a real approval system, and still requires manual Send to DSL Editor / Inspect / Apply / Run.
-`knowledge-answering` is supported by Pack Config, Rule Impact metadata, Rule Compiler, and CLI. Creator Workbench UI is not enabled for it yet, and it does not call a real LLM or connect a real knowledge provider.
+`knowledge-answering` is now demo-enabled in Creator Workbench. It remains mock/demo only, does not call a real LLM, does not connect real RAG or knowledge providers, and still requires manual Send to DSL Editor / Inspect / Apply / Run.
 The Creator Workbench UI is organized into Header, Archetype & Business Rules, Rule Explanation, Compile Preview, and Readiness & Evidence sections. It remains demo/mock only, does not run Runtime automatically, and does not represent production readiness.
 
 ## Skill-based Demo

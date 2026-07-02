@@ -185,26 +185,31 @@ P6-05B adds a manual bridge from the compiled `agent.yutra.yaml` artifact to the
 
 ## Current MVP: Compile Preview
 
-The current Creator Workbench MVP supports two archetypes:
+The current Creator Workbench MVP supports three archetypes:
 
 - enabled: `request-resolution`
 - enabled: `approval-decision`
+- enabled: `knowledge-answering`
 - disabled / coming later: all other main and cross-cutting archetypes
 
-The archetype selector is taxonomy-aware. It shows why `request-resolution` is appropriate for business action results and why `approval-decision` is appropriate for authorization decisions. It does not claim that all 14 archetypes are compile-enabled.
+The archetype selector is taxonomy-aware. It shows why `request-resolution` is appropriate for business action results, why `approval-decision` is appropriate for authorization decisions, and why `knowledge-answering` is appropriate for governed source-constrained answers. It does not claim that all 14 archetypes are compile-enabled.
 
-The request-resolution and approval-decision forms edit public demo/mock Pack Configs:
+The request-resolution, approval-decision, and knowledge-answering forms edit public demo/mock Pack Configs:
 
 - capabilities
 - refund policy basics
 - handoff policy basics
+- approval policy basics
+- risk policy basics
+- knowledge policy basics
+- source policy basics
 - response style basics
 
 Each editable field shows source provenance, affected artifact chips, and an Impact control that opens the Rule Impact Explanation panel.
 
 The UI now separates business rules, rule explanation, compile output, and readiness evidence into distinct sections so the workbench reads as an Agent Creation Workbench rather than a stacked feature panel.
 
-Adapters remain fixed to `mock`. The UI does not expose secret fields, real endpoints, customer adapter mappings, or customer SOP fields.
+Adapters remain fixed to `mock`. The UI does not expose secret fields, real endpoints, customer adapter mappings, customer SOP fields, real LLM providers, real RAG providers, real knowledge base paths, source URLs, or document IDs.
 
 Compile Preview calls the local builder-runner endpoint:
 
@@ -235,7 +240,7 @@ Important boundaries:
 
 ## Rule Impact Explanation
 
-The Creator Workbench includes a Rule Impact panel for public `request-resolution` and `approval-decision` demo configs.
+The Creator Workbench includes a Rule Impact panel for public `request-resolution`, `approval-decision`, and `knowledge-answering` demo configs.
 
 The panel explains:
 

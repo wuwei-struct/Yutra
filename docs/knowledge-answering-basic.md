@@ -12,9 +12,10 @@ The current public support includes:
 - Rule Impact metadata
 - deterministic Rule Compiler
 - Rule Compiler CLI export
+- Creator Workbench demo UI integration
 - six demo/mock artifacts
 
-The current public support does not include Creator Workbench UI integration yet.
+Creator Workbench can select `knowledge-answering`, edit the basic demo fields, explain Rule Impact, run Compile Preview, show Certification Readiness, and send `agent.yutra.yaml` to the DSL Editor. It still does not inspect, apply, or run automatically.
 
 ## Artifacts
 
@@ -33,11 +34,11 @@ This is public demo/mock support only.
 
 It does not:
 
-- connect Studio UI yet
 - connect Runtime
 - execute generated DSL
 - call a real LLM
 - connect a real retrieval provider
+- connect real RAG or vector database infrastructure
 - include real knowledge base content
 - include real FAQ or document snippets
 - include real source endpoints

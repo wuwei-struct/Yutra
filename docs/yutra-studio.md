@@ -21,8 +21,8 @@ Builder Core
 - AI Draft Assistant with mock provider by default.
 - Manual Apply to Editor.
 - DSL editor with Validate DSL, Inspect DSL, Apply DSL as Run Source, Reset from Builder, and Copy DSL.
-- Creator Workbench Compile Preview for public `request-resolution` and `approval-decision` demo Pack Configs.
-- Rule Impact Explanation for public `request-resolution` and `approval-decision` demo fields.
+- Creator Workbench Compile Preview for public `request-resolution`, `approval-decision`, and `knowledge-answering` demo Pack Configs.
+- Rule Impact Explanation for public `request-resolution`, `approval-decision`, and `knowledge-answering` demo fields.
 - Certification Readiness Preview for demo/mock compile output.
 - Manual Run Preview Evidence for showing user-triggered run evidence in the readiness panel.
 - Manual bridge from compiled `agent.yutra.yaml` to the DSL Editor.
@@ -95,7 +95,7 @@ The DSL Editor remains valuable as an advanced inspection and override surface, 
 P6-05A is the first step in that direction:
 
 ```text
-request-resolution or approval-decision Pack Config
+request-resolution, approval-decision, or knowledge-answering Pack Config
 -> /creator/compile-preview
 -> six demo/mock compiler artifacts
 -> compile report
@@ -123,7 +123,7 @@ Pack Config field
 -> affected compiler artifacts
 ```
 
-This explanation layer helps users understand generated behavior for request-resolution and approval-decision demo configs. It does not run Runtime, does not auto-apply DSL, and does not include customer SOP or real approval procedures.
+This explanation layer helps users understand generated behavior for request-resolution, approval-decision, and knowledge-answering demo configs. It does not run Runtime, does not auto-apply DSL, and does not include customer SOP, real approval procedures, real LLM calls, or real RAG / knowledge provider integration.
 
 P6-06B adds Certification Readiness Preview:
 
@@ -160,7 +160,7 @@ P6-08E adds taxonomy-aware archetype selection:
 -> Archetype Fit Test guidance
 ```
 
-Only `request-resolution` and `approval-decision` are compile-enabled in Studio. Other archetypes remain visible as taxonomy metadata with coming-soon status.
+`request-resolution`, `approval-decision`, and `knowledge-answering` are compile-enabled in Studio. Other archetypes remain visible as taxonomy metadata with coming-soon status.
 
 Relevant vNext docs:
 

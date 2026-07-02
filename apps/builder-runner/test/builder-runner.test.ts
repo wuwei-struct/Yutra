@@ -1,7 +1,11 @@
 import { afterEach, describe, expect, it } from "vitest";
 import type { BuilderFormConfig } from "@yutra/builder-core";
 import { agentSpecToChineseDsl, ecommerceSupportTemplate, formConfigToAgentSpec } from "@yutra/builder-core";
-import { APPROVAL_DECISION_BASIC_CONFIG, REQUEST_RESOLUTION_ECOMMERCE_BASIC_CONFIG } from "@yutra/pack-config-core";
+import {
+  APPROVAL_DECISION_BASIC_CONFIG,
+  KNOWLEDGE_ANSWERING_BASIC_CONFIG,
+  REQUEST_RESOLUTION_ECOMMERCE_BASIC_CONFIG
+} from "@yutra/pack-config-core";
 import { createBuilderRunnerServer } from "../src/server";
 
 const baseForm: BuilderFormConfig = {
@@ -419,6 +423,41 @@ describe("@yutra/builder-runner", () => {
     expect(body.artifacts?.testCases.filename).toBe("test-cases.json");
     expect(body.artifacts?.traceExpectation.filename).toBe("trace.expectation.json");
     expect(body.artifacts?.agent.content).toContain("approval-decision-basic");
+    expect(body.report?.packConfigHash).toMatch(/^sha256:/);
+    expect(body.report?.failClosedPolicy).toBe("enabled");
+    expect(body.certificationReadiness?.overall).toBe("warning");
+    expect(body.certificationReadiness?.certificationBoundary?.runtimeExecuted).toBe(false);
+    expect(body.events).toBeUndefined();
+  });
+
+  it("POST /creator/compile-preview valid knowledge-answering config returns artifacts and report", async () => {
+    const baseUrl = await startServer();
+    const res = await fetch(`${baseUrl}/creator/compile-preview`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        config: KNOWLEDGE_ANSWERING_BASIC_CONFIG,
+        mode: "preview",
+        locale: "en"
+      })
+    });
+    const body = (await res.json()) as {
+      ok: boolean;
+      artifacts?: Record<string, { filename: string; content?: string }>;
+      report?: { packConfigHash?: string; failClosedPolicy?: string };
+      certificationReadiness?: { overall?: string; certificationBoundary?: { runtimeExecuted?: boolean } };
+      events?: unknown[];
+    };
+
+    expect(res.status).toBe(200);
+    expect(body.ok).toBe(true);
+    expect(body.artifacts?.agent.filename).toBe("agent.yutra.yaml");
+    expect(body.artifacts?.policy.filename).toBe("policy.yaml");
+    expect(body.artifacts?.adapterConfig.filename).toBe("adapter.config.json");
+    expect(body.artifacts?.templates.filename).toBe("templates.json");
+    expect(body.artifacts?.testCases.filename).toBe("test-cases.json");
+    expect(body.artifacts?.traceExpectation.filename).toBe("trace.expectation.json");
+    expect(body.artifacts?.agent.content).toContain("knowledge-answering-basic");
     expect(body.report?.packConfigHash).toMatch(/^sha256:/);
     expect(body.report?.failClosedPolicy).toBe("enabled");
     expect(body.certificationReadiness?.overall).toBe("warning");

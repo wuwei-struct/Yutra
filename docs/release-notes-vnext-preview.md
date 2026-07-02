@@ -21,6 +21,7 @@ Yutra is an open-source governed Agent Creation & Execution Framework.
 - Manual Run Preview Evidence
 - request-resolution demo flow
 - approval-decision demo flow
+- knowledge-answering demo flow
 
 ## Main Creation Flow
 
@@ -38,12 +39,14 @@ Archetype
 
 1. request-resolution
 2. approval-decision
+3. knowledge-answering
 
 ## CLI Demo
 
 ```bash
 pnpm exec yutra compile examples/request-resolution-ecommerce-basic/pack.config.json --out .tmp/compiled-request-resolution --dry-run
 pnpm exec yutra compile examples/approval-decision-basic/pack.config.json --out .tmp/approval-decision-basic --dry-run
+pnpm exec yutra compile examples/knowledge-answering-basic/pack.config.json --out .tmp/knowledge-answering-basic --dry-run
 ```
 
 ## Studio Demo
@@ -95,7 +98,7 @@ Yutra is not currently:
 
 ## Known Limitations
 
-- Creator Workbench currently supports two demo archetypes.
+- Creator Workbench currently supports three demo archetypes.
 - Studio does not save or publish agents.
 - Runtime is only executed through explicit manual Run Preview.
 - Certification Readiness Preview is not official certification.

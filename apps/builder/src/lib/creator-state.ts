@@ -2,11 +2,12 @@ import type { ConfigField, PackConfig } from "@yutra/pack-config-core";
 import type { RuleCompilerArtifacts } from "@yutra/rule-compiler";
 import {
   APPROVAL_DECISION_BASIC_CONFIG,
+  KNOWLEDGE_ANSWERING_BASIC_CONFIG,
   REQUEST_RESOLUTION_ECOMMERCE_BASIC_CONFIG
 } from "../../../../packages/pack-config-core/src/sample-configs";
 
 export type CreatorArtifactTab = keyof RuleCompilerArtifacts;
-export type SupportedCreatorArchetype = "request-resolution" | "approval-decision";
+export type SupportedCreatorArchetype = "request-resolution" | "approval-decision" | "knowledge-answering";
 
 export const creatorArtifactTabs: Array<{ key: CreatorArtifactTab; label: string; note?: string }> = [
   { key: "agent", label: "agent.yutra.yaml", note: "not executed" },
@@ -21,7 +22,7 @@ export const creatorArchetypes: Array<{ id: string; label: string; enabled: bool
   { id: "request-resolution", label: "request-resolution / 请求处理型", enabled: true },
   { id: "approval-decision", label: "approval-decision / 审批裁决型", enabled: true },
   { id: "intake-collector", label: "intake-collector / 信息采集型", enabled: false },
-  { id: "knowledge-answering", label: "knowledge-answering / 知识问答型", enabled: false },
+  { id: "knowledge-answering", label: "knowledge-answering / 知识问答型", enabled: true },
   { id: "diagnostic-resolution", label: "diagnostic-resolution / 诊断排障型", enabled: false },
   { id: "process-orchestration", label: "process-orchestration / 流程编排型", enabled: false },
   { id: "content-production", label: "content-production / 内容生成型", enabled: false },
@@ -42,13 +43,20 @@ export function getDefaultPackConfigForArchetype(archetypeId: SupportedCreatorAr
   if (archetypeId === "approval-decision") {
     return cloneConfig(APPROVAL_DECISION_BASIC_CONFIG);
   }
+  if (archetypeId === "knowledge-answering") {
+    return cloneConfig(KNOWLEDGE_ANSWERING_BASIC_CONFIG);
+  }
   return cloneConfig(REQUEST_RESOLUTION_ECOMMERCE_BASIC_CONFIG);
 }
 
 export function getDefaultImpactPathForArchetype(archetypeId: SupportedCreatorArchetype): string {
-  return archetypeId === "approval-decision"
-    ? "rules.approvalPolicy.lowRiskMaxAmount"
-    : "rules.refundPolicy.autoRefundMaxAmount";
+  if (archetypeId === "approval-decision") {
+    return "rules.approvalPolicy.lowRiskMaxAmount";
+  }
+  if (archetypeId === "knowledge-answering") {
+    return "rules.knowledgePolicy.minConfidence";
+  }
+  return "rules.refundPolicy.autoRefundMaxAmount";
 }
 
 export function createRequestResolutionDemoConfig(): PackConfig {
@@ -57,6 +65,10 @@ export function createRequestResolutionDemoConfig(): PackConfig {
 
 export function createApprovalDecisionDemoConfig(): PackConfig {
   return getDefaultPackConfigForArchetype("approval-decision");
+}
+
+export function createKnowledgeAnsweringDemoConfig(): PackConfig {
+  return getDefaultPackConfigForArchetype("knowledge-answering");
 }
 
 export function updateConfigField<T>(field: ConfigField<T> | undefined, value: T): ConfigField<T> {

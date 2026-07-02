@@ -15,18 +15,19 @@ describe("P6-09A knowledge-answering third archetype conformance", () => {
   });
 
   it("README mentions knowledge-answering as third archetype core support", () => {
-    expect(read("README.md")).toContain("knowledge-answering third archetype core support");
-    expect(read("README.zh-CN.md")).toContain("knowledge-answering 第三母型 core 支持");
+    expect(read("README.md")).toContain("knowledge-answering third archetype support");
+    expect(read("README.zh-CN.md")).toContain("knowledge-answering 第三母型支持");
   });
 
-  it("docs state knowledge-answering UI is not yet enabled", () => {
+  it("docs state knowledge-answering UI is demo-enabled", () => {
     const combined = [
       read("docs/knowledge-answering-basic.md"),
       read("docs/rule-compiler-core.md"),
       read("docs/rule-compiler-cli.md"),
       read("docs/vnext-roadmap.md")
     ].join("\n");
-    expect(combined).toContain("Creator Workbench UI is not enabled");
+    expect(combined).toContain("Creator Workbench demo UI integration");
+    expect(combined).toContain("Creator Workbench demo UI");
   });
 
   it("docs state knowledge-answering is demo/mock only with no real provider", () => {

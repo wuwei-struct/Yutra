@@ -524,6 +524,17 @@ button:disabled {
   padding-bottom: 8px;
 }
 
+.knowledge-answering-editor h4 {
+  margin-top: 16px;
+  border-left: 3px solid #3d7c59;
+  padding-left: 8px;
+}
+
+.knowledge-answering-editor .creator-adapter-summary {
+  border-color: #9cc8ad;
+  background: #f3fbf6;
+}
+
 .field-meta-row,
 .artifact-chip-row {
   display: flex;
