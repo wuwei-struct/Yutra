@@ -16,12 +16,19 @@
 - Certification Readiness Preview.
 - Manual Run Preview Evidence.
 - approval-decision second archetype support.
+- knowledge-answering third archetype core and Studio UI support.
+- Three demo-enabled product archetypes in Creator Workbench: request-resolution, approval-decision, and knowledge-answering.
+- Archetype taxonomy metadata in `@yutra/archetype-core`.
+- Taxonomy-aware Creator Workbench archetype selection.
+- vNext Preview release candidate checklist.
 
 ### Intentionally Excluded
 
 - Git tag or GitHub Release publication.
 - npm package publication.
 - Real customer API integration.
+- Real LLM, RAG, or knowledge base integration.
+- Production readiness or production certification claim.
 - Marketplace, remote registry, hosted console, or multi-tenant SaaS.
 - Customer-specific SOP, pricing, proposal, UAT, rollout, or delivery playbooks.
 

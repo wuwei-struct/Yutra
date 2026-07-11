@@ -19,9 +19,13 @@ Yutra is an open-source governed Agent Creation & Execution Framework.
 - Rule Impact Explanation
 - Certification Readiness Preview
 - Manual Run Preview Evidence
+- Archetype taxonomy metadata
+- Taxonomy-aware archetype selection
 - request-resolution demo flow
 - approval-decision demo flow
 - knowledge-answering demo flow
+- knowledge-answering Studio UI integration
+- vNext Preview release candidate checklist
 
 ## Main Creation Flow
 
@@ -81,6 +85,7 @@ It does not include:
 - pricing / proposal / UAT / rollout playbooks
 - production integration assets
 - hosted enterprise console
+- real LLM / RAG / knowledge base integration
 
 ## Non-goals
 
@@ -104,10 +109,12 @@ Yutra is not currently:
 - Certification Readiness Preview is not official certification.
 - Manual Run Preview Evidence is not production certification.
 - No real customer API integration is included.
+- No real LLM, RAG, or knowledge base integration is included.
+- No GitHub Release has been created yet.
+- No npm package has been published.
 
 ## Suggested Next Steps
 
 - UI polish / docs polish
-- third archetype validation
 - release tag preparation
 - private commercial implementation assets outside the public repo

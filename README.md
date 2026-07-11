@@ -44,6 +44,7 @@ Implemented today:
 - Creator Workbench Compile Preview
 - Creator Workbench UI flow polish
 - Taxonomy-aware Creator Workbench archetype selection
+- Creator Workbench currently supports three demo-enabled product archetypes: `request-resolution`, `approval-decision`, and `knowledge-answering`.
 - Archetype Taxonomy metadata in `@yutra/archetype-core`
 - Rule Impact Explanation
 - Certification Readiness Preview
@@ -182,6 +183,7 @@ LLMs may draft configuration, but they must not bypass the Compiler, Runtime, Tr
 ## vNext Preview Release Notes
 
 - [vNext Preview Release Notes](docs/release-notes-vnext-preview.md)
+- [vNext Preview Release Candidate](docs/vnext-preview-release-candidate.md)
 
 Start here:
 

@@ -52,6 +52,7 @@ Yutra 关注这些问题：
 - Creator Workbench Compile Preview。
 - Creator Workbench UI 信息架构整理。
 - Creator Workbench taxonomy-aware 母型选择体验。
+- Creator Workbench 当前支持三个 demo-enabled 产物型主母型：`request-resolution`、`approval-decision` 与 `knowledge-answering`。
 - `@yutra/archetype-core` 中的 Archetype Taxonomy metadata。
 - Rule Impact Explanation。
 - Certification Readiness Preview。
@@ -171,6 +172,7 @@ LLM 可以生成配置草案，但不能绕过 Compiler、Runtime、Trace、Audi
 ## vNext Preview 发布说明
 
 - [vNext Preview 发布说明](docs/release-notes-vnext-preview.md)
+- [vNext Preview Release Candidate](docs/vnext-preview-release-candidate.md)
 
 入口文档：
 
