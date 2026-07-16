@@ -84,6 +84,19 @@ It does not include:
 - Manual Run Preview Evidence is not production certification.
 - Other product archetypes remain coming soon.
 
+## Release smoke status
+
+- Tested fix commit: `8814e83`
+- Smoke evidence: [vNext Preview Release Smoke](./vnext-preview-release-smoke.md)
+- `releaseSmokeReady: true`
+- `releaseTagReady: false`
+- `releaseTagBlocker: package_version_strategy`
+
+The full three-archetype CLI and Studio smoke passed. The package version
+strategy is still pending because the root package version is `0.1.0-rc.1`
+while the proposed tag is `v0.3.0-vnext-preview.1`. The tag has not been
+created.
+
 ## Suggested tag candidate
 
 Recommended future tag candidate:
@@ -94,6 +107,6 @@ Do not create this tag in this task.
 
 ## Next steps
 
-- Final release tag preparation
-- Optional browser manual smoke
+- Decide and apply the package version and tag naming strategy
+- Final release tag preparation after the version strategy is resolved
 - Optional fourth archetype after release tag
