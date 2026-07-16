@@ -2,6 +2,10 @@
 
 ## Unreleased / vNext Preview
 
+- Target version: `0.3.0-vnext-preview.1`
+- Status: package metadata aligned; Git tag, GitHub Release, and npm publication
+  have not been created.
+
 ### Included
 
 - README positioning update to open-source governed Agent Creation & Execution Framework.

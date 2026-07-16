@@ -4,6 +4,13 @@
 
 Yutra is an open-source governed Agent Creation & Execution Framework.
 
+- Target package version: `0.3.0-vnext-preview.1`
+- Candidate tag: `v0.3.0-vnext-preview.1`
+- Release status: package metadata aligned; candidate tag not created
+
+These are preview release notes, not a statement that a GitHub Release or npm
+publication has occurred.
+
 ## What Is Included In This Preview
 
 - DSL / Canonical IR

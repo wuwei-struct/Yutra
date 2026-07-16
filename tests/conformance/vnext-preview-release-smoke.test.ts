@@ -20,11 +20,11 @@ describe("P6-10B.1 vNext Preview release smoke evidence", () => {
     }
   });
 
-  it("separates smoke readiness from tag readiness", () => {
+  it("records smoke and tag readiness after package version alignment", () => {
     const content = read("docs/vnext-preview-release-smoke.md");
     expect(content.includes("releaseSmokeReady: true")).toBe(true);
-    expect(content.includes("releaseTagReady: false")).toBe(true);
-    expect(content.includes("releaseTagBlocker: package_version_strategy")).toBe(true);
+    expect(content.includes("releaseTagReady: true")).toBe(true);
+    expect(content.includes("releaseTagBlocker: none")).toBe(true);
   });
 
   it("records the successful knowledge-answering manual run", () => {
@@ -47,7 +47,7 @@ describe("P6-10B.1 vNext Preview release smoke evidence", () => {
     const content = read("docs/vnext-preview-release-candidate.md");
     expect(content.includes("vnext-preview-release-smoke.md")).toBe(true);
     expect(content.includes("releaseSmokeReady: true")).toBe(true);
-    expect(content.includes("releaseTagReady: false")).toBe(true);
-    expect(content.includes("package_version_strategy")).toBe(true);
+    expect(content.includes("releaseTagReady: true")).toBe(true);
+    expect(content.includes("releaseTagBlocker: none")).toBe(true);
   });
 });

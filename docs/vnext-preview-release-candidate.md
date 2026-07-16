@@ -5,6 +5,15 @@
 This document describes the current vNext Preview release candidate state.
 It is not a GitHub Release, npm publication, or production certification.
 
+- `packageVersion: 0.3.0-vnext-preview.1`
+- `candidateTag: v0.3.0-vnext-preview.1`
+- `releaseSmokeReady: true`
+- `releaseTagReady: true`
+- `releaseTagBlocker: none`
+- `tagCreated: false`
+- `githubReleaseCreated: false`
+- `npmPublished: false`
+
 ## Positioning
 
 Yutra is an open-source governed Agent Creation & Execution Framework.
@@ -89,13 +98,13 @@ It does not include:
 - Tested fix commit: `8814e83`
 - Smoke evidence: [vNext Preview Release Smoke](./vnext-preview-release-smoke.md)
 - `releaseSmokeReady: true`
-- `releaseTagReady: false`
-- `releaseTagBlocker: package_version_strategy`
+- `releaseTagReady: true`
+- `releaseTagBlocker: none`
 
-The full three-archetype CLI and Studio smoke passed. The package version
-strategy is still pending because the root package version is `0.1.0-rc.1`
-while the proposed tag is `v0.3.0-vnext-preview.1`. The tag has not been
-created.
+The full three-archetype CLI and Studio smoke passed at the linked tested fix
+commit. Package metadata is now aligned to `0.3.0-vnext-preview.1`, matching the
+candidate tag. This version-only alignment did not change the verified Runtime,
+Compiler, DSL, Trace, Skill, or Studio behavior. The tag has not been created.
 
 ## Suggested tag candidate
 
@@ -107,6 +116,6 @@ Do not create this tag in this task.
 
 ## Next steps
 
-- Decide and apply the package version and tag naming strategy
-- Final release tag preparation after the version strategy is resolved
+- Create the annotated tag only in a dedicated release task
+- Create the GitHub Release only after the tag is verified
 - Optional fourth archetype after release tag

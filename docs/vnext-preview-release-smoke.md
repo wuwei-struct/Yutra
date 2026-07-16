@@ -5,13 +5,16 @@
 - Tested fix commit: `8814e83`
 - Test date: `2026-07-16`
 - Candidate tag: `v0.3.0-vnext-preview.1`
+- Package version: `0.3.0-vnext-preview.1`
 - `releaseSmokeReady: true`
-- `releaseTagReady: false`
-- `releaseTagBlocker: package_version_strategy`
+- `releaseTagReady: true`
+- `releaseTagBlocker: none`
+- `tagCreated: false`
+- `githubReleaseCreated: false`
+- `npmPublished: false`
 
-The release smoke passed, but the candidate tag is not ready because the root
-package version remains `0.1.0-rc.1`. This task did not change package versions
-or decide the version-to-tag strategy.
+The release smoke passed, and package metadata is now aligned with the
+candidate tag. The tag has not been created.
 
 ## Full gates
 
@@ -27,6 +30,19 @@ Targeted Builder Runner, Rule Compiler, DSL, Runtime, Skill Core, and package
 tests also passed. Generated Action closure checks passed for all three demo
 archetypes, while unknown Action IDs remain fail-closed with
 `RUNTIME_ACTION_NOT_FOUND`.
+
+## Version-alignment verification
+
+The root package and all 17 workspace packages use
+`0.3.0-vnext-preview.1`. The candidate tag is exactly
+`v${packageVersion}`. Lockfile-only installation introduced no dependency
+upgrade or unrelated lockfile rewrite.
+
+The alignment changed only package metadata, release documentation, and
+conformance coverage. It did not change Runtime, Compiler, DSL, Trace, Skill,
+Pack Config, or Studio behavior. The browser smoke facts below remain the
+evidence recorded for tested fix commit `8814e83`; no new browser smoke is
+claimed by the version-alignment task.
 
 ## Three-archetype CLI smoke
 
@@ -99,8 +115,8 @@ triggered manually. The demo handlers reported `networkAccess=false`,
 
 - Certification Readiness Preview is not production certification.
 - Manual Run Preview Evidence is not production certification.
-- The package version and candidate tag strategy still require an explicit
-  decision.
+- The candidate tag and GitHub Release still require a separate explicit
+  release task.
 - No production deployment or real external integration is included.
 
 No Git tag was created in this task.
