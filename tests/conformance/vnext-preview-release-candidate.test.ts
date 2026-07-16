@@ -21,13 +21,14 @@ describe("P6-10A vNext Preview release candidate docs", () => {
     }
   });
 
-  it("release candidate document preserves release and certification boundaries", () => {
+  it("release candidate document records prerelease publication and preserves certification boundaries", () => {
     const content = read("docs/vnext-preview-release-candidate.md");
-    expect(content.includes("not a GitHub Release")).toBe(true);
+    expect(content.includes("githubReleaseCreated: true")).toBe(true);
+    expect(content.includes("githubReleaseType: prerelease")).toBe(true);
     expect(content.includes("npm publication")).toBe(true);
     expect(content.includes("not official production certification")).toBe(true);
-    expect(content.includes("No GitHub Release has been created yet.")).toBe(true);
     expect(content.includes("No npm package has been published.")).toBe(true);
+    expect(content.includes("Production ready: Yes")).toBe(false);
   });
 
   it("release candidate document excludes real LLM, RAG, and knowledge base integration", () => {

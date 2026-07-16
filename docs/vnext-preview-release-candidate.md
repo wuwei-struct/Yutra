@@ -2,17 +2,22 @@
 
 ## Status
 
-This document describes the current vNext Preview release candidate state.
-It is not a GitHub Release, npm publication, or production certification.
+This document records the published vNext Preview GitHub prerelease state.
+It is not an npm publication or production certification.
 
 - `packageVersion: 0.3.0-vnext-preview.1`
 - `candidateTag: v0.3.0-vnext-preview.1`
+- `releasedTag: v0.3.0-vnext-preview.1`
+- `releaseCommit: 90c006e3caddeb2395c0badb2d2dfb9c18b91451`
 - `releaseSmokeReady: true`
 - `releaseTagReady: true`
 - `releaseTagBlocker: none`
-- `tagCreated: false`
-- `githubReleaseCreated: false`
+- `tagCreated: true`
+- `githubReleaseCreated: true`
+- `githubReleaseType: prerelease`
+- `githubReleaseUrl: https://github.com/wuwei-struct/Yutra/releases/tag/v0.3.0-vnext-preview.1`
 - `npmPublished: false`
+- `publishedDate: 2026-07-16`
 
 ## Positioning
 
@@ -85,7 +90,7 @@ It does not include:
 ## Known limitations
 
 - No production deployment package is included.
-- No GitHub Release has been created yet.
+- The GitHub Release is a prerelease, not a stable release.
 - No npm package has been published.
 - No real customer API integration is included.
 - No real LLM / RAG / knowledge base integration is included.
@@ -104,18 +109,17 @@ It does not include:
 The full three-archetype CLI and Studio smoke passed at the linked tested fix
 commit. Package metadata is now aligned to `0.3.0-vnext-preview.1`, matching the
 candidate tag. This version-only alignment did not change the verified Runtime,
-Compiler, DSL, Trace, Skill, or Studio behavior. The tag has not been created.
+Compiler, DSL, Trace, Skill, or Studio behavior. The annotated tag is fixed to
+the release preparation commit recorded above.
 
-## Suggested tag candidate
+## Published prerelease
 
-Recommended future tag candidate:
+The published GitHub prerelease is:
 
-`v0.3.0-vnext-preview.1`
-
-Do not create this tag in this task.
+[Yutra v0.3.0 vNext Preview 1](https://github.com/wuwei-struct/Yutra/releases/tag/v0.3.0-vnext-preview.1)
 
 ## Next steps
 
-- Create the annotated tag only in a dedicated release task
-- Create the GitHub Release only after the tag is verified
-- Optional fourth archetype after release tag
+- Preserve the prerelease Tag and release evidence
+- Keep npm publication as a separate explicit decision
+- Optionally validate a fourth archetype after the prerelease

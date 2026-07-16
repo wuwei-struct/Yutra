@@ -53,10 +53,11 @@ describe("P6-10C.1 fixed release version alignment", () => {
     expect(candidate.includes("releaseTagBlocker: none")).toBe(true);
   });
 
-  it("records that publication actions have not occurred", () => {
+  it("records prerelease publication while npm remains unpublished", () => {
     const candidate = read("docs/vnext-preview-release-candidate.md");
-    expect(candidate.includes("tagCreated: false")).toBe(true);
-    expect(candidate.includes("githubReleaseCreated: false")).toBe(true);
+    expect(candidate.includes("tagCreated: true")).toBe(true);
+    expect(candidate.includes("githubReleaseCreated: true")).toBe(true);
+    expect(candidate.includes("githubReleaseType: prerelease")).toBe(true);
     expect(candidate.includes("npmPublished: false")).toBe(true);
   });
 
