@@ -53,7 +53,7 @@ function buildAgentSpec(config: PackConfig, configHash: string): Record<string, 
       { name: "check_source_policy", sideEffect: "none", riskLevel: "low", requiresApproval: false },
       { name: "render_answer_with_sources", sideEffect: "none", riskLevel: "low", requiresApproval: false },
       { name: "ask_clarifying_question", sideEffect: "none", riskLevel: "low", requiresApproval: false },
-      { name: "request_human_handoff", sideEffect: "external", riskLevel: "medium", requiresApproval: true },
+      { name: "escalate_human", sideEffect: "external", riskLevel: "medium", requiresApproval: true },
       { name: "render_no_answer_response", sideEffect: "none", riskLevel: "low", requiresApproval: false }
     ],
     states: {
@@ -122,7 +122,7 @@ function buildAgentSpec(config: PackConfig, configHash: string): Record<string, 
         transitions: [{ to: "done" }]
       },
       handoff: {
-        actions: ["request_human_handoff"],
+        actions: ["escalate_human"],
         handoff: true,
         transitions: [{ to: "done" }]
       },

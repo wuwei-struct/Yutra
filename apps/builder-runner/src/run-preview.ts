@@ -13,6 +13,7 @@ import type { AgentSpec } from "@yutra/spec";
 import type { BuilderRunPreviewRequest, BuilderRunPreviewResponse, BuilderRunnerValidationResult } from "./types";
 import { inspectDslText } from "./dsl-inspect";
 import { buildTimeline, sanitizeErrorMessage, toTraceJsonl } from "./response-formatters";
+import { creatorDemoActionRegistry } from "./actions/creator-demo-action-registry";
 
 const DEFAULT_SKILLS_DIR = "examples/ecommerce-support/skills";
 
@@ -141,7 +142,7 @@ export async function runBuilderPreview(request: BuilderRunPreviewRequest): Prom
       spec,
       input: resolveRuntimeInput(request),
       options: {
-        actionRegistry: {},
+        actionRegistry: creatorDemoActionRegistry,
         skillSearchPaths: [resolveSkillsDir(request.options?.skillsDir)],
         traceStorage
       }

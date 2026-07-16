@@ -1,11 +1,18 @@
 import { afterEach, describe, expect, it } from "vitest";
 import type { BuilderFormConfig } from "@yutra/builder-core";
 import { agentSpecToChineseDsl, ecommerceSupportTemplate, formConfigToAgentSpec } from "@yutra/builder-core";
+import type { AgentSpec } from "@yutra/spec";
 import {
   APPROVAL_DECISION_BASIC_CONFIG,
   KNOWLEDGE_ANSWERING_BASIC_CONFIG,
-  REQUEST_RESOLUTION_ECOMMERCE_BASIC_CONFIG
+  REQUEST_RESOLUTION_ECOMMERCE_BASIC_CONFIG,
+  type PackConfig
 } from "@yutra/pack-config-core";
+import { compilePackConfig } from "@yutra/rule-compiler";
+import { assertCompiledActionsResolvable } from "../src/action-closure";
+import { creatorDemoActionRegistry } from "../src/actions/creator-demo-action-registry";
+import { inspectDslText } from "../src/dsl-inspect";
+import { runBuilderPreview } from "../src/run-preview";
 import { createBuilderRunnerServer } from "../src/server";
 
 const baseForm: BuilderFormConfig = {
@@ -29,6 +36,21 @@ const startedServers: Array<{ close: () => Promise<void> }> = [];
 
 function buildValidDsl(): string {
   return agentSpecToChineseDsl(formConfigToAgentSpec(baseForm, ecommerceSupportTemplate));
+}
+
+function compileDemoDsl(config: PackConfig): string {
+  const output = compilePackConfig({ config });
+  expect(output.ok, JSON.stringify(output.issues, null, 2)).toBe(true);
+  return output.artifacts?.agent.content ?? "";
+}
+
+function inspectCompiledSpec(dslText: string): AgentSpec {
+  const inspected = inspectDslText({ dslText, format: "yaml" });
+  expect(inspected.ok).toBe(true);
+  if (!inspected.ok) {
+    throw new Error(inspected.error.message);
+  }
+  return inspected.canonical as AgentSpec;
 }
 
 async function startServer() {
@@ -193,6 +215,122 @@ describe("@yutra/builder-runner", () => {
     expect(body.ok).toBe(false);
     expect(body.error?.code).toBe("DSL_PARSE_ERROR");
     expect(body.events).toEqual([]);
+  });
+
+  it("resolves every generated Action ID for all three Creator demo archetypes", () => {
+    const configs = [
+      REQUEST_RESOLUTION_ECOMMERCE_BASIC_CONFIG,
+      APPROVAL_DECISION_BASIC_CONFIG,
+      KNOWLEDGE_ANSWERING_BASIC_CONFIG
+    ];
+
+    for (const config of configs) {
+      const result = assertCompiledActionsResolvable({
+        compiledDsl: inspectCompiledSpec(compileDemoDsl(config)),
+        actionRegistry: creatorDemoActionRegistry
+      });
+      expect(result.actionIds.length).toBeGreaterThan(0);
+      expect(result.unresolvedActionIds).toEqual([]);
+    }
+    expect(creatorDemoActionRegistry.classify_question_intent).toBeTypeOf("function");
+  });
+
+  it("runs the knowledge-answering compiled DSL success path to completion", async () => {
+    const response = await runBuilderPreview({
+      sourceMode: "dsl",
+      dslText: compileDemoDsl(KNOWLEDGE_ANSWERING_BASIC_CONFIG),
+      format: "yaml",
+      input: {
+        context: {
+          question_id: "DEMO-Q-SUCCESS",
+          question_text: "demo governed question"
+        }
+      }
+    });
+
+    expect(response.ok).toBe(true);
+    if (!response.ok) {
+      throw new Error(response.error.message);
+    }
+    expect(response.run.status).toBe("completed");
+    expect(response.run.errorCode).toBeUndefined();
+    expect(response.events.some((event) => event.type === "action.succeeded")).toBe(true);
+    expect(response.events.some((event) => event.type === "transition.resolved")).toBe(true);
+    expect(response.events.some((event) => event.type === "run.completed")).toBe(true);
+    expect(JSON.stringify(response.events)).not.toContain("RUNTIME_ACTION_NOT_FOUND");
+    expect(response.auditBundle).toBeDefined();
+  });
+
+  it("keeps knowledge-answering low-confidence and no-answer paths fail-closed", async () => {
+    const dslText = compileDemoDsl(KNOWLEDGE_ANSWERING_BASIC_CONFIG);
+    const lowConfidence = await runBuilderPreview({
+      sourceMode: "dsl",
+      dslText,
+      input: {
+        context: {
+          question_id: "DEMO-Q-LOW",
+          question_text: "demo ambiguous question",
+          confidence_score: 0.4
+        }
+      }
+    });
+    const noAnswer = await runBuilderPreview({
+      sourceMode: "dsl",
+      dslText,
+      input: {
+        context: {
+          question_id: "DEMO-Q-NONE",
+          question_text: "demo unsupported question",
+          knowledge_hit: false
+        }
+      }
+    });
+
+    expect(lowConfidence.ok).toBe(true);
+    expect(noAnswer.ok).toBe(true);
+    expect(JSON.stringify(lowConfidence)).toContain("ask_clarification");
+    expect(JSON.stringify(noAnswer)).toContain("no_answer");
+    expect(JSON.stringify(noAnswer)).toContain("fail_closed");
+  });
+
+  it("routes sensitive knowledge questions to demo handoff without real external effects", async () => {
+    const response = await runBuilderPreview({
+      sourceMode: "dsl",
+      dslText: compileDemoDsl(KNOWLEDGE_ANSWERING_BASIC_CONFIG),
+      input: {
+        context: {
+          question_id: "DEMO-Q-SENSITIVE",
+          question_text: "demo sensitive question",
+          sensitive_question: true
+        }
+      }
+    });
+
+    expect(response.ok).toBe(true);
+    if (!response.ok) {
+      throw new Error(response.error.message);
+    }
+    expect(response.run.status).toBe("completed");
+    expect(response.timeline.some((item) => item.state === "handoff")).toBe(true);
+    expect(response.timeline.some((item) => item.action === "escalate_human" && item.type === "action.succeeded")).toBe(true);
+    expect(JSON.stringify(response.events)).toContain('"external_side_effect_executed":false');
+    expect(JSON.stringify(response.events)).toContain('"networkAccess":false');
+  });
+
+  it("keeps unknown compiled Actions fail-closed with RUNTIME_ACTION_NOT_FOUND", async () => {
+    const dslText = compileDemoDsl(KNOWLEDGE_ANSWERING_BASIC_CONFIG).replaceAll(
+      "classify_question_intent",
+      "unknown_demo_action"
+    );
+    const response = await runBuilderPreview({ sourceMode: "dsl", dslText, input: { context: {} } });
+
+    expect(response.ok).toBe(true);
+    if (!response.ok) {
+      throw new Error(response.error.message);
+    }
+    expect(response.run.status).toBe("failed");
+    expect(response.run.errorCode).toBe("RUNTIME_ACTION_NOT_FOUND");
+    expect(response.events.some((event) => event.type === "run.failed")).toBe(true);
   });
 
   it("POST /run-preview with invalid form returns structured error", async () => {

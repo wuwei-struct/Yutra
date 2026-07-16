@@ -224,6 +224,8 @@ describe("@yutra/rule-compiler", () => {
     expect(inspected.issues).toEqual([]);
     expect(inspected.canonical.agent).toBe("knowledge_answering_basic");
     expect(Object.keys(inspected.canonical.states)).toContain("handoff");
+    expect(inspected.canonical.states.handoff?.actions).toContain("escalate_human");
+    expect(inspected.canonical.states.handoff?.actions).not.toContain("request_human_handoff");
   });
 
   it("knowledge-answering artifacts include confidence policy, templates, tests, and trace expectations", () => {
