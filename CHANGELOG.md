@@ -1,10 +1,10 @@
 # Changelog
 
-## Unreleased / vNext Preview
+## Unreleased
 
-- Target version: `0.3.0-vnext-preview.1`
-- Status: package metadata aligned; Git tag, GitHub Release, and npm publication
-  have not been created.
+No unreleased changes are recorded after the vNext Preview release preparation.
+
+## [0.3.0-vnext-preview.1] - 2026-07-16
 
 ### Included
 
@@ -25,10 +25,11 @@
 - Archetype taxonomy metadata in `@yutra/archetype-core`.
 - Taxonomy-aware Creator Workbench archetype selection.
 - vNext Preview release candidate checklist.
+- Knowledge-answering Run Preview Action Closure alignment.
+- Three-archetype RC smoke evidence.
 
 ### Intentionally Excluded
 
-- Git tag or GitHub Release publication.
 - npm package publication.
 - Real customer API integration.
 - Real LLM, RAG, or knowledge base integration.
