@@ -4,11 +4,13 @@
 
 ### Added
 
+- `@yutra/scenario-composition-core` with an `orchestrated_subflows` composition-plan contract, namespaced Pack Config Slots, explicit routes and identity bindings, fail-closed precedence, and contract-layer readiness.
 - `@yutra/scenario-pattern-core` with demo-only Scenario Pattern manifests, fail-closed role validation, derived composition summaries, local registry queries, and bilingual explanations.
 - Built-in composition contracts for ecommerce refund, customer complaint, and renewal churn warning demos.
 
 ### Intentionally Excluded
 
+- Scenario Composition Compiler, combined DSL generation, composed Agent execution, or generic Pack Config deep merge.
 - Composition compilation or execution.
 - Pack Config merge and Compiler precedence.
 - Creator Workbench or Runtime integration for Scenario Patterns.

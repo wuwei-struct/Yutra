@@ -66,6 +66,8 @@ Scenario Patterns are useful presets for product and delivery thinking, but they
 
 `@yutra/scenario-pattern-core` now provides the structured demo-only manifest, validation, composition summary, local registry, and explain contract for this layer. It reuses Product and Cross-cutting Archetype metadata from `@yutra/archetype-core`; it does not compile or execute a composed Agent. See [Scenario Pattern Core](./scenario-pattern-core.md).
 
+`@yutra/scenario-composition-core` adds the next pre-compiler contract: a Pattern can be bound to isolated Primary and Supporting Pack Config Slots plus scoped Cross-cutting Overlays. It uses explicit `orchestrated_subflows`, routes, identity data bindings, and fail-closed precedence rather than generic Pack Config deep merge. See [Scenario Composition Contract](./scenario-composition-contract.md). No composition compiler or Runtime integration is included.
+
 ### Ecommerce refund / 电商退款
 
 Main archetype:

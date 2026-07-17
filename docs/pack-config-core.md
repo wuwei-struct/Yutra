@@ -174,6 +174,10 @@ This prepares for future audit binding. It does not write trace events.
 - include real endpoints or secrets
 - include pricing, UAT, rollout, or delivery playbooks
 
+## Scenario Composition Isolation
+
+`@yutra/scenario-composition-core` may reference an existing validated Pack Config inside a named Primary or Supporting Slot. Each config remains isolated under its Slot namespace. The composition contract does not flatten root fields, merge adapters, merge templates, propagate endpoints or secrets, or infer cross-Slot field mappings. Routes and `identity` data bindings must be explicit, and ambiguous conflicts fail closed. See [Scenario Composition Contract](./scenario-composition-contract.md).
+
 ## Next Step
 
 P6-04 should implement the first Rule Compiler contract:

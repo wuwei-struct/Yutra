@@ -158,7 +158,10 @@ Current status:
 - Primary, supporting, and cross-cutting role validation is fail-closed.
 - Built-in patterns cover ecommerce refund, customer complaint, and renewal churn warning demos.
 - Composition summaries derive primitive coverage, governance focus, and explicit Compiler/Workbench support status.
-- Composition Compiler, Pack Config merge, Creator Workbench preview, and Runtime execution remain deferred.
+- `@yutra/scenario-composition-core` defines namespaced `orchestrated_subflows` plans, explicit routing and identity bindings, fail-closed precedence, and contract-layer readiness.
+- Customer complaint and ecommerce refund have validated demo composition plans; renewal churn remains a contract-only draft.
+- `compile_ready` means participating Product Archetypes have individual compiler support; `compositionCompilerAvailable` remains false.
+- Composition Compiler, combined DSL generation, generic Pack Config deep merge, Creator Workbench preview, and Runtime execution remain deferred.
 
 ## First Priority Archetypes
 

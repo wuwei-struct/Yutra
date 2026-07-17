@@ -10,6 +10,8 @@ Behavior Primitives
 
 A scenario pattern is a composition preset, not a new archetype. It describes which Product Archetype owns the primary output, which Product Archetypes provide supporting outputs, and which Cross-cutting Archetypes add governance or collaboration concerns.
 
+The next contract layer is a Scenario Composition Plan: an explicit, namespaced binding of a Pattern to Pack Config Slots, routes, data bindings, and fail-closed precedence. See [Scenario Composition Contract](./scenario-composition-contract.md). The Pattern package remains independent and does not contain execution or merge semantics.
+
 场景组合范式是母型组合预设，不是新的主母型。它描述主产出由哪个产物型主母型负责、哪些产物型主母型提供辅助产出，以及哪些横切母型提供治理或协同能力。
 
 ## Manifest Contract
@@ -134,4 +136,4 @@ This package currently does not:
 - connect Creator Workbench
 - execute any business action
 
-A future iteration may add a Composition Compiler or Creator Workbench preview, but that requires an explicit contract and governance design.
+`@yutra/scenario-composition-core` now supplies that explicit pre-compiler contract. It still does not compile or run a composed Agent. A future iteration may add a Scenario Composition Compile Preview without weakening namespace isolation or fail-closed governance.

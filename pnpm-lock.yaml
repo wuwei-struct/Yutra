@@ -231,6 +231,21 @@ importers:
         specifier: ^2.8.1
         version: 2.8.2
 
+  packages/scenario-composition-core:
+    dependencies:
+      '@yutra/archetype-core':
+        specifier: workspace:*
+        version: link:../archetype-core
+      '@yutra/pack-config-core':
+        specifier: workspace:*
+        version: link:../pack-config-core
+      '@yutra/scenario-pattern-core':
+        specifier: workspace:*
+        version: link:../scenario-pattern-core
+      zod:
+        specifier: ^3.24.2
+        version: 3.25.76
+
   packages/scenario-pattern-core:
     dependencies:
       '@yutra/archetype-core':

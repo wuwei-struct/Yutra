@@ -1,0 +1,38 @@
+{
+  "name": "@yutra/scenario-composition-core",
+  "version": "0.3.0-vnext-preview.1",
+  "private": false,
+  "description": "Yutra scenario composition plan contracts, validation, readiness, and explanation",
+  "type": "module",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --dts",
+    "test": "vitest run --passWithNoTests",
+    "lint": "eslint src --max-warnings=0"
+  },
+  "dependencies": {
+    "@yutra/archetype-core": "workspace:*",
+    "@yutra/pack-config-core": "workspace:*",
+    "@yutra/scenario-pattern-core": "workspace:*",
+    "zod": "^3.24.2"
+  },
+  "license": "MIT",
+  "author": "Yutra Contributors",
+  "keywords": [
+    "yutra",
+    "scenario-composition",
+    "orchestration",
+    "governance"
+  ]
+}
