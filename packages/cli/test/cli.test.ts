@@ -11,6 +11,8 @@ const workspaceRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..
 const compileConfigPath = "examples/request-resolution-ecommerce-basic/pack.config.json";
 const approvalCompileConfigPath = "examples/approval-decision-basic/pack.config.json";
 const knowledgeCompileConfigPath = "examples/knowledge-answering-basic/pack.config.json";
+const customerCompositionPlanPath = "examples/customer-complaint-composition/plan.json";
+const ecommerceCompositionPlanPath = "examples/ecommerce-refund-composition/plan.json";
 const compiledArtifactFiles = [
   "agent.yutra.yaml",
   "policy.yaml",
@@ -698,6 +700,130 @@ describe("@yutra/cli", () => {
     expect(parsed.dryRun).toBe(true);
     expect(parsed.artifactFilenames).toContain("agent.yutra.yaml");
     expect(parsed.artifactHashes["trace.expectation.json"]).toMatch(/^sha256:/);
+    await rm(dir, { recursive: true, force: true });
+  });
+
+  it("composition compile --help displays preview-only usage", async () => {
+    const { io, stdout } = createMemoryIO();
+    const code = await runCli(["composition", "compile", "--help"], io);
+    expect(code).toBe(0);
+    expect(stdout.some((line) => line.includes("yutra composition compile <composition-plan.json>"))).toBe(true);
+    expect(stdout.some((line) => line.includes("runtimeExecutable=false"))).toBe(true);
+  });
+
+  it("composition compile dry-run writes no files", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "yutra-composition-dry-"));
+    const outDir = join(dir, "out");
+    const { io, stdout } = createMemoryIO();
+    const code = await runCli(
+      ["composition", "compile", customerCompositionPlanPath, "--out", outDir, "--dry-run"],
+      io
+    );
+    expect(code).toBe(0);
+    expect(existsSync(outDir)).toBe(false);
+    expect(stdout).toContain("previewOnly: true");
+    expect(stdout).toContain("runtimeExecutable: false");
+    await rm(dir, { recursive: true, force: true });
+  });
+
+  it("composition compile --force writes the complete namespaced Bundle", async () => {
+    const outDir = await mkdtemp(join(tmpdir(), "yutra-composition-out-"));
+    const { io } = createMemoryIO();
+    const code = await runCli(
+      ["composition", "compile", customerCompositionPlanPath, "--out", outDir, "--force"],
+      io
+    );
+    expect(code).toBe(0);
+    for (const filename of [
+      "composition.manifest.json",
+      "composition.routes.json",
+      "composition.bindings.json",
+      "composition.overlays.json",
+      "composition.precedence.json",
+      "composition.slot-index.json",
+      "composition-report.json"
+    ]) {
+      expect(existsSync(join(outDir, filename)), filename).toBe(true);
+    }
+    for (const slotId of ["complaint_resolution", "policy_explanation", "compensation_decision"]) {
+      for (const filename of compiledArtifactFiles.slice(0, 6)) {
+        expect(existsSync(join(outDir, "slots", slotId, filename)), `${slotId}/${filename}`).toBe(true);
+      }
+    }
+    expect(existsSync(join(outDir, "orchestrator.yutra.yaml"))).toBe(false);
+    await rm(outDir, { recursive: true, force: true });
+  });
+
+  it("composition compile refuses an existing output directory without --force", async () => {
+    const outDir = await mkdtemp(join(tmpdir(), "yutra-composition-existing-"));
+    const { io, stderr } = createMemoryIO();
+    const code = await runCli(["composition", "compile", ecommerceCompositionPlanPath, "--out", outDir], io);
+    expect(code).not.toBe(0);
+    expect(stderr.some((line) => line.includes("COMPOSITION_OUTPUT_EXISTS"))).toBe(true);
+    await rm(outDir, { recursive: true, force: true });
+  });
+
+  it("composition compile --json returns a parseable preview summary", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "yutra-composition-json-"));
+    const { io, stdout } = createMemoryIO();
+    const code = await runCli(
+      [
+        "composition",
+        "compile",
+        ecommerceCompositionPlanPath,
+        "--out",
+        join(dir, "out"),
+        "--dry-run",
+        "--json"
+      ],
+      io
+    );
+    expect(code).toBe(0);
+    const summary = JSON.parse(stdout.join("\n")) as {
+      ok: boolean;
+      previewOnly: boolean;
+      runtimeExecutable: boolean;
+      slots: unknown[];
+      compositionArtifactFilenames: string[];
+    };
+    expect(summary.ok).toBe(true);
+    expect(summary.previewOnly).toBe(true);
+    expect(summary.runtimeExecutable).toBe(false);
+    expect(summary.slots).toHaveLength(2);
+    expect(summary.compositionArtifactFilenames).toHaveLength(7);
+    await rm(dir, { recursive: true, force: true });
+  });
+
+  it("composition compile rejects output path traversal", async () => {
+    const { io, stderr } = createMemoryIO();
+    const code = await runCli(
+      ["composition", "compile", customerCompositionPlanPath, "--out", "../unsafe-composition-output"],
+      io
+    );
+    expect(code).not.toBe(0);
+    expect(stderr.some((line) => line.includes("COMPOSITION_OUTPUT_PATH_UNSAFE"))).toBe(true);
+  });
+
+  it("composition compile rejects renewal churn without writing artifacts", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "yutra-composition-renewal-"));
+    const planPath = join(dir, "renewal-plan.json");
+    const outDir = join(dir, "out");
+    await writeFile(
+      planPath,
+      JSON.stringify({
+        schemaVersion: "1.0.0",
+        compositionId: "renewal-churn-warning-composition-demo",
+        patternRef: { patternId: "renewal-churn-warning-demo", version: "0.1.0" },
+        executionModel: "orchestrated_subflows",
+        eligibleForCompilerInput: false
+      }),
+      "utf8"
+    );
+    const { io, stderr } = createMemoryIO();
+    const code = await runCli(["composition", "compile", planPath, "--out", outDir], io);
+    expect(code).not.toBe(0);
+    expect(stderr.some((line) => line.includes("COMPOSITION_NOT_COMPILE_READY"))).toBe(true);
+    expect(existsSync(outDir)).toBe(false);
     await rm(dir, { recursive: true, force: true });
   });
 });

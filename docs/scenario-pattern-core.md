@@ -136,4 +136,9 @@ This package currently does not:
 - connect Creator Workbench
 - execute any business action
 
-`@yutra/scenario-composition-core` now supplies that explicit pre-compiler contract. It still does not compile or run a composed Agent. A future iteration may add a Scenario Composition Compile Preview without weakening namespace isolation or fail-closed governance.
+`@yutra/scenario-composition-core` supplies that explicit pre-compiler contract.
+`@yutra/scenario-composition-compiler` can now compile eligible plans into a
+preview-only Bundle of namespaced Slot artifacts and composition relationship
+artifacts. It still does not generate an executable top-level Orchestrator DSL
+or run a composed Agent. See
+[Scenario Composition Compile Preview](./scenario-composition-compile-preview.md).

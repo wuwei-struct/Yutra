@@ -109,7 +109,25 @@ It is demo/mock only:
 
 `approval-decision` is supported by the compiler core, CLI, and Creator Workbench demo UI. The UI remains demo/mock only and does not connect a real approval system.
 
-`knowledge-answering` is supported by the compiler core and CLI. Creator Workbench UI is not enabled for this archetype yet. It remains demo/mock only and does not call a real LLM or connect a real retrieval provider.
+`knowledge-answering` is supported by the compiler core, CLI, and Creator Workbench demo UI. It remains demo/mock only and does not call a real LLM or connect a real retrieval provider.
+
+## Scenario Composition Compile Preview
+
+The CLI also exposes a separate preview-only composition command:
+
+```bash
+pnpm exec yutra composition compile examples/customer-complaint-composition/plan.json --out .tmp/customer-complaint --dry-run
+pnpm exec yutra composition compile examples/ecommerce-refund-composition/plan.json --out .tmp/ecommerce-refund --force
+```
+
+This command validates the Composition Plan, calls the existing Rule Compiler
+for every Slot, and writes six canonical artifacts under each
+`slots/<slotId>/` namespace plus seven top-level composition relationship
+artifacts. It does not deep-merge Pack Configs, generate an executable
+Orchestrator DSL, or run Runtime.
+
+See
+[Scenario Composition Compile Preview](./scenario-composition-compile-preview.md).
 
 ## Non-goals
 

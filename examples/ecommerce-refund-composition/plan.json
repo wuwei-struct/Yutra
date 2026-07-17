@@ -1,0 +1,543 @@
+{
+  "schemaVersion": "1.0.0",
+  "compositionId": "ecommerce-refund-composition-demo",
+  "version": "0.1.0",
+  "patternRef": {
+    "patternId": "ecommerce-refund-demo",
+    "version": "0.1.0"
+  },
+  "executionModel": "orchestrated_subflows",
+  "primarySlotId": "refund_resolution",
+  "slots": [
+    {
+      "slotId": "refund_resolution",
+      "role": "primary",
+      "archetypeId": "request-resolution",
+      "packConfigId": "request-resolution:ecommerce-basic-demo",
+      "packConfig": {
+        "packConfigId": "request-resolution:ecommerce-basic-demo",
+        "packConfigVersion": "0.1.0",
+        "archetypeId": "request-resolution",
+        "archetypeVersion": "0.1.0",
+        "variantId": "ecommerce-basic-demo",
+        "variantVersion": "0.1.0",
+        "locale": "en",
+        "capabilities": {
+          "orderLookup": {
+            "value": true,
+            "source": "confirmedByUser",
+            "required": true
+          },
+          "shippingLookup": {
+            "value": true,
+            "source": "confirmedByUser"
+          },
+          "refundRequest": {
+            "value": true,
+            "source": "confirmedByUser"
+          },
+          "returnRequest": {
+            "value": true,
+            "source": "confirmedByUser"
+          },
+          "handoff": {
+            "value": true,
+            "source": "confirmedByUser",
+            "required": true
+          }
+        },
+        "businessObjects": [
+          {
+            "objectId": "order",
+            "label": {
+              "en": "Order",
+              "zhCN": "订单"
+            },
+            "fields": [
+              "order_id",
+              "status",
+              "amount"
+            ]
+          },
+          {
+            "objectId": "request",
+            "label": {
+              "en": "Request",
+              "zhCN": "请求"
+            },
+            "fields": [
+              "request_type",
+              "reason"
+            ]
+          }
+        ],
+        "rules": {
+          "refundPolicy.autoRefundWhenNotShipped": {
+            "value": true,
+            "source": "defaultFromPack",
+            "label": {
+              "en": "Auto refund when not shipped",
+              "zhCN": "未发货自动退款"
+            }
+          },
+          "refundPolicy.autoRefundMaxAmount": {
+            "value": 300,
+            "source": "defaultFromPack",
+            "label": {
+              "en": "Demo auto refund max amount",
+              "zhCN": "演示自动退款金额上限"
+            },
+            "description": {
+              "en": "Demo value only. Replace in private implementation.",
+              "zhCN": "仅演示值，私有实施时替换。"
+            }
+          },
+          "refundPolicy.shippedOrderStrategy": {
+            "value": "require_return_first",
+            "source": "confirmedByUser"
+          },
+          "refundPolicy.expiredAfterSaleStrategy": {
+            "value": "ask_for_more_info",
+            "source": "confirmedByUser"
+          },
+          "refundPolicy.apiFailureStrategy": {
+            "value": "retry_then_handoff",
+            "source": "confirmedByUser"
+          },
+          "handoffPolicy.highValueRefund": {
+            "value": true,
+            "source": "confirmedByUser"
+          },
+          "handoffPolicy.complaint": {
+            "value": true,
+            "source": "confirmedByUser"
+          },
+          "handoffPolicy.orderNotFound": {
+            "value": true,
+            "source": "confirmedByUser"
+          },
+          "handoffPolicy.ruleConflict": {
+            "value": true,
+            "source": "confirmedByUser"
+          },
+          "handoffPolicy.maxUserRetryCount": {
+            "value": 2,
+            "source": "defaultFromPack"
+          },
+          "responseStyle.tone": {
+            "value": "warm_professional",
+            "source": "confirmedByUser"
+          },
+          "responseStyle.includeReason": {
+            "value": true,
+            "source": "confirmedByUser"
+          },
+          "responseStyle.includeHumanSupportEntry": {
+            "value": true,
+            "source": "confirmedByUser"
+          }
+        },
+        "policies": {
+          "publish.requiresHumanReview": {
+            "value": true,
+            "source": "defaultFromPack"
+          }
+        },
+        "adapters": [
+          {
+            "adapterId": "order-adapter",
+            "mode": "mock",
+            "contractRef": "contracts/order-contract.md",
+            "fieldMappings": {
+              "orderId": "order_id"
+            },
+            "containsRealEndpoint": false,
+            "containsSecret": false
+          },
+          {
+            "adapterId": "escalation-adapter",
+            "mode": "mock",
+            "contractRef": "contracts/escalation-contract.md",
+            "fieldMappings": {
+              "reasonCode": "reason_code"
+            },
+            "containsRealEndpoint": false,
+            "containsSecret": false
+          }
+        ],
+        "templates": [
+          {
+            "templateId": "response.default.demo",
+            "purpose": "demo response",
+            "locale": "en",
+            "text": {
+              "value": "Demo response template. Replace with private brand-approved copy during implementation.",
+              "source": "defaultFromPack"
+            }
+          }
+        ],
+        "tests": [
+          {
+            "testCaseId": "happy-path-demo",
+            "title": "Happy path demo",
+            "input": {
+              "request_type": "demo_request",
+              "order_id": "DEMO-ORDER"
+            },
+            "expectedPath": [
+              "triage",
+              "resolve",
+              "respond"
+            ],
+            "expectedOutcome": "completed",
+            "tags": [
+              "demo",
+              "mock"
+            ]
+          }
+        ],
+        "governance": {
+          "environment": "demo",
+          "publishable": true,
+          "requiresHumanReview": true,
+          "unconfirmedFieldPolicy": "block_publish",
+          "missingFieldPolicy": "block_compile",
+          "sideEffectPolicy": {
+            "maxAutoSideEffect": "read",
+            "requiresPolicyGuardFrom": "write"
+          }
+        },
+        "metadata": {
+          "publicDemo": true,
+          "containsCustomerData": false
+        }
+      },
+      "purpose": {
+        "en": "Own the demo refund request result and final response.",
+        "zhCN": "负责 demo 退款请求结果和最终响应。"
+      }
+    },
+    {
+      "slotId": "refund_authorization",
+      "role": "supporting",
+      "archetypeId": "approval-decision",
+      "packConfigId": "approval-decision:basic-demo",
+      "packConfig": {
+        "packConfigId": "approval-decision:basic-demo",
+        "packConfigVersion": "0.1.0",
+        "archetypeId": "approval-decision",
+        "archetypeVersion": "0.1.0",
+        "variantId": "approval-basic-demo",
+        "variantVersion": "0.1.0",
+        "locale": "en",
+        "capabilities": {
+          "requestIntake": {
+            "value": true,
+            "source": "confirmedByUser",
+            "required": true
+          },
+          "evidenceCollection": {
+            "value": true,
+            "source": "confirmedByUser"
+          },
+          "eligibilityCheck": {
+            "value": true,
+            "source": "confirmedByUser"
+          },
+          "riskReview": {
+            "value": true,
+            "source": "confirmedByUser"
+          },
+          "approvalDecision": {
+            "value": true,
+            "source": "confirmedByUser"
+          },
+          "handoff": {
+            "value": true,
+            "source": "confirmedByUser",
+            "required": true
+          }
+        },
+        "businessObjects": [
+          {
+            "objectId": "approval_request",
+            "label": {
+              "en": "Approval request",
+              "zhCN": "审批请求"
+            },
+            "fields": [
+              "request_id",
+              "amount",
+              "risk_level"
+            ]
+          },
+          {
+            "objectId": "evidence",
+            "label": {
+              "en": "Evidence",
+              "zhCN": "证明材料"
+            },
+            "fields": [
+              "evidence_id",
+              "evidence_type",
+              "is_complete"
+            ]
+          }
+        ],
+        "rules": {
+          "approvalPolicy.autoApproveLowRisk": {
+            "value": true,
+            "source": "defaultFromPack",
+            "label": {
+              "en": "Demo low-risk auto approval",
+              "zhCN": "演示低风险自动通过"
+            }
+          },
+          "approvalPolicy.lowRiskMaxAmount": {
+            "value": 300,
+            "source": "defaultFromPack",
+            "label": {
+              "en": "Demo low-risk max amount",
+              "zhCN": "演示低风险金额上限"
+            },
+            "description": {
+              "en": "Demo value only. Replace in private implementation.",
+              "zhCN": "仅演示值，私有实施时替换。"
+            }
+          },
+          "approvalPolicy.missingEvidenceStrategy": {
+            "value": "ask_for_more_info",
+            "source": "confirmedByUser"
+          },
+          "approvalPolicy.highRiskStrategy": {
+            "value": "require_human_approval",
+            "source": "confirmedByUser"
+          },
+          "approvalPolicy.policyConflictStrategy": {
+            "value": "handoff",
+            "source": "confirmedByUser"
+          },
+          "approvalPolicy.timeoutStrategy": {
+            "value": "remind_reviewer",
+            "source": "confirmedByUser"
+          },
+          "riskPolicy.requireHumanForHighRisk": {
+            "value": true,
+            "source": "confirmedByUser"
+          },
+          "riskPolicy.requireEvidenceBeforeDecision": {
+            "value": true,
+            "source": "confirmedByUser"
+          },
+          "riskPolicy.requireReasonForRejection": {
+            "value": true,
+            "source": "confirmedByUser"
+          },
+          "riskPolicy.maxUserRetryCount": {
+            "value": 2,
+            "source": "defaultFromPack"
+          },
+          "responseStyle.tone": {
+            "value": "neutral",
+            "source": "confirmedByUser"
+          },
+          "responseStyle.includeDecisionReason": {
+            "value": true,
+            "source": "confirmedByUser"
+          },
+          "responseStyle.includeNextSteps": {
+            "value": true,
+            "source": "confirmedByUser"
+          },
+          "responseStyle.includeHumanReviewEntry": {
+            "value": true,
+            "source": "confirmedByUser"
+          }
+        },
+        "policies": {
+          "publish.requiresHumanReview": {
+            "value": true,
+            "source": "defaultFromPack"
+          }
+        },
+        "adapters": [
+          {
+            "adapterId": "approval-record-adapter",
+            "mode": "mock",
+            "contractRef": "contracts/approval-record-demo-contract.md",
+            "fieldMappings": {
+              "requestId": "request_id",
+              "decisionStatus": "decision_status"
+            },
+            "containsRealEndpoint": false,
+            "containsSecret": false
+          },
+          {
+            "adapterId": "reviewer-queue-adapter",
+            "mode": "mock",
+            "contractRef": "contracts/reviewer-queue-demo-contract.md",
+            "fieldMappings": {
+              "reviewReason": "review_reason"
+            },
+            "containsRealEndpoint": false,
+            "containsSecret": false
+          }
+        ],
+        "templates": [
+          {
+            "templateId": "approval.response.default.demo",
+            "purpose": "demo approval response",
+            "locale": "en",
+            "text": {
+              "value": "Demo approval response template. Replace with private approved copy during implementation.",
+              "source": "defaultFromPack"
+            }
+          }
+        ],
+        "tests": [
+          {
+            "testCaseId": "approval-low-risk-demo",
+            "title": "Low-risk approval demo",
+            "input": {
+              "request_type": "demo_approval",
+              "request_id": "DEMO-APPROVAL",
+              "amount": 100
+            },
+            "expectedPath": [
+              "collect_request",
+              "evaluate_policy",
+              "auto_approved"
+            ],
+            "expectedOutcome": "approved",
+            "tags": [
+              "demo",
+              "mock"
+            ]
+          }
+        ],
+        "governance": {
+          "environment": "demo",
+          "publishable": true,
+          "requiresHumanReview": true,
+          "unconfirmedFieldPolicy": "block_publish",
+          "missingFieldPolicy": "block_compile",
+          "sideEffectPolicy": {
+            "maxAutoSideEffect": "read",
+            "requiresPolicyGuardFrom": "write"
+          }
+        },
+        "metadata": {
+          "publicDemo": true,
+          "containsCustomerData": false,
+          "containsOrganizationData": false
+        }
+      },
+      "purpose": {
+        "en": "Return an authorization decision for guarded demo cases.",
+        "zhCN": "为受 Guard 约束的 demo 情况返回授权性决策。"
+      }
+    }
+  ],
+  "crossCuttingOverlays": [
+    {
+      "overlayId": "refund_policy_guard",
+      "archetypeId": "policy-guard",
+      "scopes": [
+        {
+          "type": "scenario"
+        }
+      ],
+      "enforcementMode": "deny_override"
+    },
+    {
+      "overlayId": "refund_adapter_boundary",
+      "archetypeId": "adapter-connector",
+      "scopes": [
+        {
+          "type": "slot",
+          "slotId": "refund_resolution"
+        }
+      ],
+      "enforcementMode": "adapter_boundary"
+    },
+    {
+      "overlayId": "refund_handoff",
+      "archetypeId": "human-handoff",
+      "scopes": [
+        {
+          "type": "route",
+          "routeId": "refund_handoff_required"
+        }
+      ],
+      "enforcementMode": "require_handoff"
+    }
+  ],
+  "routes": [
+    {
+      "routeId": "request_refund_authorization",
+      "fromSlotId": "refund_resolution",
+      "toSlotId": "refund_authorization",
+      "trigger": "on_guard",
+      "conditionRef": "authorization_required",
+      "returnMode": "return_to_caller"
+    },
+    {
+      "routeId": "return_refund_authorization",
+      "fromSlotId": "refund_authorization",
+      "toSlotId": "refund_resolution",
+      "trigger": "on_result",
+      "conditionRef": "authorization_decision_available",
+      "returnMode": "return_to_caller"
+    },
+    {
+      "routeId": "refund_handoff_required",
+      "fromSlotId": "refund_resolution",
+      "toSlotId": "$human_handoff",
+      "trigger": "on_handoff",
+      "conditionRef": "human_review_required",
+      "returnMode": "terminate_scenario"
+    },
+    {
+      "routeId": "refund_complete",
+      "fromSlotId": "refund_resolution",
+      "toSlotId": "$scenario_done",
+      "trigger": "on_result",
+      "conditionRef": "primary_acceptance_satisfied",
+      "returnMode": "terminate_scenario"
+    }
+  ],
+  "dataBindings": [
+    {
+      "bindingId": "refund_authorization_to_resolution",
+      "fromSlotId": "refund_authorization",
+      "fromPath": "result.authorizationDecision",
+      "toSlotId": "refund_resolution",
+      "toPath": "supporting.authorizationDecision",
+      "required": true,
+      "transform": "identity"
+    }
+  ],
+  "precedencePolicy": {
+    "rules": [
+      "hard_boundary_first",
+      "deny_overrides",
+      "human_review_over_automation",
+      "higher_risk_over_lower_risk",
+      "explicit_route_over_local_default",
+      "primary_owns_terminal_response",
+      "namespaced_supporting_configs",
+      "no_implicit_adapter_inheritance",
+      "no_secret_merge",
+      "fail_on_ambiguous_conflict"
+    ],
+    "conflictMode": "fail_closed"
+  },
+  "publicExposure": {
+    "mode": "demo_only",
+    "containsCustomerData": false,
+    "containsRealEndpoint": false,
+    "containsSecret": false,
+    "containsCustomerSop": false,
+    "containsCommercialDeliveryAsset": false
+  }
+}

@@ -38,7 +38,7 @@ export function resolveCompositionReadiness(
         supportContext.availableCrossCuttingArchetypeIds,
         input.crossCuttingArchetypeIds
       ),
-      compositionCompilerAvailable: false,
+      compositionCompilerAvailable: supportContext.compositionCompilerAvailable ?? false,
       status: patternAligned ? "contract_only" : "invalid",
       blockers: patternAligned ? [...input.blockers] : ["scenario_pattern_alignment_failed"]
     };
@@ -73,7 +73,7 @@ export function resolveCompositionReadiness(
     allProductArchetypesCompilerEnabled: compilerReady,
     allProductArchetypesWorkbenchEnabled: workbenchReady,
     allCrossCuttingAvailable: overlaysReady,
-    compositionCompilerAvailable: false,
+    compositionCompilerAvailable: supportContext.compositionCompilerAvailable ?? false,
     status,
     blockers
   };

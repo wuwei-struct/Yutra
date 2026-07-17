@@ -17,6 +17,7 @@ P6-04B adds a thin CLI/export layer on top of this core package. See [Rule Compi
 P6-05A adds a local Studio Compile Preview through builder-runner. That preview calls this package in memory and still does not execute Runtime or write artifacts.
 P6-06A adds Rule Impact Explanation in the Creator Workbench using Pack Config metadata. That layer explains field impact but does not change compiler output.
 P6-06B adds Certification Readiness Preview derived from compile output. It does not execute Runtime, does not execute test cases, and does not run official certification.
+P6-11B.1 adds a separate Scenario Composition Compile Preview that calls this package once per namespaced Slot. It does not merge Pack Configs, change the three individual compilers, generate a top-level executable DSL, or execute Runtime.
 
 ## Position in the vNext Chain
 
@@ -171,7 +172,20 @@ It generates the same six artifacts:
 
 It intentionally avoids real answer generation, real knowledge base content, real retrieval provider configuration, real source endpoints, customer knowledge assets, customer SOP, and delivery templates.
 
-Creator Workbench UI is not enabled for `knowledge-answering` yet. Current support is Pack Config + Rule Impact metadata + Rule Compiler + CLI only.
+Creator Workbench UI is demo-enabled for `knowledge-answering`. Current support remains demo/mock only and does not call a real LLM, connect a real retrieval provider, or execute Runtime automatically.
+
+## Scenario Composition Compile Preview Relationship
+
+`@yutra/scenario-composition-compiler` reuses `compilePackConfig` for each
+validated Composition Slot. Every Slot retains its own Pack Config identity,
+config hash, six canonical artifacts, and artifact hashes under a separate
+namespace.
+
+The composition package does not alter Rule Compiler semantics. Its top-level
+JSON files describe routes, bindings, overlays, precedence, Slot indexes, and
+the deterministic preview report. They are not an executable Orchestrator DSL.
+See
+[Scenario Composition Compile Preview](./scenario-composition-compile-preview.md).
 
 ## Rule Impact Explanation Relationship
 

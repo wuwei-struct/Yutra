@@ -123,6 +123,7 @@ export type CompositionSupportContext = {
   compilerEnabledArchetypeIds: ProductArchetypeId[];
   workbenchEnabledArchetypeIds: ProductArchetypeId[];
   availableCrossCuttingArchetypeIds: CrossCuttingArchetypeId[];
+  compositionCompilerAvailable?: boolean;
 };
 
 export type CompositionReadinessStatus = "compile_ready" | "partially_supported" | "contract_only" | "invalid";
@@ -133,7 +134,7 @@ export type CompositionReadiness = {
   allProductArchetypesCompilerEnabled: boolean;
   allProductArchetypesWorkbenchEnabled: boolean;
   allCrossCuttingAvailable: boolean;
-  compositionCompilerAvailable: false;
+  compositionCompilerAvailable: boolean;
   status: CompositionReadinessStatus;
   blockers: string[];
 };

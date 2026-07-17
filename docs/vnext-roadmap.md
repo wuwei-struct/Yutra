@@ -160,8 +160,9 @@ Current status:
 - Composition summaries derive primitive coverage, governance focus, and explicit Compiler/Workbench support status.
 - `@yutra/scenario-composition-core` defines namespaced `orchestrated_subflows` plans, explicit routing and identity bindings, fail-closed precedence, and contract-layer readiness.
 - Customer complaint and ecommerce refund have validated demo composition plans; renewal churn remains a contract-only draft.
-- `compile_ready` means participating Product Archetypes have individual compiler support; `compositionCompilerAvailable` remains false.
-- Composition Compiler, combined DSL generation, generic Pack Config deep merge, Creator Workbench preview, and Runtime execution remain deferred.
+- `compile_ready` means participating Product Archetypes have individual compiler support; composition compiler availability remains an explicit caller context and defaults to false.
+- `@yutra/scenario-composition-compiler` generates deterministic, preview-only namespaced Slot artifacts for customer complaint and ecommerce refund.
+- Executable top-level Orchestrator DSL, generic Pack Config deep merge, Creator Workbench preview, and Runtime execution remain deferred.
 
 ## First Priority Archetypes
 

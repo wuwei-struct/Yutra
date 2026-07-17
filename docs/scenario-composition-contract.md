@@ -1,11 +1,11 @@
 # Scenario Composition Contract
 
-`@yutra/scenario-composition-core` defines the contract between a static Scenario Pattern and a future composition compiler:
+`@yutra/scenario-composition-core` defines the contract between a static Scenario Pattern and a composition compiler:
 
 ```text
 Scenario Pattern
 -> Scenario Composition Plan
--> Future Composition Compiler
+-> Composition Compiler
 -> Orchestrator + Namespaced Subflows
 ```
 
@@ -113,7 +113,7 @@ An Allow cannot override a Deny. Automation cannot override required human revie
 
 It uses the three existing public demo Pack Configs in separate Slots. Explicit routes request a policy explanation, request an authorization decision, return structured results to the Primary, or require human handoff. The Primary owns the final response.
 
-With the current support context this plan is contract-layer `compile_ready`, while `compositionCompilerAvailable` remains `false`. This status means every participating Product Archetype has an individual compiler and Workbench flow; it does not mean a composition compiler exists.
+With the current Product Archetype support context this plan is contract-layer `compile_ready`. The contract package still defaults `compositionCompilerAvailable` to `false`; the dedicated Compile Preview compiler opts in explicitly. Contract readiness alone does not imply executable composition Runtime support.
 
 ### Ecommerce refund
 
@@ -125,9 +125,21 @@ With the current support context this plan is contract-layer `compile_ready`, wh
 
 ## Readiness
 
-`resolveCompositionReadiness` reports contract and Pattern alignment, individual Product Archetype compiler and Workbench support, Cross-cutting availability, explicit blockers, and `compositionCompilerAvailable: false`.
+`resolveCompositionReadiness` reports contract and Pattern alignment, individual Product Archetype compiler and Workbench support, Cross-cutting availability, explicit blockers, and caller-supplied composition compiler availability. Availability defaults to `false`; `@yutra/scenario-composition-compiler` passes `true` only while building a preview Bundle.
 
 Contract-layer `compile_ready` is an input-readiness statement only. No composition DSL or Runtime execution is produced.
+
+## Compile Preview
+
+`@yutra/scenario-composition-compiler` now consumes validated, contract-layer
+`compile_ready` plans. It calls the existing Rule Compiler once per Slot and
+keeps every six-artifact result under `slots/<slotId>/`. Seven top-level JSON
+artifacts describe routes, bindings, overlays, precedence, Slot indexes, and
+the deterministic report.
+
+The preview is not a composed Runtime program: `previewOnly=true`,
+`runtimeExecutable=false`, and no top-level Orchestrator DSL is generated. See
+[Scenario Composition Compile Preview](./scenario-composition-compile-preview.md).
 
 ## Provenance Requirement
 
@@ -139,12 +151,12 @@ Every validated built-in Plan is `demo_only`, uses mock adapters, and declares a
 
 ## Current Non-goals
 
-- no Scenario Composition Compiler;
-- no combined DSL or artifact generation;
+- no executable top-level Orchestrator DSL;
+- no composed Runtime program;
 - no Pack Config deep merge;
 - no composed Agent execution;
 - no Runtime integration;
 - no Creator Workbench integration;
 - no remote registry or install flow.
 
-The next possible stage is a Scenario Composition Compile Preview that consumes this contract without weakening namespace isolation or fail-closed governance.
+The next possible stage is a Studio view of the existing Compile Preview Bundle. It must preserve namespace isolation, fail-closed governance, and explicit manual boundaries.

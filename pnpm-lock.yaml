@@ -172,6 +172,9 @@ importers:
       '@yutra/runtime':
         specifier: workspace:*
         version: link:../runtime
+      '@yutra/scenario-composition-compiler':
+        specifier: workspace:*
+        version: link:../scenario-composition-compiler
       '@yutra/skill-core':
         specifier: workspace:*
         version: link:../skill-core
@@ -230,6 +233,24 @@ importers:
       yaml:
         specifier: ^2.8.1
         version: 2.8.2
+
+  packages/scenario-composition-compiler:
+    dependencies:
+      '@yutra/archetype-core':
+        specifier: workspace:*
+        version: link:../archetype-core
+      '@yutra/pack-config-core':
+        specifier: workspace:*
+        version: link:../pack-config-core
+      '@yutra/rule-compiler':
+        specifier: workspace:*
+        version: link:../rule-compiler
+      '@yutra/scenario-composition-core':
+        specifier: workspace:*
+        version: link:../scenario-composition-core
+      '@yutra/scenario-pattern-core':
+        specifier: workspace:*
+        version: link:../scenario-pattern-core
 
   packages/scenario-composition-core:
     dependencies:

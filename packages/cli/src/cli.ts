@@ -1,6 +1,5 @@
 import { existsSync, readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
-import { isAbsolute } from "node:path";
 import { pathToFileURL } from "node:url";
 import { mkdir, rename, writeFile } from "node:fs/promises";
 import { formatExplainOutput, inspectCanonicalization, loadAndValidateDslFile, loadDslFile } from "@yutra/dsl";
@@ -15,38 +14,11 @@ import { getStringFlag, parseArgs } from "./args";
 import { EXIT_CODE_GENERAL_FAILURE, EXIT_CODE_SUCCESS, EXIT_CODE_TRACE_FAILURE, EXIT_CODE_VALIDATION_FAILURE } from "./exit-codes";
 import { formatIssues, formatRunSummary, formatTraceTable, formatTraceTimeline, formatValidateSummary } from "./formatters";
 import type { CliIO } from "./io";
+import { runCompositionCompile } from "./composition-compile-command";
+import { findWorkspaceRoot, resolveWorkspacePath } from "./workspace-path";
 
 const DEFAULT_TRACE_FILE = ".yutra/traces/events.jsonl";
 const DEFAULT_SKILL_PATHS = ["skills", ".yutra/skills", "examples/ecommerce-support/skills"];
-
-function findWorkspaceRoot(start: string): string {
-  let current = start;
-  while (true) {
-    if (existsSync(resolve(current, "pnpm-workspace.yaml"))) {
-      return current;
-    }
-
-    const parent = dirname(current);
-    if (parent === current) {
-      return start;
-    }
-    current = parent;
-  }
-}
-
-function resolveWorkspacePath(inputPath: string): string {
-  if (isAbsolute(inputPath)) {
-    return inputPath;
-  }
-
-  const cwdPath = resolve(process.cwd(), inputPath);
-  if (existsSync(cwdPath)) {
-    return cwdPath;
-  }
-
-  const workspaceRoot = findWorkspaceRoot(process.cwd());
-  return resolve(workspaceRoot, inputPath);
-}
 
 function printHelp(io: CliIO): void {
   io.stdout("Yutra CLI v0.1");
@@ -60,6 +32,7 @@ function printHelp(io: CliIO): void {
   io.stdout("  yutra skill inspect <nameOrPath> [--as-action] [--json] [--skills-dir <path>]");
   io.stdout("  yutra skill validate <path> [--json]");
   io.stdout("  yutra compile <pack-config.json> --out <dir> [--mode <preview|publish>] [--locale <en|zh-CN>] [--force] [--dry-run] [--json]");
+  io.stdout("  yutra composition compile <composition-plan.json> --out <dir> [--force] [--dry-run] [--json]");
   io.stdout("  yutra trace list [--trace-file <jsonl>]");
   io.stdout("  yutra trace show <runId> [--trace-file <jsonl>] [--json]");
   io.stdout("  yutra trace export <runId> --out <json> [--trace-file <jsonl>]");
@@ -813,6 +786,10 @@ export async function runCli(argv: string[], io: CliIO): Promise<number> {
 
     if (command === "compile") {
       return runCompile([subcommand, ...rest].filter(Boolean) as string[], flags, io);
+    }
+
+    if (command === "composition" && subcommand === "compile") {
+      return runCompositionCompile(rest, flags, io);
     }
 
     if (command === "trace" && subcommand === "list") {
