@@ -279,6 +279,24 @@ importers:
         specifier: ^3.24.2
         version: 3.25.76
 
+  packages/scenario-orchestrator-core:
+    dependencies:
+      '@yutra/archetype-core':
+        specifier: workspace:*
+        version: link:../archetype-core
+      '@yutra/scenario-composition-compiler':
+        specifier: workspace:*
+        version: link:../scenario-composition-compiler
+      '@yutra/scenario-composition-core':
+        specifier: workspace:*
+        version: link:../scenario-composition-core
+      '@yutra/scenario-pattern-core':
+        specifier: workspace:*
+        version: link:../scenario-pattern-core
+      zod:
+        specifier: ^3.24.2
+        version: 3.25.76
+
   packages/scenario-pattern-core:
     dependencies:
       '@yutra/archetype-core':

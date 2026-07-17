@@ -37,6 +37,20 @@ Business Rules
 
 DSL remains the deterministic intermediate layer consumed by the runtime.
 
+Scenario composition adds a separate future-facing contract chain:
+
+```text
+Composition Preview Bundle
+-> Scenario Orchestrator Document
+-> Future Orchestrator Runtime
+-> Namespaced Slot DSL execution
+```
+
+`@yutra/scenario-orchestrator-core` currently defines only the document,
+call-return, Context, terminal, budget, Trace, and provenance contracts. It
+does not change this execution standard, the existing DSL parser, Runtime, or
+Trace event model, and Yutra Runtime cannot execute the Orchestrator Document.
+
 ## Boundaries
 
 The execution standard does not include:

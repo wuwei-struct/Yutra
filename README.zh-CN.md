@@ -184,6 +184,7 @@ LLM 可以生成配置草案，但不能绕过 Compiler、Runtime、Trace、Audi
 - [Scenario Composition Contract](docs/scenario-composition-contract.md)
 - [Scenario Composition Compile Preview](docs/scenario-composition-compile-preview.md)
 - [Studio Scenario Composition Compile Preview](docs/studio-scenario-composition-preview.md)
+- [Scenario Orchestrator DSL Contract](docs/scenario-orchestrator-contract.md)
 - [Creator Archetype Selection](docs/creator-archetype-selection.md)
 - [Archetype Core](docs/archetype-core.md)
 - [Business Rule Config](docs/business-rule-config.md)

@@ -163,6 +163,7 @@ Current status:
 - `compile_ready` means participating Product Archetypes have individual compiler support; composition compiler availability remains an explicit caller context and defaults to false.
 - `@yutra/scenario-composition-compiler` generates deterministic, preview-only namespaced Slot artifacts for customer complaint and ecommerce refund.
 - Studio has an independent Scenario Composition workbench for canonical catalog/detail views and in-memory Compile Preview of customer complaint and ecommerce refund.
+- `@yutra/scenario-orchestrator-core` defines the preview-only `single_active_slot_call_return` Orchestrator Document contract, Context namespace isolation, explicit call-return, fixed terminals, budgets, Trace/Audit expectations, and closed provenance.
 - Renewal churn remains contract-only; executable top-level Orchestrator DSL, Plan authoring, generic Pack Config deep merge, and Runtime execution remain deferred.
 
 ## First Priority Archetypes

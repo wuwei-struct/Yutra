@@ -167,3 +167,15 @@ while preserving namespace isolation, fail-closed governance, and explicit
 manual boundaries. See
 [Studio Scenario Composition Compile Preview](./studio-scenario-composition-preview.md).
 Plan Authoring and an executable Orchestrator contract remain future work.
+
+## Orchestrator Contract
+
+The next contract layer is now defined by
+[`@yutra/scenario-orchestrator-core`](./scenario-orchestrator-contract.md).
+It binds a validated Composition Plan and Preview Bundle to namespaced Slot
+artifact references, explicit call-return Routes, fixed Context policies,
+fail-closed terminals, budgets, Trace expectations, and closed provenance.
+
+It remains a contract only. It does not deep-merge Pack Configs, generate an
+Orchestrator DSL artifact, modify Slot DSL, connect Runtime, or execute a
+Scenario.

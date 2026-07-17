@@ -172,3 +172,8 @@ This iteration does not:
 
 Studio exposes this preview Bundle without making it Runtime executable.
 Future work may define Plan Authoring or a governed Orchestrator contract.
+
+The governed contract is now documented in
+[Scenario Orchestrator DSL Contract](./scenario-orchestrator-contract.md).
+It references this Bundle's Slot paths and hashes without changing the seven
+preview artifacts or generating a runnable top-level DSL.

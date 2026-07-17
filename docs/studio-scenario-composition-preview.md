@@ -115,3 +115,7 @@ Scenario Composition Compile Preview is demo/mock only:
 
 The next design stage may define Plan Authoring or a governed Orchestrator DSL
 contract. Neither capability is implemented here.
+
+The read-only governed contract is now available in
+[Scenario Orchestrator DSL Contract](./scenario-orchestrator-contract.md).
+Studio does not compile, edit, apply, or run that contract in this iteration.
