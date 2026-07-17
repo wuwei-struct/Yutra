@@ -26,6 +26,11 @@ runtimeExecutable=false
 
 It does not generate an executable top-level DSL or run a composed Agent.
 
+Studio can now inspect this same preview Bundle through the independent
+[Studio Scenario Composition Compile Preview](./studio-scenario-composition-preview.md)
+workbench. The Studio integration remains read-only, compiles in memory, and
+does not make the Bundle Runtime executable.
+
 ## Contract and Readiness
 
 The compiler consumes `ScenarioCompositionPlan` from
@@ -165,5 +170,5 @@ This iteration does not:
 - change DSL or Trace semantics;
 - publish npm packages.
 
-A future stage may expose this same preview Bundle in Studio without making it
-Runtime executable.
+Studio exposes this preview Bundle without making it Runtime executable.
+Future work may define Plan Authoring or a governed Orchestrator contract.

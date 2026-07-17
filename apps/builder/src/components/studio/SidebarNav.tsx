@@ -7,6 +7,7 @@ const groups: Array<{ titleKey: MessageKey; items: Array<{ id: StudioNavItem; la
     items: [
       { id: "dashboard", labelKey: "sidebar.dashboard" },
       { id: "my-agent", labelKey: "sidebar.myAgents" },
+      { id: "scenario-composition", labelKey: "sidebar.scenarioComposition" },
       { id: "templates", labelKey: "sidebar.templates" },
       { id: "packs", labelKey: "sidebar.packs" },
       { id: "tools", labelKey: "sidebar.tools" },

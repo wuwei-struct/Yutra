@@ -644,4 +644,145 @@ describe("@yutra/builder-runner", () => {
     expect(body.error?.code).toMatch(/^RULE_COMPILER_/);
     expect(body.artifacts).toBeUndefined();
   });
+
+  it("GET /creator/scenario-compositions returns three canonical compositions", async () => {
+    const baseUrl = await startServer();
+    const res = await fetch(`${baseUrl}/creator/scenario-compositions`);
+    const body = (await res.json()) as {
+      compositions: Array<{
+        compositionId: string;
+        readiness: { status: string };
+        eligibleForCompilePreview: boolean;
+      }>;
+    };
+
+    expect(res.status).toBe(200);
+    expect(body.compositions).toHaveLength(3);
+    expect(
+      body.compositions.find((item) => item.compositionId === "customer-complaint-composition-demo")
+        ?.eligibleForCompilePreview
+    ).toBe(true);
+    expect(
+      body.compositions.find((item) => item.compositionId === "ecommerce-refund-composition-demo")
+        ?.eligibleForCompilePreview
+    ).toBe(true);
+    const renewal = body.compositions.find(
+      (item) => item.compositionId === "renewal-churn-warning-composition-demo"
+    );
+    expect(renewal?.readiness.status).toBe("contract_only");
+    expect(renewal?.eligibleForCompilePreview).toBe(false);
+  });
+
+  it("GET /creator/scenario-compositions/:id returns plan, summary, readiness, and boundary", async () => {
+    const baseUrl = await startServer();
+    const res = await fetch(
+      `${baseUrl}/creator/scenario-compositions/customer-complaint-composition-demo`
+    );
+    const body = (await res.json()) as {
+      plan: { slots?: unknown[] };
+      compositionSummary: { primaryOutput?: { en?: string } };
+      readiness: { status: string; compositionCompilerAvailable: boolean };
+      publicBoundary: { mode: string; containsRealEndpoint: boolean; containsSecret: boolean };
+      eligibleForCompilePreview: boolean;
+    };
+
+    expect(res.status).toBe(200);
+    expect(body.plan.slots).toHaveLength(3);
+    expect(body.compositionSummary.primaryOutput?.en).toBeTruthy();
+    expect(body.readiness.status).toBe("compile_ready");
+    expect(body.readiness.compositionCompilerAvailable).toBe(true);
+    expect(body.publicBoundary).toMatchObject({
+      mode: "demo_only",
+      containsRealEndpoint: false,
+      containsSecret: false
+    });
+    expect(body.eligibleForCompilePreview).toBe(true);
+  });
+
+  it.each([
+    ["customer-complaint-composition-demo", 3],
+    ["ecommerce-refund-composition-demo", 2]
+  ])("POST Scenario Composition Compile Preview compiles %s in memory", async (compositionId, slotCount) => {
+    const baseUrl = await startServer();
+    const res = await fetch(`${baseUrl}/creator/scenario-compositions/compile-preview`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ compositionId })
+    });
+    const body = (await res.json()) as {
+      ok: boolean;
+      result?: {
+        previewOnly: boolean;
+        runtimeExecutable: boolean;
+        slots: Array<{ artifacts: Record<string, string> }>;
+        compositionArtifacts: Record<string, string>;
+      };
+    };
+
+    expect(res.status).toBe(200);
+    expect(body.ok).toBe(true);
+    expect(body.result?.previewOnly).toBe(true);
+    expect(body.result?.runtimeExecutable).toBe(false);
+    expect(body.result?.slots).toHaveLength(slotCount);
+    for (const slot of body.result?.slots ?? []) {
+      expect(Object.keys(slot.artifacts)).toHaveLength(6);
+    }
+    expect(Object.keys(body.result?.compositionArtifacts ?? {})).toHaveLength(7);
+    expect(body.result?.compositionArtifacts).not.toHaveProperty("orchestrator.yutra.yaml");
+    expect(JSON.stringify(body)).not.toContain("RUNTIME_ACTION_NOT_FOUND");
+  });
+
+  it("POST Scenario Composition Compile Preview rejects renewal churn without partial artifacts", async () => {
+    const baseUrl = await startServer();
+    const res = await fetch(`${baseUrl}/creator/scenario-compositions/compile-preview`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ compositionId: "renewal-churn-warning-composition-demo" })
+    });
+    const body = (await res.json()) as {
+      ok: boolean;
+      error?: { code?: string };
+      result?: unknown;
+    };
+
+    expect(res.status).toBe(422);
+    expect(body.ok).toBe(false);
+    expect(body.error?.code).toBe("COMPOSITION_NOT_COMPILE_READY");
+    expect(body.result).toBeUndefined();
+  });
+
+  it("Scenario Composition APIs reject unknown IDs and arbitrary request fields", async () => {
+    const baseUrl = await startServer();
+    const unknown = await fetch(`${baseUrl}/creator/scenario-compositions/not-a-composition`);
+    const unknownBody = (await unknown.json()) as { error?: { code?: string } };
+    expect(unknown.status).toBe(404);
+    expect(unknownBody.error?.code).toBe("SCENARIO_COMPOSITION_NOT_FOUND");
+
+    const invalid = await fetch(`${baseUrl}/creator/scenario-compositions/compile-preview`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        compositionId: "customer-complaint-composition-demo",
+        plan: { arbitrary: true }
+      })
+    });
+    const invalidBody = (await invalid.json()) as { error?: { code?: string } };
+    expect(invalid.status).toBe(400);
+    expect(invalidBody.error?.code).toBe("SCENARIO_COMPOSITION_REQUEST_INVALID");
+  });
+
+  it("Scenario Composition Compile Preview rejects oversized requests without exposing internals", async () => {
+    const baseUrl = await startServer();
+    const res = await fetch(`${baseUrl}/creator/scenario-compositions/compile-preview`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ compositionId: "x".repeat(5000) })
+    });
+    const body = (await res.json()) as { error?: { code?: string; message?: string } };
+
+    expect(res.status).toBe(400);
+    expect(body.error?.code).toBe("SCENARIO_COMPOSITION_REQUEST_INVALID");
+    expect(body.error?.message).not.toContain("node_modules");
+    expect(body.error?.message).not.toContain(process.cwd());
+  });
 });

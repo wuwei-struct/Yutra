@@ -245,3 +245,177 @@ export interface CreatorCompilePreviewResponse {
     message: string;
   };
 }
+
+export interface ScenarioLocalizedText {
+  en: string;
+  zhCN: string;
+}
+
+export interface ScenarioCompositionReadiness {
+  contractValid: boolean;
+  patternAligned: boolean;
+  allProductArchetypesCompilerEnabled: boolean;
+  allProductArchetypesWorkbenchEnabled: boolean;
+  allCrossCuttingAvailable: boolean;
+  compositionCompilerAvailable: boolean;
+  status: "compile_ready" | "partially_supported" | "contract_only" | "invalid";
+  blockers: string[];
+}
+
+export interface ScenarioCompositionCatalogItem {
+  compositionId: string;
+  patternId: string;
+  name: ScenarioLocalizedText;
+  summary: ScenarioLocalizedText;
+  primaryArchetypeId: string;
+  supportingArchetypeIds: string[];
+  crossCuttingArchetypeIds: string[];
+  triggerPattern: string;
+  primaryOutput: ScenarioLocalizedText;
+  acceptanceObject: ScenarioLocalizedText;
+  readiness: ScenarioCompositionReadiness;
+  eligibleForCompilePreview: boolean;
+}
+
+export interface ScenarioCompositionPublicBoundary {
+  mode: "demo_only";
+  containsCustomerData: false;
+  containsRealEndpoint: false;
+  containsSecret: false;
+  containsCustomerSop: false;
+  containsCommercialDeliveryAsset: false;
+}
+
+export interface ScenarioCompositionSlot {
+  slotId: string;
+  role: "primary" | "supporting";
+  archetypeId: string;
+  packConfigId: string;
+  purpose: ScenarioLocalizedText;
+}
+
+export interface ScenarioCompositionRoute {
+  routeId: string;
+  fromSlotId: string;
+  toSlotId: string;
+  trigger: string;
+  conditionRef: string;
+  returnMode: string;
+}
+
+export interface ScenarioCompositionBinding {
+  bindingId: string;
+  fromSlotId: string;
+  fromPath: string;
+  toSlotId: string;
+  toPath: string;
+  required: boolean;
+  transform: "identity";
+}
+
+export interface ScenarioCompositionOverlay {
+  overlayId: string;
+  archetypeId: string;
+  scopes: Array<{ type: string; slotId?: string; routeId?: string }>;
+  enforcementMode: string;
+}
+
+export interface ScenarioCompositionPlanView {
+  schemaVersion: "1.0.0";
+  compositionId: string;
+  version?: string;
+  patternRef: { patternId: string; version: string };
+  executionModel: "orchestrated_subflows";
+  primarySlotId?: string;
+  slots?: ScenarioCompositionSlot[];
+  crossCuttingOverlays?: ScenarioCompositionOverlay[];
+  routes?: ScenarioCompositionRoute[];
+  dataBindings?: ScenarioCompositionBinding[];
+  precedencePolicy?: {
+    rules: string[];
+    conflictMode: "fail_closed";
+  };
+  primaryArchetypeId?: string;
+  supportingArchetypeIds?: string[];
+  crossCuttingArchetypeIds?: string[];
+  status?: "contract_only";
+  eligibleForCompilerInput?: false;
+  blockers?: string[];
+  publicExposure: ScenarioCompositionPublicBoundary;
+}
+
+export interface ScenarioPatternCompositionSummary {
+  patternId: string;
+  triggerPattern: string;
+  primaryOutput: ScenarioLocalizedText;
+  acceptanceObject: ScenarioLocalizedText;
+  primitiveCoverage: string[];
+  governanceFocus: {
+    en: string[];
+    zhCN: string[];
+  };
+}
+
+export interface ScenarioCompositionDetailResponse {
+  compositionId: string;
+  pattern: {
+    patternId: string;
+    version: string;
+    name: ScenarioLocalizedText;
+    summary: ScenarioLocalizedText;
+    primaryArchetypeId: string;
+    supportingArchetypeIds: string[];
+    crossCuttingArchetypeIds: string[];
+    triggerPattern: string;
+  };
+  plan: ScenarioCompositionPlanView;
+  compositionSummary: ScenarioPatternCompositionSummary;
+  readiness: ScenarioCompositionReadiness;
+  publicBoundary: ScenarioCompositionPublicBoundary;
+  compositionCompilerAvailable: true;
+  eligibleForCompilePreview: boolean;
+}
+
+export interface CompiledScenarioCompositionSlot {
+  slotId: string;
+  role: "primary" | "supporting";
+  archetypeId: string;
+  packConfigId: string;
+  namespace: string;
+  configHash: string;
+  artifactHashes: Record<string, string>;
+  artifacts: Record<string, string>;
+}
+
+export interface ScenarioCompositionCompileResult {
+  schemaVersion: "1.0.0";
+  mode: "preview";
+  compositionId: string;
+  compositionVersion: string;
+  patternId: string;
+  executionModel: "orchestrated_subflows";
+  previewOnly: true;
+  runtimeExecutable: false;
+  compositionCompilerVersion: string;
+  planHash: string;
+  bundleHash: string;
+  slots: CompiledScenarioCompositionSlot[];
+  compositionArtifacts: Record<string, string>;
+  compileReport: {
+    success: true;
+    slotCount: number;
+    warnings: Array<{ code: string; message: string }>;
+    blockers: string[];
+  };
+}
+
+export type ScenarioCompositionCompilePreviewResponse =
+  | {
+      ok: true;
+      result: ScenarioCompositionCompileResult;
+    }
+  | {
+      ok: false;
+      error: { code: string; message: string };
+      issues: Array<{ code: string; message: string; severity: "error" | "warning" }>;
+    };

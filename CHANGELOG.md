@@ -4,6 +4,8 @@
 
 ### Added
 
+- Studio Scenario Composition Workbench with canonical catalog/detail views, Composition Readiness, in-memory preview compilation, seven composition artifacts, six namespaced artifacts per Slot, and a manual single-Slot DSL Editor bridge.
+- Builder Runner read-only Scenario Composition Catalog, Detail, and Compile Preview APIs with strict canonical-ID requests and fail-closed renewal churn rejection.
 - `@yutra/scenario-composition-compiler` with deterministic, preview-only per-Slot Rule Compiler output, namespaced artifacts, composition relationship artifacts, hashes, and fail-closed reporting.
 - `yutra composition compile` with dry-run, explicit export, JSON summary, overwrite protection, and output-path safety.
 - Customer complaint and ecommerce refund Composition Compile Preview examples.
@@ -14,7 +16,7 @@
 ### Intentionally Excluded
 
 - Executable top-level Orchestrator DSL, composed Agent execution, or generic Pack Config deep merge.
-- Runtime or Creator Workbench integration for Composition Compile Preview.
+- Composition Runtime execution, Plan authoring, and top-level Orchestrator DSL generation.
 - Pack Config merge and Compiler precedence.
 - Creator Workbench or Runtime integration for Scenario Patterns.
 

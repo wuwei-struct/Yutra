@@ -9,7 +9,10 @@ Scenario Pattern
 -> Orchestrator + Namespaced Subflows
 ```
 
-It is a browser-safe, deterministic contract package. It does not compile DSL, execute an Agent, call Runtime, or connect Creator Workbench.
+It is a browser-safe, deterministic contract package. It does not compile DSL,
+execute an Agent, or call Runtime. Studio consumes the contract through a
+separate read-only Scenario Composition workbench; the core package remains
+independent of UI code.
 
 ## Pattern and Plan
 
@@ -159,4 +162,8 @@ Every validated built-in Plan is `demo_only`, uses mock adapters, and declares a
 - no Creator Workbench integration;
 - no remote registry or install flow.
 
-The next possible stage is a Studio view of the existing Compile Preview Bundle. It must preserve namespace isolation, fail-closed governance, and explicit manual boundaries.
+Studio now provides a read-only view of the existing Compile Preview Bundle
+while preserving namespace isolation, fail-closed governance, and explicit
+manual boundaries. See
+[Studio Scenario Composition Compile Preview](./studio-scenario-composition-preview.md).
+Plan Authoring and an executable Orchestrator contract remain future work.

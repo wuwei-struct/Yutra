@@ -7,6 +7,16 @@ import { I18nProvider, STUDIO_LOCALE_STORAGE_KEY, resolveInitialLocale } from ".
 import { generateDraftPreview } from "../src/lib/ai-draft-client";
 import { compileCreatorPreview } from "../src/lib/creator-client";
 import { inspectDsl, runPreview } from "../src/lib/runner-client";
+import {
+  compileScenarioCompositionPreview,
+  fetchScenarioCompositionCatalog,
+  fetchScenarioCompositionDetail
+} from "../src/lib/scenario-composition-client";
+import type {
+  ScenarioCompositionCatalogItem,
+  ScenarioCompositionCompileResult,
+  ScenarioCompositionDetailResponse
+} from "../src/types";
 
 vi.mock("../src/lib/runner-client", () => ({
   inspectDsl: vi.fn(),
@@ -19,6 +29,12 @@ vi.mock("../src/lib/ai-draft-client", () => ({
 
 vi.mock("../src/lib/creator-client", () => ({
   compileCreatorPreview: vi.fn()
+}));
+
+vi.mock("../src/lib/scenario-composition-client", () => ({
+  fetchScenarioCompositionCatalog: vi.fn(),
+  fetchScenarioCompositionDetail: vi.fn(),
+  compileScenarioCompositionPreview: vi.fn()
 }));
 
 afterEach(() => {
@@ -310,6 +326,288 @@ function mockCompilePreviewFailure() {
     error: { code: "RULE_COMPILER_REQUIRED_FIELD_MISSING", message: "Required field missing." },
     issues: [{ code: "RULE_COMPILER_REQUIRED_FIELD_MISSING", severity: "error", message: "Required field missing." }]
   });
+}
+
+const scenarioCatalog: ScenarioCompositionCatalogItem[] = [
+  {
+    compositionId: "customer-complaint-composition-demo",
+    patternId: "customer-complaint-demo",
+    name: { en: "Customer Complaint Demo", zhCN: "客户投诉 Demo" },
+    summary: { en: "Complaint composition preview.", zhCN: "投诉组合预览。" },
+    primaryArchetypeId: "request-resolution",
+    supportingArchetypeIds: ["knowledge-answering", "approval-decision"],
+    crossCuttingArchetypeIds: ["human-handoff", "policy-guard"],
+    triggerPattern: "user_request",
+    primaryOutput: { en: "Business action result", zhCN: "业务动作结果" },
+    acceptanceObject: { en: "Request outcome", zhCN: "诉求结果" },
+    readiness: {
+      contractValid: true,
+      patternAligned: true,
+      allProductArchetypesCompilerEnabled: true,
+      allProductArchetypesWorkbenchEnabled: true,
+      allCrossCuttingAvailable: true,
+      compositionCompilerAvailable: true,
+      status: "compile_ready",
+      blockers: []
+    },
+    eligibleForCompilePreview: true
+  },
+  {
+    compositionId: "ecommerce-refund-composition-demo",
+    patternId: "ecommerce-refund-demo",
+    name: { en: "Ecommerce Refund Demo", zhCN: "电商退款 Demo" },
+    summary: { en: "Refund composition preview.", zhCN: "退款组合预览。" },
+    primaryArchetypeId: "request-resolution",
+    supportingArchetypeIds: ["approval-decision"],
+    crossCuttingArchetypeIds: ["policy-guard", "adapter-connector", "human-handoff"],
+    triggerPattern: "user_request",
+    primaryOutput: { en: "Business action result", zhCN: "业务动作结果" },
+    acceptanceObject: { en: "Refund outcome", zhCN: "退款结果" },
+    readiness: {
+      contractValid: true,
+      patternAligned: true,
+      allProductArchetypesCompilerEnabled: true,
+      allProductArchetypesWorkbenchEnabled: true,
+      allCrossCuttingAvailable: true,
+      compositionCompilerAvailable: true,
+      status: "compile_ready",
+      blockers: []
+    },
+    eligibleForCompilePreview: true
+  },
+  {
+    compositionId: "renewal-churn-warning-composition-demo",
+    patternId: "renewal-churn-warning-demo",
+    name: { en: "Renewal Churn Warning Demo", zhCN: "续费流失预警 Demo" },
+    summary: { en: "Contract-only composition.", zhCN: "仅合同层组合。" },
+    primaryArchetypeId: "monitoring-response",
+    supportingArchetypeIds: ["data-insight", "lead-engagement"],
+    crossCuttingArchetypeIds: ["human-handoff", "feedback-optimization"],
+    triggerPattern: "system_event",
+    primaryOutput: { en: "Event response result", zhCN: "事件响应结果" },
+    acceptanceObject: { en: "Signal response", zhCN: "信号响应" },
+    readiness: {
+      contractValid: true,
+      patternAligned: true,
+      allProductArchetypesCompilerEnabled: false,
+      allProductArchetypesWorkbenchEnabled: false,
+      allCrossCuttingAvailable: true,
+      compositionCompilerAvailable: true,
+      status: "contract_only",
+      blockers: [
+        "monitoring-response Pack Config and compiler are unavailable",
+        "data-insight Pack Config and compiler are unavailable",
+        "lead-engagement Pack Config and compiler are unavailable"
+      ]
+    },
+    eligibleForCompilePreview: false
+  }
+];
+
+function scenarioDetail(compositionId: string): ScenarioCompositionDetailResponse {
+  const catalogItem = scenarioCatalog.find((item) => item.compositionId === compositionId)!;
+  const isCustomer = compositionId === "customer-complaint-composition-demo";
+  const isRefund = compositionId === "ecommerce-refund-composition-demo";
+  const slots = isCustomer
+    ? [
+        ["complaint_resolution", "primary", "request-resolution"],
+        ["policy_explanation", "supporting", "knowledge-answering"],
+        ["compensation_decision", "supporting", "approval-decision"]
+      ]
+    : isRefund
+      ? [
+          ["refund_resolution", "primary", "request-resolution"],
+          ["refund_authorization", "supporting", "approval-decision"]
+        ]
+      : [];
+  return {
+    compositionId,
+    pattern: {
+      patternId: catalogItem.patternId,
+      version: "0.1.0",
+      name: catalogItem.name,
+      summary: catalogItem.summary,
+      primaryArchetypeId: catalogItem.primaryArchetypeId,
+      supportingArchetypeIds: catalogItem.supportingArchetypeIds,
+      crossCuttingArchetypeIds: catalogItem.crossCuttingArchetypeIds,
+      triggerPattern: catalogItem.triggerPattern
+    },
+    plan: slots.length
+      ? {
+          schemaVersion: "1.0.0",
+          compositionId,
+          version: "0.1.0",
+          patternRef: { patternId: catalogItem.patternId, version: "0.1.0" },
+          executionModel: "orchestrated_subflows",
+          primarySlotId: slots[0]?.[0],
+          slots: slots.map(([slotId, role, archetypeId]) => ({
+            slotId: slotId!,
+            role: role as "primary" | "supporting",
+            archetypeId: archetypeId!,
+            packConfigId: `${archetypeId}:basic-demo`,
+            purpose: { en: `${slotId} purpose`, zhCN: `${slotId} 用途` }
+          })),
+          crossCuttingOverlays: catalogItem.crossCuttingArchetypeIds.map((archetypeId, index) => ({
+            overlayId: `overlay_${index}`,
+            archetypeId,
+            scopes: [{ type: "scenario" }],
+            enforcementMode: index === 0 ? "deny_override" : "require_handoff"
+          })),
+          routes: [
+            {
+              routeId: "route_support",
+              fromSlotId: slots[0]?.[0] ?? "",
+              toSlotId: slots[1]?.[0] ?? "$scenario_done",
+              trigger: "on_guard",
+              conditionRef: "support_required",
+              returnMode: "return_to_caller"
+            }
+          ],
+          dataBindings: slots.length > 1
+            ? [{
+                bindingId: "binding_support",
+                fromSlotId: slots[1]?.[0] ?? "",
+                fromPath: "result.value",
+                toSlotId: slots[0]?.[0] ?? "",
+                toPath: "supporting.value",
+                required: true,
+                transform: "identity"
+              }]
+            : [],
+          precedencePolicy: {
+            rules: [
+              "hard_boundary_first",
+              "deny_overrides",
+              "human_review_over_automation",
+              "higher_risk_over_lower_risk",
+              "explicit_route_over_local_default",
+              "primary_owns_terminal_response",
+              "namespaced_supporting_configs",
+              "no_implicit_adapter_inheritance",
+              "no_secret_merge",
+              "fail_on_ambiguous_conflict"
+            ],
+            conflictMode: "fail_closed"
+          },
+          publicExposure: {
+            mode: "demo_only",
+            containsCustomerData: false,
+            containsRealEndpoint: false,
+            containsSecret: false,
+            containsCustomerSop: false,
+            containsCommercialDeliveryAsset: false
+          }
+        }
+      : {
+          schemaVersion: "1.0.0",
+          compositionId,
+          patternRef: { patternId: catalogItem.patternId, version: "0.1.0" },
+          executionModel: "orchestrated_subflows",
+          primaryArchetypeId: catalogItem.primaryArchetypeId,
+          supportingArchetypeIds: catalogItem.supportingArchetypeIds,
+          crossCuttingArchetypeIds: catalogItem.crossCuttingArchetypeIds,
+          status: "contract_only",
+          eligibleForCompilerInput: false,
+          blockers: catalogItem.readiness.blockers,
+          publicExposure: {
+            mode: "demo_only",
+            containsCustomerData: false,
+            containsRealEndpoint: false,
+            containsSecret: false,
+            containsCustomerSop: false,
+            containsCommercialDeliveryAsset: false
+          }
+        },
+    compositionSummary: {
+      patternId: catalogItem.patternId,
+      triggerPattern: catalogItem.triggerPattern,
+      primaryOutput: catalogItem.primaryOutput,
+      acceptanceObject: catalogItem.acceptanceObject,
+      primitiveCoverage: ["collect", "evaluate", "route", "audit"],
+      governanceFocus: {
+        en: ["fail-closed", "human review"],
+        zhCN: ["失败关闭", "人工审核"]
+      }
+    },
+    readiness: catalogItem.readiness,
+    publicBoundary: {
+      mode: "demo_only",
+      containsCustomerData: false,
+      containsRealEndpoint: false,
+      containsSecret: false,
+      containsCustomerSop: false,
+      containsCommercialDeliveryAsset: false
+    },
+    compositionCompilerAvailable: true,
+    eligibleForCompilePreview: catalogItem.eligibleForCompilePreview
+  };
+}
+
+function scenarioCompileResult(compositionId: string): ScenarioCompositionCompileResult {
+  const detail = scenarioDetail(compositionId);
+  const filenames = [
+    "agent.yutra.yaml",
+    "policy.yaml",
+    "adapter.config.json",
+    "templates.json",
+    "test-cases.json",
+    "trace.expectation.json"
+  ];
+  const compositionFilenames = [
+    "composition.manifest.json",
+    "composition.routes.json",
+    "composition.bindings.json",
+    "composition.overlays.json",
+    "composition.precedence.json",
+    "composition.slot-index.json",
+    "composition-report.json"
+  ];
+  return {
+    schemaVersion: "1.0.0",
+    mode: "preview",
+    compositionId,
+    compositionVersion: "0.1.0",
+    patternId: detail.pattern.patternId,
+    executionModel: "orchestrated_subflows",
+    previewOnly: true,
+    runtimeExecutable: false,
+    compositionCompilerVersion: "0.1.0",
+    planHash: "sha256:plan",
+    bundleHash: "sha256:bundle",
+    slots: (detail.plan.slots ?? []).map((slot) => ({
+      slotId: slot.slotId,
+      role: slot.role,
+      archetypeId: slot.archetypeId,
+      packConfigId: slot.packConfigId,
+      namespace: `slots/${slot.slotId}`,
+      configHash: `sha256:${slot.slotId}`,
+      artifactHashes: Object.fromEntries(filenames.map((filename) => [filename, `sha256:${slot.slotId}:${filename}`])),
+      artifacts: Object.fromEntries(
+        filenames.map((filename) => [
+          filename,
+          filename === "agent.yutra.yaml" ? `agent: ${slot.slotId}\n` : JSON.stringify({ filename, slotId: slot.slotId }, null, 2)
+        ])
+      )
+    })),
+    compositionArtifacts: Object.fromEntries(
+      compositionFilenames.map((filename) => [filename, JSON.stringify({ filename, compositionId }, null, 2)])
+    ),
+    compileReport: {
+      success: true,
+      slotCount: detail.plan.slots?.length ?? 0,
+      warnings: [],
+      blockers: []
+    }
+  };
+}
+
+function mockScenarioCompositionApis() {
+  vi.mocked(fetchScenarioCompositionCatalog).mockResolvedValue(scenarioCatalog);
+  vi.mocked(fetchScenarioCompositionDetail).mockImplementation(async (compositionId) => scenarioDetail(compositionId));
+  vi.mocked(compileScenarioCompositionPreview).mockImplementation(async (compositionId) => ({
+    ok: true,
+    result: scenarioCompileResult(compositionId)
+  }));
 }
 
 async function inspectAndApplyDsl() {
@@ -998,5 +1296,131 @@ describe("@yutra/builder Studio UI", () => {
       expect(screen.getByLabelText("FlowDraft Preview")).toBeTruthy();
     });
     expect(runPreview).not.toHaveBeenCalled();
+  });
+
+  it("Scenario Composition Workbench renders three canonical Scenario cards and boundaries", async () => {
+    mockScenarioCompositionApis();
+    renderStudio();
+    fireEvent.click(screen.getByRole("button", { name: "Scenario Composition" }));
+
+    await waitFor(() => expect(fetchScenarioCompositionCatalog).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(screen.getByLabelText("Scenario Composition Workbench")).toBeTruthy());
+    expect(screen.getByLabelText("Scenario Pattern Selector").textContent).toContain("Customer Complaint Demo");
+    expect(screen.getByLabelText("Scenario Pattern Selector").textContent).toContain("Ecommerce Refund Demo");
+    expect(screen.getByLabelText("Scenario Pattern Selector").textContent).toContain("Renewal Churn Warning Demo");
+    expect(screen.getByLabelText("Scenario Pattern Selector").textContent).toContain(
+      "A scenario pattern is a composition preset, not a new archetype."
+    );
+    expect(screen.getByLabelText("Scenario Composition Boundary Notice").textContent).toContain("No Deep Merge");
+    expect(screen.getByLabelText("Scenario Composition Boundary Notice").textContent).toContain("No Orchestrator DSL");
+    expect(screen.queryByRole("button", { name: /Scenario Run/i })).toBeNull();
+  });
+
+  it("customer complaint Compile Preview shows seven composition artifacts and three namespaced Slots", async () => {
+    mockScenarioCompositionApis();
+    renderStudio();
+    fireEvent.click(screen.getByRole("button", { name: "Scenario Composition" }));
+
+    await waitFor(() => expect(screen.getByLabelText("Composition Overview")).toBeTruthy());
+    expect(screen.getByLabelText("Composition Overview").textContent).toContain("complaint_resolution");
+    expect(screen.getByLabelText("Composition Overview").textContent).toContain("policy_explanation");
+    expect(screen.getByLabelText("Composition Overview").textContent).toContain("compensation_decision");
+    expect(screen.getByLabelText("Composition Readiness").textContent).toContain("compile_ready");
+    expect(screen.getByLabelText("Composition Routes")).toBeTruthy();
+    expect(screen.getByLabelText("Composition Data Bindings")).toBeTruthy();
+    expect(screen.getByLabelText("Composition Overlays")).toBeTruthy();
+    expect(screen.getByLabelText("Composition Precedence").textContent).toContain("fail_closed");
+
+    fireEvent.click(screen.getByRole("button", { name: "Compile Composition Preview" }));
+    await waitFor(() =>
+      expect(compileScenarioCompositionPreview).toHaveBeenCalledWith("customer-complaint-composition-demo")
+    );
+    await waitFor(() => expect(screen.getByLabelText("Composition Artifacts")).toBeTruthy());
+    for (const filename of [
+      "composition.manifest.json",
+      "composition.routes.json",
+      "composition.bindings.json",
+      "composition.overlays.json",
+      "composition.precedence.json",
+      "composition.slot-index.json",
+      "composition-report.json"
+    ]) {
+      expect(screen.getByRole("button", { name: filename })).toBeTruthy();
+    }
+    expect(screen.getByLabelText("Scenario Compile Preview").textContent).toContain("previewOnlytrue");
+    expect(screen.getByLabelText("Scenario Compile Preview").textContent).toContain("runtimeExecutablefalse");
+    expect(screen.getByLabelText("Slot Artifacts").textContent).toContain("complaint_resolution");
+    expect(screen.getByLabelText("Slot Artifacts").textContent).toContain("policy_explanation");
+    expect(screen.getByLabelText("Slot Artifacts").textContent).toContain("compensation_decision");
+    expect(screen.getAllByRole("button", { name: /^agent\.yutra\.yaml$/ }).length).toBeGreaterThan(0);
+    expect(runPreview).not.toHaveBeenCalled();
+    expect(inspectDsl).not.toHaveBeenCalled();
+  });
+
+  it("Send Slot DSL to Editor identifies one Slot and does not auto Inspect, Apply, or Run", async () => {
+    mockScenarioCompositionApis();
+    renderStudio();
+    fireEvent.click(screen.getByRole("button", { name: "Scenario Composition" }));
+    await waitFor(() => expect(screen.getByRole("button", { name: "Compile Composition Preview" })).toBeTruthy());
+    fireEvent.click(screen.getByRole("button", { name: "Compile Composition Preview" }));
+    await waitFor(() => expect(screen.getByLabelText("Slot Artifacts")).toBeTruthy());
+
+    fireEvent.click(screen.getByRole("button", { name: /policy_explanation/ }));
+    fireEvent.click(screen.getByRole("button", { name: "Send Slot DSL to Editor" }));
+
+    await waitFor(() => expect(screen.getByLabelText("DSL Editor Text")).toBeTruthy());
+    expect((screen.getByLabelText("DSL Editor Text") as HTMLTextAreaElement).value).toBe(
+      "agent: policy_explanation\n"
+    );
+    const metadata = screen.getByLabelText("Compiled DSL Metadata").textContent ?? "";
+    expect(metadata).toContain("customer-complaint-composition-demo");
+    expect(metadata).toContain("policy_explanation");
+    expect(metadata).toContain("knowledge-answering");
+    expect(metadata).toContain("one namespaced Slot DSL");
+    expect(screen.getByText("Builder Source active")).toBeTruthy();
+    expect(inspectDsl).not.toHaveBeenCalled();
+    expect(runPreview).not.toHaveBeenCalled();
+  });
+
+  it("switching compositions clears stale results and ecommerce refund compiles two Slots", async () => {
+    mockScenarioCompositionApis();
+    renderStudio();
+    fireEvent.click(screen.getByRole("button", { name: "Scenario Composition" }));
+    await waitFor(() => expect(screen.getByRole("button", { name: "Compile Composition Preview" })).toBeTruthy());
+    fireEvent.click(screen.getByRole("button", { name: "Compile Composition Preview" }));
+    await waitFor(() => expect(screen.getByLabelText("Composition Artifacts")).toBeTruthy());
+
+    fireEvent.click(screen.getByRole("button", { name: "Scenario ecommerce-refund-composition-demo" }));
+    await waitFor(() =>
+      expect(fetchScenarioCompositionDetail).toHaveBeenCalledWith("ecommerce-refund-composition-demo")
+    );
+    await waitFor(() => expect(screen.queryByLabelText("Composition Artifacts")).toBeNull());
+    fireEvent.click(screen.getByRole("button", { name: "Compile Composition Preview" }));
+    await waitFor(() =>
+      expect(compileScenarioCompositionPreview).toHaveBeenCalledWith("ecommerce-refund-composition-demo")
+    );
+    await waitFor(() => expect(screen.getByLabelText("Slot Artifacts")).toBeTruthy());
+    expect(screen.getByLabelText("Slot Artifacts").textContent).toContain("refund_resolution");
+    expect(screen.getByLabelText("Slot Artifacts").textContent).toContain("refund_authorization");
+    expect(screen.getByLabelText("Slot Artifacts").textContent).not.toContain("policy_explanation");
+  });
+
+  it("renewal churn remains contract-only and cannot trigger Compile Preview", async () => {
+    mockScenarioCompositionApis();
+    renderStudio();
+    fireEvent.click(screen.getByRole("button", { name: "Scenario Composition" }));
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: "Scenario renewal-churn-warning-composition-demo" })).toBeTruthy()
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Scenario renewal-churn-warning-composition-demo" }));
+
+    await waitFor(() => expect(screen.getByLabelText("Composition Readiness").textContent).toContain("contract_only"));
+    const compileButton = screen.getByRole("button", { name: "Compile Composition Preview" }) as HTMLButtonElement;
+    expect(compileButton.disabled).toBe(true);
+    expect(screen.getByLabelText("Composition Readiness").textContent).toContain(
+      "monitoring-response Pack Config and compiler are unavailable"
+    );
+    expect(compileScenarioCompositionPreview).not.toHaveBeenCalled();
+    expect(screen.queryByLabelText("Composition Artifacts")).toBeNull();
   });
 });

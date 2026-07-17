@@ -162,7 +162,8 @@ Current status:
 - Customer complaint and ecommerce refund have validated demo composition plans; renewal churn remains a contract-only draft.
 - `compile_ready` means participating Product Archetypes have individual compiler support; composition compiler availability remains an explicit caller context and defaults to false.
 - `@yutra/scenario-composition-compiler` generates deterministic, preview-only namespaced Slot artifacts for customer complaint and ecommerce refund.
-- Executable top-level Orchestrator DSL, generic Pack Config deep merge, Creator Workbench preview, and Runtime execution remain deferred.
+- Studio has an independent Scenario Composition workbench for canonical catalog/detail views and in-memory Compile Preview of customer complaint and ecommerce refund.
+- Renewal churn remains contract-only; executable top-level Orchestrator DSL, Plan authoring, generic Pack Config deep merge, and Runtime execution remain deferred.
 
 ## First Priority Archetypes
 

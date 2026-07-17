@@ -8,7 +8,18 @@ import { runPreviewSamples } from "./run-samples";
 import { inspectDsl, runPreview } from "./runner-client";
 import { defaultBuilderUiState } from "./sample-form";
 
-export type StudioNavItem = "dashboard" | "my-agent" | "templates" | "packs" | "tools" | "knowledge" | "runs" | "traces" | "env" | "docs";
+export type StudioNavItem =
+  | "dashboard"
+  | "my-agent"
+  | "scenario-composition"
+  | "templates"
+  | "packs"
+  | "tools"
+  | "knowledge"
+  | "runs"
+  | "traces"
+  | "env"
+  | "docs";
 
 export type StudioTabState = {
   dsl: "dsl" | "json" | "flow";
@@ -28,10 +39,15 @@ export type StudioRunOptions = {
 export type StudioSourceMode = "builder" | "dsl";
 
 export type CompiledDslMeta = {
+  sourceKind?: "creator_compile" | "scenario_slot";
   compileId?: string;
   compilerVersion?: string;
   configHash?: string;
   artifactHash?: string;
+  compositionId?: string;
+  slotId?: string;
+  archetypeId?: string;
+  singleSlotOnly?: boolean;
   sentAt: string;
   inspected: boolean;
 };
@@ -221,10 +237,15 @@ export function useStudioState() {
   const sendCompiledDslToEditor = (
     dslText: string,
     meta?: {
+      sourceKind?: "creator_compile" | "scenario_slot";
       compileId?: string;
       compilerVersion?: string;
       configHash?: string;
       artifactHash?: string;
+      compositionId?: string;
+      slotId?: string;
+      archetypeId?: string;
+      singleSlotOnly?: boolean;
     }
   ) => {
     setDslBuffer(dslText);
@@ -233,6 +254,7 @@ export function useStudioState() {
     setLastValidDslSpec(undefined);
     setDslApplied(false);
     setCompiledDslMeta({
+      sourceKind: meta?.sourceKind ?? "creator_compile",
       ...meta,
       sentAt: new Date().toISOString(),
       inspected: false

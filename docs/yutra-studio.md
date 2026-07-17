@@ -162,6 +162,22 @@ P6-08E adds taxonomy-aware archetype selection:
 
 `request-resolution`, `approval-decision`, and `knowledge-answering` are compile-enabled in Studio. Other archetypes remain visible as taxonomy metadata with coming-soon status.
 
+## Scenario Composition Workbench
+
+Studio also provides an independent, read-only Scenario Composition workbench.
+It loads the canonical Built-in Composition catalog from Builder Runner,
+displays Primary / Supporting / Cross-cutting relationships and explicit Plan
+details, and can compile customer complaint and ecommerce refund into
+namespaced preview artifacts.
+
+Renewal churn warning remains contract-only. Composition preview always reports
+`previewOnly=true` and `runtimeExecutable=false`; it does not deep-merge Pack
+Configs, generate an Orchestrator DSL, or execute Runtime. A selected Slot DSL
+can be sent manually to the DSL Editor for single-Slot inspection without
+automatic Inspect, Apply, or Run.
+
+See [Studio Scenario Composition Compile Preview](studio-scenario-composition-preview.md).
+
 Relevant vNext docs:
 
 - [vNext Charter](vnext-charter.md)
@@ -171,6 +187,7 @@ Relevant vNext docs:
 - [Creator Workbench](creator-workbench.md)
 - [Creator Workbench UI](creator-workbench-ui.md)
 - [Creator Archetype Selection](creator-archetype-selection.md)
+- [Studio Scenario Composition Compile Preview](studio-scenario-composition-preview.md)
 - [vNext Roadmap](vnext-roadmap.md)
 
 ## Roadmap

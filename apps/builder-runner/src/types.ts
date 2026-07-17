@@ -8,6 +8,17 @@ import type {
   RuleCompilerIssue,
   RuleCompilerReport
 } from "@yutra/rule-compiler";
+import type {
+  CompositionReadiness,
+  ScenarioCompositionDraft,
+  ScenarioCompositionPlan
+} from "@yutra/scenario-composition-core";
+import type { ScenarioCompositionCompileResult } from "@yutra/scenario-composition-compiler";
+import type {
+  LocalizedScenarioText,
+  ScenarioPatternCompositionSummary,
+  ScenarioPatternManifest
+} from "@yutra/scenario-pattern-core";
 
 export interface BuilderRunnerIssue {
   code: string;
@@ -120,6 +131,61 @@ export interface CreatorCompilePreviewErrorResponse {
 }
 
 export type CreatorCompilePreviewResponse = CreatorCompilePreviewSuccessResponse | CreatorCompilePreviewErrorResponse;
+
+export interface ScenarioCompositionCatalogItem {
+  compositionId: string;
+  patternId: string;
+  name: LocalizedScenarioText;
+  summary: LocalizedScenarioText;
+  primaryArchetypeId: string;
+  supportingArchetypeIds: string[];
+  crossCuttingArchetypeIds: string[];
+  triggerPattern: string;
+  primaryOutput: LocalizedScenarioText;
+  acceptanceObject: LocalizedScenarioText;
+  readiness: CompositionReadiness;
+  eligibleForCompilePreview: boolean;
+}
+
+export interface ScenarioCompositionCatalogResponse {
+  compositions: ScenarioCompositionCatalogItem[];
+}
+
+export interface ScenarioCompositionDetailResponse {
+  compositionId: string;
+  pattern: ScenarioPatternManifest;
+  plan: ScenarioCompositionPlan | ScenarioCompositionDraft;
+  compositionSummary: ScenarioPatternCompositionSummary;
+  readiness: CompositionReadiness;
+  publicBoundary: ScenarioCompositionPlan["publicExposure"];
+  compositionCompilerAvailable: true;
+  eligibleForCompilePreview: boolean;
+}
+
+export interface ScenarioCompositionCompilePreviewRequest {
+  compositionId: string;
+}
+
+export type ScenarioCompositionCompilePreviewResponse =
+  | {
+      ok: true;
+      result: ScenarioCompositionCompileResult;
+    }
+  | {
+      ok: false;
+      error: {
+        code: string;
+        message: string;
+      };
+      issues: Array<{
+        code: string;
+        severity: "error" | "warning";
+        message: string;
+        compositionId?: string;
+        slotId?: string;
+        path?: string[];
+      }>;
+    };
 
 export interface LegacyBuilderRunPreviewRequest {
   form: BuilderFormConfig;

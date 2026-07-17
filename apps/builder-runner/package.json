@@ -21,12 +21,16 @@
     "lint": "eslint src test --max-warnings=0"
   },
   "dependencies": {
+    "@yutra/archetype-core": "workspace:*",
     "@yutra/builder-ai-core": "workspace:*",
     "@yutra/builder-core": "workspace:*",
     "@yutra/dsl": "workspace:*",
     "@yutra/pack-config-core": "workspace:*",
     "@yutra/rule-compiler": "workspace:*",
     "@yutra/runtime": "workspace:*",
+    "@yutra/scenario-composition-compiler": "workspace:*",
+    "@yutra/scenario-composition-core": "workspace:*",
+    "@yutra/scenario-pattern-core": "workspace:*",
     "@yutra/trace": "workspace:*"
   },
   "devDependencies": {

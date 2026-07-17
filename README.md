@@ -194,6 +194,7 @@ Start here:
 - [Scenario Pattern Core](docs/scenario-pattern-core.md)
 - [Scenario Composition Contract](docs/scenario-composition-contract.md)
 - [Scenario Composition Compile Preview](docs/scenario-composition-compile-preview.md)
+- [Studio Scenario Composition Compile Preview](docs/studio-scenario-composition-preview.md)
 - [Creator Archetype Selection](docs/creator-archetype-selection.md)
 - [Archetype Core](docs/archetype-core.md)
 - [Business Rule Config](docs/business-rule-config.md)

@@ -77,9 +77,22 @@ export function DslEditorColumn(props: DslEditorColumnProps) {
                 <dd>{studio.compiledDslMeta.configHash ?? "-"}</dd>
                 <dt>artifactHash</dt>
                 <dd>{studio.compiledDslMeta.artifactHash ?? "-"}</dd>
+                {studio.compiledDslMeta.sourceKind === "scenario_slot" ? (
+                  <>
+                    <dt>compositionId</dt>
+                    <dd>{studio.compiledDslMeta.compositionId ?? "-"}</dd>
+                    <dt>slotId</dt>
+                    <dd>{studio.compiledDslMeta.slotId ?? "-"}</dd>
+                    <dt>archetypeId</dt>
+                    <dd>{studio.compiledDslMeta.archetypeId ?? "-"}</dd>
+                  </>
+                ) : null}
                 <dt>Status</dt>
                 <dd>{studio.compiledDslMeta.inspected ? "inspected" : "Not inspected yet"}</dd>
               </dl>
+              {studio.compiledDslMeta.singleSlotOnly ? (
+                <p className="warning-text">{t("scenario.slotDslEditorBoundary")}</p>
+              ) : null}
               {!studio.compiledDslMeta.inspected ? (
                 <p className="warning-text">Compiled DSL is not trusted until inspected.</p>
               ) : null}

@@ -111,6 +111,9 @@ importers:
 
   apps/builder-runner:
     dependencies:
+      '@yutra/archetype-core':
+        specifier: workspace:*
+        version: link:../../packages/archetype-core
       '@yutra/builder-ai-core':
         specifier: workspace:*
         version: link:../../packages/builder-ai-core
@@ -129,6 +132,15 @@ importers:
       '@yutra/runtime':
         specifier: workspace:*
         version: link:../../packages/runtime
+      '@yutra/scenario-composition-compiler':
+        specifier: workspace:*
+        version: link:../../packages/scenario-composition-compiler
+      '@yutra/scenario-composition-core':
+        specifier: workspace:*
+        version: link:../../packages/scenario-composition-core
+      '@yutra/scenario-pattern-core':
+        specifier: workspace:*
+        version: link:../../packages/scenario-pattern-core
       '@yutra/trace':
         specifier: workspace:*
         version: link:../../packages/trace
