@@ -51,6 +51,12 @@ call-return, Context, terminal, budget, Trace, and provenance contracts. It
 does not change this execution standard, the existing DSL parser, Runtime, or
 Trace event model, and Yutra Runtime cannot execute the Orchestrator Document.
 
+`@yutra/scenario-orchestrator-compiler` may serialize that contract as
+`scenario.orchestrator.yaml` for inspection and hashing. The artifact uses
+`kind=scenario_orchestrator`, is not current Agent DSL, and remains fixed to
+`runtimeExecutable=false` and `currentRuntimeSupported=false`. It does not
+extend the Runtime loop, DSL parser, or existing Trace event semantics.
+
 ## Boundaries
 
 The execution standard does not include:

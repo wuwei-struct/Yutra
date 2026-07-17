@@ -119,3 +119,8 @@ contract. Neither capability is implemented here.
 The read-only governed contract is now available in
 [Scenario Orchestrator DSL Contract](./scenario-orchestrator-contract.md).
 Studio does not compile, edit, apply, or run that contract in this iteration.
+
+The CLI/core path can now generate a preview-only Orchestrator contract through
+[Scenario Orchestrator Compiler Preview](./scenario-orchestrator-compiler-preview.md).
+That capability is not connected to Studio, does not add an Orchestrator Run
+button, and remains unsupported by the current Runtime.

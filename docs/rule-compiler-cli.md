@@ -129,6 +129,25 @@ Orchestrator DSL, or run Runtime.
 See
 [Scenario Composition Compile Preview](./scenario-composition-compile-preview.md).
 
+## Scenario Orchestrator Compiler Preview
+
+An explicit downstream command validates a Composition Bundle against a
+built-in Orchestrator Compile Profile and exports the Composition artifacts,
+namespaced Slot artifacts, and six Orchestrator contract artifacts:
+
+```bash
+pnpm exec yutra orchestrator compile examples/customer-complaint-composition/plan.json --out .tmp/customer-complaint-orchestrator --dry-run
+pnpm exec yutra orchestrator compile examples/ecommerce-refund-composition/plan.json --out .tmp/ecommerce-refund-orchestrator --force
+```
+
+The command outputs `scenario.orchestrator.yaml`, not a top-level
+`agent.yutra.yaml`. It reports `previewOnly=true`,
+`runtimeExecutable=false`, and `currentRuntimeSupported=false`. It has no
+`run`, `apply`, `execute`, `deploy`, or `publish` subcommand.
+
+See
+[Scenario Orchestrator Compiler Preview](./scenario-orchestrator-compiler-preview.md).
+
 ## Non-goals
 
 The Rule Compiler CLI does not:

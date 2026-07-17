@@ -12,7 +12,7 @@ const productArchetypeIds = ALL_ARCHETYPE_IDS.filter(
   (id) => !(CROSS_CUTTING_ARCHETYPE_IDS as readonly string[]).includes(id)
 ) as [string, ...string[]];
 
-const hashSchema = z.string().regex(/^[a-f0-9]{64}$/);
+const hashSchema = z.string().regex(/^sha256:[a-f0-9]{64}$/);
 
 export const scenarioOrchestratorPublicExposureSchema = z
   .object({

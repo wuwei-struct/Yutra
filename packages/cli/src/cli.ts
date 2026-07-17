@@ -15,6 +15,7 @@ import { EXIT_CODE_GENERAL_FAILURE, EXIT_CODE_SUCCESS, EXIT_CODE_TRACE_FAILURE, 
 import { formatIssues, formatRunSummary, formatTraceTable, formatTraceTimeline, formatValidateSummary } from "./formatters";
 import type { CliIO } from "./io";
 import { runCompositionCompile } from "./composition-compile-command";
+import { runOrchestratorCompile } from "./orchestrator-compile-command";
 import { findWorkspaceRoot, resolveWorkspacePath } from "./workspace-path";
 
 const DEFAULT_TRACE_FILE = ".yutra/traces/events.jsonl";
@@ -33,6 +34,7 @@ function printHelp(io: CliIO): void {
   io.stdout("  yutra skill validate <path> [--json]");
   io.stdout("  yutra compile <pack-config.json> --out <dir> [--mode <preview|publish>] [--locale <en|zh-CN>] [--force] [--dry-run] [--json]");
   io.stdout("  yutra composition compile <composition-plan.json> --out <dir> [--force] [--dry-run] [--json]");
+  io.stdout("  yutra orchestrator compile <composition-plan.json> --out <dir> [--force] [--dry-run] [--json]");
   io.stdout("  yutra trace list [--trace-file <jsonl>]");
   io.stdout("  yutra trace show <runId> [--trace-file <jsonl>] [--json]");
   io.stdout("  yutra trace export <runId> --out <json> [--trace-file <jsonl>]");
@@ -790,6 +792,10 @@ export async function runCli(argv: string[], io: CliIO): Promise<number> {
 
     if (command === "composition" && subcommand === "compile") {
       return runCompositionCompile(rest, flags, io);
+    }
+
+    if (command === "orchestrator" && subcommand === "compile") {
+      return runOrchestratorCompile(rest, flags, io);
     }
 
     if (command === "trace" && subcommand === "list") {

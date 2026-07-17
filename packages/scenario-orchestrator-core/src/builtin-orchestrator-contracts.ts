@@ -30,7 +30,7 @@ const SLOT_ARTIFACT_FILENAMES = [
 ] as const;
 
 function demoHash(character: string): string {
-  return character.repeat(64);
+  return `sha256:${character.repeat(64)}`;
 }
 
 function createBundleFixture(

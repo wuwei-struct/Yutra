@@ -12,7 +12,13 @@ Scenario Composition Preview Bundle
 -> Namespaced Slot DSL Execution
 ```
 
-The package defines and validates a document contract only. It does not generate an `orchestrator.yutra.yaml` artifact, modify `@yutra/dsl`, connect Runtime, or execute a composed Agent.
+The package defines and validates a document contract only. The separate
+`@yutra/scenario-orchestrator-compiler` can now generate a preview-only
+`scenario.orchestrator.yaml` contract artifact. Core itself still does not
+generate artifacts, modify `@yutra/dsl`, connect Runtime, or execute a
+composed Agent.
+
+The contract package does not generate an `orchestrator.yutra.yaml` artifact.
 
 Every document is fixed to:
 
@@ -294,13 +300,15 @@ This document defines a future scenario orchestration contract. It is not curren
 
 Current non-goals:
 
-- no Orchestrator Compiler;
-- no generated Orchestrator DSL artifact;
+- no Runtime-executable Orchestrator DSL;
 - no Scenario Runtime;
 - no composed Agent execution;
 - no modification to `@yutra/dsl`;
 - no Studio capability change;
 - no visual Plan Authoring.
 
-The next possible stage is an Orchestrator DSL Compiler Preview that still
-preserves `previewOnly=true` and `runtimeExecutable=false`.
+The preview Compiler is documented in
+[Scenario Orchestrator Compiler Preview](./scenario-orchestrator-compiler-preview.md).
+It preserves `previewOnly=true`, `runtimeExecutable=false`, and
+`currentRuntimeSupported=false`. A next possible stage is a Studio
+Orchestrator Preview or a separate Runtime Adapter Contract.

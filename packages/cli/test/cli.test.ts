@@ -826,4 +826,266 @@ describe("@yutra/cli", () => {
     expect(existsSync(outDir)).toBe(false);
     await rm(dir, { recursive: true, force: true });
   });
+
+  it("orchestrator compile --help displays preview-only usage", async () => {
+    const { io, stdout } = createMemoryIO();
+    const code = await runCli(["orchestrator", "compile", "--help"], io);
+    expect(code).toBe(0);
+    expect(
+      stdout.some((line) =>
+        line.includes("yutra orchestrator compile <composition-plan.json>")
+      )
+    ).toBe(true);
+    expect(stdout.some((line) => line.includes("runtimeExecutable=false"))).toBe(
+      true
+    );
+  });
+
+  it("orchestrator compile dry-run writes no files", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "yutra-orchestrator-dry-"));
+    const outDir = join(dir, "out");
+    const { io, stdout } = createMemoryIO();
+    const code = await runCli(
+      [
+        "orchestrator",
+        "compile",
+        customerCompositionPlanPath,
+        "--out",
+        outDir,
+        "--dry-run"
+      ],
+      io
+    );
+    expect(code).toBe(0);
+    expect(existsSync(outDir)).toBe(false);
+    expect(stdout).toContain("previewOnly: true");
+    expect(stdout).toContain("runtimeExecutable: false");
+    expect(stdout).toContain("currentRuntimeSupported: false");
+    expect(stdout).toContain("runtimeExecutionPerformed: false");
+    await rm(dir, { recursive: true, force: true });
+  });
+
+  it("orchestrator compile writes the complete customer complaint Bundle", async () => {
+    const outDir = await mkdtemp(join(tmpdir(), "yutra-orchestrator-out-"));
+    const { io } = createMemoryIO();
+    const code = await runCli(
+      [
+        "orchestrator",
+        "compile",
+        customerCompositionPlanPath,
+        "--out",
+        outDir,
+        "--force"
+      ],
+      io
+    );
+    expect(code).toBe(0);
+    for (const filename of [
+      "composition.manifest.json",
+      "composition.routes.json",
+      "composition.bindings.json",
+      "composition.overlays.json",
+      "composition.precedence.json",
+      "composition.slot-index.json",
+      "composition-report.json",
+      "scenario.orchestrator.yaml",
+      "orchestrator.routes.json",
+      "orchestrator.context-policy.json",
+      "orchestrator.trace-contract.json",
+      "orchestrator.provenance.json",
+      "orchestrator-report.json"
+    ]) {
+      expect(existsSync(join(outDir, filename)), filename).toBe(true);
+    }
+    for (const slotId of [
+      "complaint_resolution",
+      "policy_explanation",
+      "compensation_decision"
+    ]) {
+      for (const filename of compiledArtifactFiles.slice(0, 6)) {
+        expect(
+          existsSync(join(outDir, "slots", slotId, filename)),
+          `${slotId}/${filename}`
+        ).toBe(true);
+      }
+    }
+    expect(existsSync(join(outDir, "agent.yutra.yaml"))).toBe(false);
+    await rm(outDir, { recursive: true, force: true });
+  });
+
+  it("orchestrator compile writes the complete ecommerce refund Bundle", async () => {
+    const outDir = await mkdtemp(join(tmpdir(), "yutra-orchestrator-refund-"));
+    const { io } = createMemoryIO();
+    const code = await runCli(
+      [
+        "orchestrator",
+        "compile",
+        ecommerceCompositionPlanPath,
+        "--out",
+        outDir,
+        "--force"
+      ],
+      io
+    );
+    expect(code).toBe(0);
+    for (const slotId of ["refund_resolution", "refund_authorization"]) {
+      for (const filename of compiledArtifactFiles.slice(0, 6)) {
+        expect(
+          existsSync(join(outDir, "slots", slotId, filename))
+        ).toBe(true);
+      }
+    }
+    expect(existsSync(join(outDir, "scenario.orchestrator.yaml"))).toBe(true);
+    await rm(outDir, { recursive: true, force: true });
+  });
+
+  it("orchestrator compile refuses overwrite unless --force is used", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "yutra-orchestrator-force-"));
+    const outDir = join(dir, "out");
+    const first = createMemoryIO();
+    const second = createMemoryIO();
+    const forced = createMemoryIO();
+    expect(
+      await runCli(
+        [
+          "orchestrator",
+          "compile",
+          ecommerceCompositionPlanPath,
+          "--out",
+          outDir
+        ],
+        first.io
+      )
+    ).toBe(0);
+    expect(
+      await runCli(
+        [
+          "orchestrator",
+          "compile",
+          ecommerceCompositionPlanPath,
+          "--out",
+          outDir
+        ],
+        second.io
+      )
+    ).not.toBe(0);
+    expect(
+      second.stderr.some((line) =>
+        line.includes("ORCHESTRATOR_OUTPUT_EXISTS")
+      )
+    ).toBe(true);
+    expect(
+      await runCli(
+        [
+          "orchestrator",
+          "compile",
+          ecommerceCompositionPlanPath,
+          "--out",
+          outDir,
+          "--force"
+        ],
+        forced.io
+      )
+    ).toBe(0);
+    await rm(dir, { recursive: true, force: true });
+  });
+
+  it("orchestrator compile --json returns a parseable summary", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "yutra-orchestrator-json-"));
+    const { io, stdout } = createMemoryIO();
+    const code = await runCli(
+      [
+        "orchestrator",
+        "compile",
+        customerCompositionPlanPath,
+        "--out",
+        join(dir, "out"),
+        "--dry-run",
+        "--json"
+      ],
+      io
+    );
+    expect(code).toBe(0);
+    const parsed = JSON.parse(stdout.join("\n")) as {
+      previewOnly: boolean;
+      runtimeExecutable: boolean;
+      currentRuntimeSupported: boolean;
+      compositionArtifactFilenames: string[];
+      orchestratorArtifactFilenames: string[];
+    };
+    expect(parsed.previewOnly).toBe(true);
+    expect(parsed.runtimeExecutable).toBe(false);
+    expect(parsed.currentRuntimeSupported).toBe(false);
+    expect(parsed.compositionArtifactFilenames).toHaveLength(7);
+    expect(parsed.orchestratorArtifactFilenames).toHaveLength(6);
+    await rm(dir, { recursive: true, force: true });
+  });
+
+  it("orchestrator compile rejects output path traversal", async () => {
+    const { io, stderr } = createMemoryIO();
+    const code = await runCli(
+      [
+        "orchestrator",
+        "compile",
+        customerCompositionPlanPath,
+        "--out",
+        "../unsafe-orchestrator-output"
+      ],
+      io
+    );
+    expect(code).not.toBe(0);
+    expect(
+      stderr.some((line) =>
+        line.includes("ORCHESTRATOR_OUTPUT_PATH_UNSAFE")
+      )
+    ).toBe(true);
+  });
+
+  it("orchestrator compile rejects renewal churn without partial files", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "yutra-orchestrator-renewal-"));
+    const planPath = join(dir, "renewal-plan.json");
+    const outDir = join(dir, "out");
+    await writeFile(
+      planPath,
+      JSON.stringify({
+        schemaVersion: "1.0.0",
+        compositionId: "renewal-churn-warning-composition-demo",
+        patternRef: {
+          patternId: "renewal-churn-warning-demo",
+          version: "0.1.0"
+        },
+        executionModel: "orchestrated_subflows",
+        eligibleForCompilerInput: false
+      }),
+      "utf8"
+    );
+    const { io, stderr } = createMemoryIO();
+    const code = await runCli(
+      ["orchestrator", "compile", planPath, "--out", outDir],
+      io
+    );
+    expect(code).not.toBe(0);
+    expect(
+      stderr.some((line) =>
+        line.includes("ORCHESTRATOR_COMPOSITION_NOT_READY")
+      )
+    ).toBe(true);
+    expect(existsSync(outDir)).toBe(false);
+    await rm(dir, { recursive: true, force: true });
+  });
+
+  it("orchestrator command exposes no run or execute subcommand", async () => {
+    const runIO = createMemoryIO();
+    const executeIO = createMemoryIO();
+    expect(await runCli(["orchestrator", "run"], runIO.io)).not.toBe(0);
+    expect(await runCli(["orchestrator", "execute"], executeIO.io)).not.toBe(
+      0
+    );
+    expect(runIO.stderr.some((line) => line.includes("Unknown command"))).toBe(
+      true
+    );
+    expect(
+      executeIO.stderr.some((line) => line.includes("Unknown command"))
+    ).toBe(true);
+  });
 });

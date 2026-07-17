@@ -1,0 +1,40 @@
+{
+  "name": "@yutra/scenario-orchestrator-compiler",
+  "version": "0.3.0-vnext-preview.1",
+  "private": false,
+  "description": "Yutra deterministic Scenario Orchestrator Compiler Preview",
+  "type": "module",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --dts",
+    "test": "vitest run --passWithNoTests",
+    "lint": "eslint src --max-warnings=0"
+  },
+  "dependencies": {
+    "@yutra/archetype-core": "workspace:*",
+    "@yutra/scenario-composition-compiler": "workspace:*",
+    "@yutra/scenario-composition-core": "workspace:*",
+    "@yutra/scenario-orchestrator-core": "workspace:*",
+    "@yutra/scenario-pattern-core": "workspace:*"
+  },
+  "license": "MIT",
+  "author": "Yutra Contributors",
+  "keywords": [
+    "yutra",
+    "scenario-orchestrator",
+    "compiler",
+    "preview",
+    "governance"
+  ]
+}

@@ -27,6 +27,7 @@
     "dependencies":  {
                          "@yutra/dsl":  "workspace:*",
                          "@yutra/scenario-composition-compiler":  "workspace:*",
+                         "@yutra/scenario-orchestrator-compiler":  "workspace:*",
                          "@yutra/rule-compiler":  "workspace:*",
                          "@yutra/runtime":  "workspace:*",
                          "@yutra/skill-core":  "workspace:*",

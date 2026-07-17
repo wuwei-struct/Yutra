@@ -444,7 +444,7 @@ describe("@yutra/scenario-orchestrator-core", () => {
   it("rejects a Composition Bundle hash mismatch", () => {
     expectCustomerIssue(
       (document) => {
-        document.compositionRef.bundleHash = "0".repeat(64);
+        document.compositionRef.bundleHash = `sha256:${"0".repeat(64)}`;
       },
       "ORCHESTRATOR_COMPOSITION_REF_INVALID"
     );

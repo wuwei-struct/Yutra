@@ -177,3 +177,9 @@ The governed contract is now documented in
 [Scenario Orchestrator DSL Contract](./scenario-orchestrator-contract.md).
 It references this Bundle's Slot paths and hashes without changing the seven
 preview artifacts or generating a runnable top-level DSL.
+
+The separate
+[Scenario Orchestrator Compiler Preview](./scenario-orchestrator-compiler-preview.md)
+can consume this unchanged Bundle plus an explicit Compile Profile and produce
+six additional contract artifacts. The Composition Compiler itself still does
+not generate Orchestrator output, and neither package executes Runtime.
