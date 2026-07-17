@@ -64,6 +64,8 @@ Real business scenarios are often not a single main archetype. They are usually 
 
 Scenario Patterns are useful presets for product and delivery thinking, but they should not automatically become new main archetype IDs.
 
+`@yutra/scenario-pattern-core` now provides the structured demo-only manifest, validation, composition summary, local registry, and explain contract for this layer. It reuses Product and Cross-cutting Archetype metadata from `@yutra/archetype-core`; it does not compile or execute a composed Agent. See [Scenario Pattern Core](./scenario-pattern-core.md).
+
 ### Ecommerce refund / 电商退款
 
 Main archetype:

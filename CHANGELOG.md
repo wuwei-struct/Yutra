@@ -2,7 +2,16 @@
 
 ## Unreleased
 
-No unreleased changes are recorded after the vNext Preview release preparation.
+### Added
+
+- `@yutra/scenario-pattern-core` with demo-only Scenario Pattern manifests, fail-closed role validation, derived composition summaries, local registry queries, and bilingual explanations.
+- Built-in composition contracts for ecommerce refund, customer complaint, and renewal churn warning demos.
+
+### Intentionally Excluded
+
+- Composition compilation or execution.
+- Pack Config merge and Compiler precedence.
+- Creator Workbench or Runtime integration for Scenario Patterns.
 
 ## [0.3.0-vnext-preview.1] - 2026-07-16
 

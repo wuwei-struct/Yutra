@@ -148,6 +148,18 @@ Expected proof:
 - different archetype and business rule set
 - approval / HITL / policy behavior remains auditable
 
+## U8: Scenario Pattern Composition Contract
+
+Goal: represent the taxonomy's third layer without inventing a new Product Archetype or prematurely defining composition execution.
+
+Current status:
+
+- `@yutra/scenario-pattern-core` defines demo-only Scenario Pattern manifests.
+- Primary, supporting, and cross-cutting role validation is fail-closed.
+- Built-in patterns cover ecommerce refund, customer complaint, and renewal churn warning demos.
+- Composition summaries derive primitive coverage, governance focus, and explicit Compiler/Workbench support status.
+- Composition Compiler, Pack Config merge, Creator Workbench preview, and Runtime execution remain deferred.
+
 ## First Priority Archetypes
 
 The first stage should prioritize only five archetypes:

@@ -22,6 +22,8 @@ Yutra separates three layers:
 
 See: [Archetype Taxonomy](./archetype-taxonomy.md)
 
+The Scenario Pattern layer is represented by the independent [`@yutra/scenario-pattern-core`](./scenario-pattern-core.md) contract. Scenario Pattern manifests reference these existing Product and Cross-cutting Archetypes without becoming additional archetype IDs.
+
 The main archetypes below are product-facing archetypes. They are differentiated by primary output, acceptance object, and governance focus, not by being mutually exclusive low-level primitives.
 
 中文说明：下面的 10 个主母型是面向创建体验和验收对象的产物型主母型，不是底层不可再分的行为原语。行为原语、产物型主母型与场景组合范式之间的关系见 [Archetype Taxonomy](./archetype-taxonomy.md)。
