@@ -279,6 +279,13 @@ implementation and cannot execute an Orchestrator. Existing single-Agent Run
 Preview is not Orchestrator Runtime support. Studio Scenario Orchestrator
 Preview therefore still has no Apply or Run action.
 
+The separate
+[In-memory Demo Runtime Adapter](./scenario-orchestrator-in-memory-runtime-adapter.md)
+implements this contract for deterministic, mock-only execution of one Slot.
+Its own Descriptor is `available`, but it does not change
+`YUTRA_RUNTIME_ADAPTER_CONTRACT_V1`, does not implement an Orchestrator Engine,
+and does not make Studio or the production Runtime Orchestrator-capable.
+
 ## Public Boundary
 
 The package is platform-neutral contract code. It has no filesystem, network,
@@ -295,5 +302,6 @@ This iteration:
 - does not change Runtime, Agent DSL, Trace, Skill, Audit, Compiler, or Studio
   behavior.
 
-A possible next stage is an in-memory demo Runtime Adapter with explicit
-mock-only execution boundaries, not a production Runtime integration.
+The next possible stage is an in-memory Scenario Orchestrator Engine that uses
+the demo Adapter without moving Route, Binding, call-stack, or terminal
+ownership into the Slot Runtime.

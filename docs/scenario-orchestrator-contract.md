@@ -313,3 +313,8 @@ It preserves `previewOnly=true`, `runtimeExecutable=false`, and
 `currentRuntimeSupported=false`. Studio provides read-only inspection, and the
 separate [Runtime Adapter Contract](./scenario-orchestrator-runtime-adapter-contract.md)
 now defines a future one-Slot boundary without implementing Runtime support.
+An [In-memory Demo Runtime Adapter](./scenario-orchestrator-in-memory-runtime-adapter.md)
+now exercises that boundary for one deterministic mock Slot at a time. It does
+not select Routes, apply Bindings, maintain the call stack, or execute the
+Scenario, so the Orchestrator Document remains non-executable by current
+Studio and Runtime surfaces.

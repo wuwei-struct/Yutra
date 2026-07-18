@@ -216,5 +216,8 @@ This iteration:
 The separate
 [Scenario Orchestrator Runtime Adapter Contract](./scenario-orchestrator-runtime-adapter-contract.md)
 defines a future capability handshake, artifact and Action Closure preflight,
-and one-Slot invocation boundary. It does not implement the Adapter, and
-Runtime execution remains out of scope.
+and one-Slot invocation boundary. The
+[In-memory Demo Runtime Adapter](./scenario-orchestrator-in-memory-runtime-adapter.md)
+implements only that one-Slot boundary for deterministic mock smoke. The
+Compiler still does not run it, and no Route, Binding, Scenario terminal, or
+composed execution is performed.

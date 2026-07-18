@@ -166,6 +166,7 @@ Current status:
 - Scenario Orchestrator Compiler Preview binds canonical Composition Bundles through explicit Compile Profiles and exports `scenario.orchestrator.yaml` plus five supporting contract artifacts. Studio exposes those two canonical previews only after explicit Composition Preview; the result remains preview-only, is not current Agent DSL, and cannot run in the current Runtime.
 - `@yutra/scenario-orchestrator-core` defines the preview-only `single_active_slot_call_return` Orchestrator Document contract, Context namespace isolation, explicit call-return, fixed terminals, budgets, Trace/Audit expectations, and closed provenance.
 - `@yutra/scenario-orchestrator-runtime-contract` defines the future Engine/Slot Adapter boundary, fail-closed capability handshake, namespaced invocation, Action Closure, idempotency, Trace/Audit parent binding, and side-effect limits. The current Yutra Runtime descriptor remains `contract_only`.
+- `@yutra/scenario-orchestrator-runtime-demo` provides deterministic mock-only execution of one canonical Slot with in-memory artifact/hash checks, Action Closure, side-effect gates, idempotency, timeout, and redacted Trace/Audit sidecars. It does not provide the Scenario Engine.
 - Renewal churn remains contract-only; executable top-level Orchestrator DSL, Plan authoring, generic Pack Config deep merge, and Runtime execution remain deferred.
 
 ## First Priority Archetypes

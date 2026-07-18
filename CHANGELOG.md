@@ -4,6 +4,7 @@
 
 ### Added
 
+- `@yutra/scenario-orchestrator-runtime-demo` with deterministic mock-only one-Slot execution through the existing Runtime, in-memory artifact/hash validation, Action Closure and side-effect preflight, idempotency replay, timeout/single-concurrency enforcement, and redacted Trace/Audit sidecars.
 - `@yutra/scenario-orchestrator-runtime-contract` with a fail-closed capability handshake, Slot invocation/result contracts, artifact and Action Closure binding, deterministic idempotency, Trace/Audit parent binding, side-effect limits, and an explicitly contract-only current Yutra Runtime descriptor.
 - Studio Scenario Orchestrator Preview with a strict canonical-ID Runner API, explicit Compile Profile inspection, six read-only Orchestrator artifacts, Context/Route/Terminal/Trace/Provenance views, and enforced non-Agent-DSL/non-Runtime boundaries.
 - `@yutra/scenario-orchestrator-compiler` with explicit Compile Profiles, canonical Composition Bundle verification, deterministic `scenario.orchestrator.yaml` contract output, six preview artifacts, closed hashes/provenance, fail-closed profile alignment, and `yutra orchestrator compile`.
@@ -19,7 +20,7 @@
 
 ### Intentionally Excluded
 
-- Orchestrator Engine or callable Runtime Adapter implementation, Slot execution, and composed Agent execution.
+- Scenario Orchestrator Engine, Route/Binding execution, Scenario call stack, full composed Agent execution, and Studio Orchestrator Run.
 - Runtime-executable Orchestrator DSL, Orchestrator Runtime, or composed Agent execution.
 - Executable top-level Orchestrator DSL, composed Agent execution, or generic Pack Config deep merge.
 - Composition Runtime execution, Plan authoring, and executable top-level Orchestrator DSL generation.

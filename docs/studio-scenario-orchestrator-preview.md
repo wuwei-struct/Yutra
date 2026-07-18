@@ -135,3 +135,10 @@ The separate
 defines the future capability and one-Slot invocation boundary. Its current
 Yutra descriptor is `contract_only`; Studio still has no Orchestrator Apply or
 Run action.
+
+The separate
+[In-memory Demo Runtime Adapter](./scenario-orchestrator-in-memory-runtime-adapter.md)
+can execute one canonical Slot in package tests and smoke only. It is not
+wired into Builder Runner or Studio. This workbench still has no Orchestrator
+Run, does not call the Adapter, and keeps
+`orchestratorRuntimeSupported=false`.

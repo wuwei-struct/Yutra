@@ -62,6 +62,13 @@ capability handshake and one-Slot invocation boundary. It does not implement a
 Runtime Adapter, change `@yutra/runtime`, or emit Orchestrator Trace. The
 current Yutra Runtime Adapter descriptor remains `contract_only`.
 
+`@yutra/scenario-orchestrator-runtime-demo` implements that boundary as a
+mock-only in-memory Adapter around the unchanged public `executeRun` API. It
+executes one Slot, preserves namespaced input/output, and records redacted
+Trace/Audit correlation references. It does not select Routes, apply Bindings,
+maintain a Scenario call stack, emit Orchestrator events, or interpret Slot
+completion as Scenario completion.
+
 ## Boundaries
 
 The execution standard does not include:
