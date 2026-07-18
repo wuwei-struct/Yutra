@@ -321,6 +321,18 @@ importers:
         specifier: ^3.24.2
         version: 3.25.76
 
+  packages/scenario-orchestrator-runtime-contract:
+    dependencies:
+      '@yutra/scenario-orchestrator-compiler':
+        specifier: workspace:*
+        version: link:../scenario-orchestrator-compiler
+      '@yutra/scenario-orchestrator-core':
+        specifier: workspace:*
+        version: link:../scenario-orchestrator-core
+      zod:
+        specifier: ^3.24.2
+        version: 3.25.76
+
   packages/scenario-pattern-core:
     dependencies:
       '@yutra/archetype-core':

@@ -310,5 +310,6 @@ Current non-goals:
 The preview Compiler is documented in
 [Scenario Orchestrator Compiler Preview](./scenario-orchestrator-compiler-preview.md).
 It preserves `previewOnly=true`, `runtimeExecutable=false`, and
-`currentRuntimeSupported=false`. A next possible stage is a Studio
-Orchestrator Preview or a separate Runtime Adapter Contract.
+`currentRuntimeSupported=false`. Studio provides read-only inspection, and the
+separate [Runtime Adapter Contract](./scenario-orchestrator-runtime-adapter-contract.md)
+now defines a future one-Slot boundary without implementing Runtime support.

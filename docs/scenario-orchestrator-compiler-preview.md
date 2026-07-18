@@ -213,5 +213,8 @@ This iteration:
 - does not execute a composed Agent;
 - does not publish npm.
 
-A possible next stage is a separate Runtime Adapter Contract. Runtime
-execution remains out of scope until explicitly designed.
+The separate
+[Scenario Orchestrator Runtime Adapter Contract](./scenario-orchestrator-runtime-adapter-contract.md)
+defines a future capability handshake, artifact and Action Closure preflight,
+and one-Slot invocation boundary. It does not implement the Adapter, and
+Runtime execution remains out of scope.

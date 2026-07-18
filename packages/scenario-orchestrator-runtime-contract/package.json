@@ -1,0 +1,38 @@
+{
+  "name": "@yutra/scenario-orchestrator-runtime-contract",
+  "version": "0.3.0-vnext-preview.1",
+  "private": false,
+  "description": "Yutra Scenario Orchestrator to Slot Runtime Adapter safety contract",
+  "type": "module",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --dts",
+    "test": "vitest run --passWithNoTests",
+    "lint": "eslint src --max-warnings=0"
+  },
+  "dependencies": {
+    "@yutra/scenario-orchestrator-compiler": "workspace:*",
+    "@yutra/scenario-orchestrator-core": "workspace:*",
+    "zod": "^3.24.2"
+  },
+  "license": "MIT",
+  "author": "Yutra Contributors",
+  "keywords": [
+    "yutra",
+    "scenario-orchestrator",
+    "runtime-adapter",
+    "contract",
+    "governance"
+  ]
+}

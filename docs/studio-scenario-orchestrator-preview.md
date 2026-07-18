@@ -130,5 +130,8 @@ This workbench is demo/mock only:
 - no customer data, customer SOP, or commercial delivery asset;
 - not production ready.
 
-A possible next design stage is a separate Orchestrator Runtime Adapter
-Contract. It is not a direct Runtime integration commitment.
+The separate
+[Orchestrator Runtime Adapter Contract](./scenario-orchestrator-runtime-adapter-contract.md)
+defines the future capability and one-Slot invocation boundary. Its current
+Yutra descriptor is `contract_only`; Studio still has no Orchestrator Apply or
+Run action.

@@ -57,6 +57,11 @@ Trace event model, and Yutra Runtime cannot execute the Orchestrator Document.
 `runtimeExecutable=false` and `currentRuntimeSupported=false`. It does not
 extend the Runtime loop, DSL parser, or existing Trace event semantics.
 
+`@yutra/scenario-orchestrator-runtime-contract` separately defines a future
+capability handshake and one-Slot invocation boundary. It does not implement a
+Runtime Adapter, change `@yutra/runtime`, or emit Orchestrator Trace. The
+current Yutra Runtime Adapter descriptor remains `contract_only`.
+
 ## Boundaries
 
 The execution standard does not include:
