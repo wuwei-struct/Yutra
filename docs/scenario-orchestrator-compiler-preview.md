@@ -208,10 +208,10 @@ This iteration:
 - does not modify `@yutra/dsl`;
 - does not connect Runtime;
 - does not emit Trace;
-- does not connect Studio;
+- exposes its canonical built-in previews through the read-only
+  [Studio Scenario Orchestrator Preview](./studio-scenario-orchestrator-preview.md);
 - does not execute a composed Agent;
 - does not publish npm.
 
-A possible next stage is Studio Orchestrator Preview or a separate Runtime
-Adapter Contract. Runtime execution remains out of scope until explicitly
-designed.
+A possible next stage is a separate Runtime Adapter Contract. Runtime
+execution remains out of scope until explicitly designed.

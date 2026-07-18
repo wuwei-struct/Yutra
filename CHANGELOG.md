@@ -4,6 +4,7 @@
 
 ### Added
 
+- Studio Scenario Orchestrator Preview with a strict canonical-ID Runner API, explicit Compile Profile inspection, six read-only Orchestrator artifacts, Context/Route/Terminal/Trace/Provenance views, and enforced non-Agent-DSL/non-Runtime boundaries.
 - `@yutra/scenario-orchestrator-compiler` with explicit Compile Profiles, canonical Composition Bundle verification, deterministic `scenario.orchestrator.yaml` contract output, six preview artifacts, closed hashes/provenance, fail-closed profile alignment, and `yutra orchestrator compile`.
 - `@yutra/scenario-orchestrator-core` with a preview-only `single_active_slot_call_return` Orchestrator Document contract, isolated Slot Context, explicit call-return Routes and identity Bindings, fixed fail-closed terminals, budgets, Trace/Audit expectations, closed provenance, deterministic demo fixtures, and bilingual explanation.
 - Studio Scenario Composition Workbench with canonical catalog/detail views, Composition Readiness, in-memory preview compilation, seven composition artifacts, six namespaced artifacts per Slot, and a manual single-Slot DSL Editor bridge.
@@ -19,7 +20,7 @@
 
 - Runtime-executable Orchestrator DSL, Orchestrator Runtime, or composed Agent execution.
 - Executable top-level Orchestrator DSL, composed Agent execution, or generic Pack Config deep merge.
-- Composition Runtime execution, Plan authoring, and top-level Orchestrator DSL generation.
+- Composition Runtime execution, Plan authoring, and executable top-level Orchestrator DSL generation.
 - Pack Config merge and Compiler precedence.
 - Creator Workbench or Runtime integration for Scenario Patterns.
 

@@ -1,5 +1,6 @@
 import { useI18n } from "../../i18n";
 import { useScenarioCompositionState } from "../../lib/scenario-composition-state";
+import { useScenarioOrchestratorState } from "../../lib/scenario-orchestrator-state";
 import { ScenarioCompositionArtifactsPanel } from "./ScenarioCompositionArtifactsPanel";
 import { ScenarioCompositionBoundaryNotice } from "./ScenarioCompositionBoundaryNotice";
 import { ScenarioCompositionOverview } from "./ScenarioCompositionOverview";
@@ -11,12 +12,14 @@ import {
   ScenarioSlotArtifactsPanel,
   type ScenarioSlotDslMetadata
 } from "./ScenarioSlotArtifactsPanel";
+import { ScenarioOrchestratorPreviewPanel } from "./ScenarioOrchestratorPreviewPanel";
 
 export function ScenarioCompositionWorkbench(props: {
   onSendSlotDsl: (dslText: string, metadata: ScenarioSlotDslMetadata) => void;
 }) {
   const { t } = useI18n();
   const state = useScenarioCompositionState();
+  const orchestrator = useScenarioOrchestratorState(state.selectedCompositionId);
   return (
     <main className="scenario-workbench" aria-label="Scenario Composition Workbench">
       <header className="scenario-hero">
@@ -60,6 +63,21 @@ export function ScenarioCompositionWorkbench(props: {
           <ScenarioCompositionArtifactsPanel result={state.compileResult} />
           <ScenarioSlotArtifactsPanel result={state.compileResult} onSendSlotDsl={props.onSendSlotDsl} />
         </div>
+      ) : null}
+      {state.detail ? (
+        <ScenarioOrchestratorPreviewPanel
+          detail={state.detail}
+          compositionResult={state.compileResult}
+          status={orchestrator.status}
+          result={orchestrator.result}
+          selectedArtifact={orchestrator.selectedArtifact}
+          selectedProfileSection={orchestrator.selectedProfileSection}
+          errorCode={orchestrator.errorCode}
+          errorMessage={orchestrator.errorMessage}
+          onCompile={() => void orchestrator.compilePreview()}
+          onSelectArtifact={orchestrator.setSelectedArtifact}
+          onSelectProfileSection={orchestrator.setSelectedProfileSection}
+        />
       ) : null}
     </main>
   );

@@ -24,6 +24,7 @@ import type {
   ScenarioCompositionCompilePreviewResponse,
   ScenarioCompositionDetailResponse
 } from "./types";
+import { getScenarioOrchestratorSupport } from "./scenario-orchestrators";
 
 const PRODUCT_ARCHETYPE_IDS = [
   "request-resolution",
@@ -98,7 +99,12 @@ function catalogItem(input: ScenarioCompositionPlan | ScenarioCompositionDraft):
     eligibleForCompilePreview:
       !("eligibleForCompilerInput" in input) &&
       readiness.status === "compile_ready" &&
-      readiness.compositionCompilerAvailable
+      readiness.compositionCompilerAvailable,
+    compositionPreviewAvailable:
+      !("eligibleForCompilerInput" in input) &&
+      readiness.status === "compile_ready" &&
+      readiness.compositionCompilerAvailable,
+    ...getScenarioOrchestratorSupport(input.compositionId)
   };
 }
 
@@ -135,7 +141,12 @@ export function getScenarioCompositionDetail(compositionId: string): ScenarioCom
     eligibleForCompilePreview:
       !("eligibleForCompilerInput" in plan) &&
       readiness.status === "compile_ready" &&
-      readiness.compositionCompilerAvailable
+      readiness.compositionCompilerAvailable,
+    compositionPreviewAvailable:
+      !("eligibleForCompilerInput" in plan) &&
+      readiness.status === "compile_ready" &&
+      readiness.compositionCompilerAvailable,
+    ...getScenarioOrchestratorSupport(compositionId)
   };
 }
 

@@ -138,6 +138,9 @@ importers:
       '@yutra/scenario-composition-core':
         specifier: workspace:*
         version: link:../../packages/scenario-composition-core
+      '@yutra/scenario-orchestrator-compiler':
+        specifier: workspace:*
+        version: link:../../packages/scenario-orchestrator-compiler
       '@yutra/scenario-pattern-core':
         specifier: workspace:*
         version: link:../../packages/scenario-pattern-core

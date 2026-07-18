@@ -172,11 +172,15 @@ namespaced preview artifacts.
 
 Renewal churn warning remains contract-only. Composition preview always reports
 `previewOnly=true` and `runtimeExecutable=false`; it does not deep-merge Pack
-Configs, generate an Orchestrator DSL, or execute Runtime. A selected Slot DSL
-can be sent manually to the DSL Editor for single-Slot inspection without
-automatic Inspect, Apply, or Run.
+Configs or execute Runtime. After an explicit Composition Preview, customer
+complaint and ecommerce refund can also compile a read-only Orchestrator
+Contract Preview. Its `scenario.orchestrator.yaml` is not Agent DSL, cannot be
+sent to the Agent DSL Editor, and has no Apply or Run action. A selected Slot
+DSL remains available for manual single-Slot inspection without automatic
+Inspect, Apply, or Run.
 
 See [Studio Scenario Composition Compile Preview](studio-scenario-composition-preview.md).
+See [Studio Scenario Orchestrator Preview](studio-scenario-orchestrator-preview.md).
 
 Relevant vNext docs:
 
@@ -188,6 +192,7 @@ Relevant vNext docs:
 - [Creator Workbench UI](creator-workbench-ui.md)
 - [Creator Archetype Selection](creator-archetype-selection.md)
 - [Studio Scenario Composition Compile Preview](studio-scenario-composition-preview.md)
+- [Studio Scenario Orchestrator Preview](studio-scenario-orchestrator-preview.md)
 - [vNext Roadmap](vnext-roadmap.md)
 
 ## Roadmap

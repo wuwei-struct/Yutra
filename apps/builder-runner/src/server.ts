@@ -12,6 +12,11 @@ import {
   listScenarioCompositionCatalog,
   parseScenarioCompositionCompileRequest
 } from "./scenario-compositions";
+import {
+  ScenarioOrchestratorApiError,
+  compileBuiltInScenarioOrchestrator,
+  parseScenarioOrchestratorCompileRequest
+} from "./scenario-orchestrators";
 
 const DEFAULT_PORT = 8788;
 
@@ -63,6 +68,28 @@ function sendScenarioCompositionError(res: ServerResponse, error: unknown): void
     error: {
       code: "SCENARIO_COMPOSITION_INTERNAL_ERROR",
       message: "Scenario Composition request failed."
+    },
+    issues: []
+  });
+}
+
+function sendScenarioOrchestratorError(res: ServerResponse, error: unknown): void {
+  if (error instanceof ScenarioOrchestratorApiError) {
+    sendJson(res, error.statusCode, {
+      ok: false,
+      error: {
+        code: error.code,
+        message: sanitizeErrorMessage(error.message)
+      },
+      issues: []
+    });
+    return;
+  }
+  sendJson(res, 500, {
+    ok: false,
+    error: {
+      code: "SCENARIO_ORCHESTRATOR_INTERNAL_ERROR",
+      message: "Scenario Orchestrator request failed."
     },
     issues: []
   });
@@ -200,6 +227,35 @@ async function handleScenarioCompositionCompilePreview(req: IncomingMessage, res
   }
 }
 
+async function handleScenarioOrchestratorCompilePreview(
+  req: IncomingMessage,
+  res: ServerResponse
+): Promise<void> {
+  try {
+    const input = await readJsonBody<unknown>(req, 4096);
+    const request = parseScenarioOrchestratorCompileRequest(input);
+    const result = compileBuiltInScenarioOrchestrator(request);
+    const statusCode = result.ok ? 200 : 422;
+    sendJson(res, statusCode, result);
+  } catch (error) {
+    if (
+      error instanceof SyntaxError ||
+      (error instanceof Error && error.message.startsWith("Request body"))
+    ) {
+      sendJson(res, 400, {
+        ok: false,
+        error: {
+          code: "SCENARIO_ORCHESTRATOR_REQUEST_INVALID",
+          message: sanitizeErrorMessage(error.message)
+        },
+        issues: []
+      });
+      return;
+    }
+    sendScenarioOrchestratorError(res, error);
+  }
+}
+
 function requestHandler(req: IncomingMessage, res: ServerResponse): void {
   const method = req.method ?? "GET";
   const path = (req.url ?? "/").split("?")[0];
@@ -256,6 +312,11 @@ function requestHandler(req: IncomingMessage, res: ServerResponse): void {
 
   if (method === "POST" && path === "/creator/scenario-compositions/compile-preview") {
     void handleScenarioCompositionCompilePreview(req, res);
+    return;
+  }
+
+  if (method === "POST" && path === "/creator/scenario-orchestrators/compile-preview") {
+    void handleScenarioOrchestratorCompilePreview(req, res);
     return;
   }
 

@@ -14,6 +14,7 @@ import type {
   ScenarioCompositionPlan
 } from "@yutra/scenario-composition-core";
 import type { ScenarioCompositionCompileResult } from "@yutra/scenario-composition-compiler";
+import type { ScenarioOrchestratorCompileResult } from "@yutra/scenario-orchestrator-compiler";
 import type {
   LocalizedScenarioText,
   ScenarioPatternCompositionSummary,
@@ -145,6 +146,11 @@ export interface ScenarioCompositionCatalogItem {
   acceptanceObject: LocalizedScenarioText;
   readiness: CompositionReadiness;
   eligibleForCompilePreview: boolean;
+  compositionPreviewAvailable: boolean;
+  orchestratorPreviewAvailable: boolean;
+  orchestratorCompileProfileId?: string;
+  orchestratorRuntimeSupported: false;
+  orchestratorBlockers: string[];
 }
 
 export interface ScenarioCompositionCatalogResponse {
@@ -160,6 +166,11 @@ export interface ScenarioCompositionDetailResponse {
   publicBoundary: ScenarioCompositionPlan["publicExposure"];
   compositionCompilerAvailable: true;
   eligibleForCompilePreview: boolean;
+  compositionPreviewAvailable: boolean;
+  orchestratorPreviewAvailable: boolean;
+  orchestratorCompileProfileId?: string;
+  orchestratorRuntimeSupported: false;
+  orchestratorBlockers: string[];
 }
 
 export interface ScenarioCompositionCompilePreviewRequest {
@@ -184,6 +195,31 @@ export type ScenarioCompositionCompilePreviewResponse =
         compositionId?: string;
         slotId?: string;
         path?: string[];
+      }>;
+    };
+
+export interface ScenarioOrchestratorCompilePreviewRequest {
+  compositionId: string;
+}
+
+export type ScenarioOrchestratorCompilePreviewResponse =
+  | {
+      ok: true;
+      result: ScenarioOrchestratorCompileResult;
+    }
+  | {
+      ok: false;
+      error: {
+        code: string;
+        message: string;
+      };
+      issues: Array<{
+        code: string;
+        severity: "error" | "warning";
+        message: string;
+        compositionId?: string;
+        slotId?: string;
+        routeId?: string;
       }>;
     };
 

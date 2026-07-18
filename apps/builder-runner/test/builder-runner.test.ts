@@ -653,6 +653,11 @@ describe("@yutra/builder-runner", () => {
         compositionId: string;
         readiness: { status: string };
         eligibleForCompilePreview: boolean;
+        compositionPreviewAvailable: boolean;
+        orchestratorPreviewAvailable: boolean;
+        orchestratorCompileProfileId?: string;
+        orchestratorRuntimeSupported: boolean;
+        orchestratorBlockers: string[];
       }>;
     };
 
@@ -663,6 +668,15 @@ describe("@yutra/builder-runner", () => {
         ?.eligibleForCompilePreview
     ).toBe(true);
     expect(
+      body.compositions.find((item) => item.compositionId === "customer-complaint-composition-demo")
+    ).toMatchObject({
+      compositionPreviewAvailable: true,
+      orchestratorPreviewAvailable: true,
+      orchestratorCompileProfileId: "customer-complaint-orchestrator-profile",
+      orchestratorRuntimeSupported: false,
+      orchestratorBlockers: []
+    });
+    expect(
       body.compositions.find((item) => item.compositionId === "ecommerce-refund-composition-demo")
         ?.eligibleForCompilePreview
     ).toBe(true);
@@ -671,6 +685,17 @@ describe("@yutra/builder-runner", () => {
     );
     expect(renewal?.readiness.status).toBe("contract_only");
     expect(renewal?.eligibleForCompilePreview).toBe(false);
+    expect(renewal?.compositionPreviewAvailable).toBe(false);
+    expect(renewal?.orchestratorPreviewAvailable).toBe(false);
+    expect(renewal?.orchestratorRuntimeSupported).toBe(false);
+    expect(renewal?.orchestratorBlockers).toEqual(
+      expect.arrayContaining([
+        expect.stringContaining("Profile"),
+        expect.stringContaining("monitoring-response"),
+        expect.stringContaining("data-insight"),
+        expect.stringContaining("lead-engagement")
+      ])
+    );
   });
 
   it("GET /creator/scenario-compositions/:id returns plan, summary, readiness, and boundary", async () => {
@@ -684,6 +709,11 @@ describe("@yutra/builder-runner", () => {
       readiness: { status: string; compositionCompilerAvailable: boolean };
       publicBoundary: { mode: string; containsRealEndpoint: boolean; containsSecret: boolean };
       eligibleForCompilePreview: boolean;
+      compositionPreviewAvailable: boolean;
+      orchestratorPreviewAvailable: boolean;
+      orchestratorCompileProfileId?: string;
+      orchestratorRuntimeSupported: boolean;
+      orchestratorBlockers: string[];
     };
 
     expect(res.status).toBe(200);
@@ -697,6 +727,13 @@ describe("@yutra/builder-runner", () => {
       containsSecret: false
     });
     expect(body.eligibleForCompilePreview).toBe(true);
+    expect(body.compositionPreviewAvailable).toBe(true);
+    expect(body.orchestratorPreviewAvailable).toBe(true);
+    expect(body.orchestratorCompileProfileId).toBe(
+      "customer-complaint-orchestrator-profile"
+    );
+    expect(body.orchestratorRuntimeSupported).toBe(false);
+    expect(body.orchestratorBlockers).toEqual([]);
   });
 
   it.each([
@@ -782,6 +819,133 @@ describe("@yutra/builder-runner", () => {
 
     expect(res.status).toBe(400);
     expect(body.error?.code).toBe("SCENARIO_COMPOSITION_REQUEST_INVALID");
+    expect(body.error?.message).not.toContain("node_modules");
+    expect(body.error?.message).not.toContain(process.cwd());
+  });
+
+  it.each([
+    ["customer-complaint-composition-demo", 3],
+    ["ecommerce-refund-composition-demo", 2]
+  ])("POST Scenario Orchestrator Compile Preview compiles %s in memory", async (compositionId, slotCount) => {
+    const baseUrl = await startServer();
+    const res = await fetch(`${baseUrl}/creator/scenario-orchestrators/compile-preview`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ compositionId })
+    });
+    const body = (await res.json()) as {
+      ok: boolean;
+      result?: {
+        previewOnly: boolean;
+        runtimeExecutable: boolean;
+        currentRuntimeSupported: boolean;
+        orchestratorDocument: {
+          kind: string;
+          slots: unknown[];
+          tracePolicy: {
+            mandatoryEventTypes: string[];
+            eventEmissionImplemented: boolean;
+          };
+        };
+        orchestratorArtifacts: Record<string, string>;
+        compositionResult: {
+          compositionArtifacts: Record<string, string>;
+          slots: Array<{ artifacts: Record<string, string> }>;
+        };
+        compileReport: {
+          noAgentDslGenerated: boolean;
+          noRuntimeExecution: boolean;
+        };
+      };
+    };
+
+    expect(res.status).toBe(200);
+    expect(body.ok).toBe(true);
+    expect(body.result).toMatchObject({
+      previewOnly: true,
+      runtimeExecutable: false,
+      currentRuntimeSupported: false
+    });
+    expect(body.result?.orchestratorDocument.kind).toBe("scenario_orchestrator");
+    expect(body.result?.orchestratorDocument.slots).toHaveLength(slotCount);
+    expect(body.result?.orchestratorDocument.tracePolicy.mandatoryEventTypes).toHaveLength(13);
+    expect(body.result?.orchestratorDocument.tracePolicy.eventEmissionImplemented).toBe(false);
+    expect(Object.keys(body.result?.orchestratorArtifacts ?? {})).toHaveLength(6);
+    expect(body.result?.orchestratorArtifacts).toHaveProperty("scenario.orchestrator.yaml");
+    expect(body.result?.orchestratorArtifacts).not.toHaveProperty("agent.yutra.yaml");
+    expect(Object.keys(body.result?.compositionResult.compositionArtifacts ?? {})).toHaveLength(7);
+    for (const slot of body.result?.compositionResult.slots ?? []) {
+      expect(Object.keys(slot.artifacts)).toHaveLength(6);
+    }
+    expect(body.result?.compileReport).toMatchObject({
+      noAgentDslGenerated: true,
+      noRuntimeExecution: true
+    });
+    expect(JSON.stringify(body)).not.toContain(process.cwd());
+  });
+
+  it("POST Scenario Orchestrator Compile Preview rejects renewal churn without partial output", async () => {
+    const baseUrl = await startServer();
+    const res = await fetch(`${baseUrl}/creator/scenario-orchestrators/compile-preview`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ compositionId: "renewal-churn-warning-composition-demo" })
+    });
+    const body = (await res.json()) as {
+      ok: boolean;
+      error?: { code?: string; message?: string };
+      result?: unknown;
+    };
+
+    expect(res.status).toBe(422);
+    expect(body.ok).toBe(false);
+    expect(body.error?.code).toBe("ORCHESTRATOR_COMPOSITION_NOT_READY");
+    expect(body.result).toBeUndefined();
+    expect(body.error?.message).not.toContain("node_modules");
+    expect(body.error?.message).not.toContain(process.cwd());
+  });
+
+  it("Scenario Orchestrator API rejects unknown compositions and client-supplied profiles", async () => {
+    const baseUrl = await startServer();
+    const unknown = await fetch(`${baseUrl}/creator/scenario-orchestrators/compile-preview`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ compositionId: "not-a-composition" })
+    });
+    const unknownBody = (await unknown.json()) as { error?: { code?: string } };
+    expect(unknown.status).toBe(404);
+    expect(unknownBody.error?.code).toBe(
+      "SCENARIO_ORCHESTRATOR_COMPOSITION_NOT_FOUND"
+    );
+
+    for (const field of ["compileProfile", "plan", "planHash", "routes", "slots"]) {
+      const invalid = await fetch(`${baseUrl}/creator/scenario-orchestrators/compile-preview`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          compositionId: "customer-complaint-composition-demo",
+          [field]: {}
+        })
+      });
+      const invalidBody = (await invalid.json()) as { error?: { code?: string } };
+      expect(invalid.status).toBe(400);
+      expect(invalidBody.error?.code).toBe(
+        "SCENARIO_ORCHESTRATOR_REQUEST_INVALID"
+      );
+    }
+  });
+
+  it("Scenario Orchestrator API rejects oversized requests without exposing internals", async () => {
+    const baseUrl = await startServer();
+    const res = await fetch(`${baseUrl}/creator/scenario-orchestrators/compile-preview`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ compositionId: "x".repeat(5000) })
+    });
+    const body = (await res.json()) as { error?: { code?: string; message?: string } };
+
+    expect(res.status).toBe(400);
+    expect(body.error?.code).toBe("SCENARIO_ORCHESTRATOR_REQUEST_INVALID");
     expect(body.error?.message).not.toContain("node_modules");
     expect(body.error?.message).not.toContain(process.cwd());
   });

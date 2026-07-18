@@ -113,14 +113,17 @@ Scenario Composition Compile Preview is demo/mock only:
 - no customer data, customer SOP, or commercial delivery asset;
 - not production ready.
 
-The next design stage may define Plan Authoring or a governed Orchestrator DSL
-contract. Neither capability is implemented here.
+Composition Preview can now be followed by a separate, explicit
+[Studio Scenario Orchestrator Preview](./studio-scenario-orchestrator-preview.md).
+The Orchestrator view remains read-only, non-executable, and separate from the
+Agent DSL Editor. Plan Authoring is still not implemented.
 
 The read-only governed contract is now available in
 [Scenario Orchestrator DSL Contract](./scenario-orchestrator-contract.md).
 Studio does not compile, edit, apply, or run that contract in this iteration.
 
-The CLI/core path can now generate a preview-only Orchestrator contract through
+The CLI/core path can generate a preview-only Orchestrator contract through
 [Scenario Orchestrator Compiler Preview](./scenario-orchestrator-compiler-preview.md).
-That capability is not connected to Studio, does not add an Orchestrator Run
-button, and remains unsupported by the current Runtime.
+Studio now exposes the same canonical preview in memory after an explicit
+Composition Preview. It does not add an Orchestrator Apply or Run button and
+remains unsupported by the current Runtime.

@@ -12,10 +12,12 @@ import {
   fetchScenarioCompositionCatalog,
   fetchScenarioCompositionDetail
 } from "../src/lib/scenario-composition-client";
+import { compileScenarioOrchestratorPreview } from "../src/lib/scenario-orchestrator-client";
 import type {
   ScenarioCompositionCatalogItem,
   ScenarioCompositionCompileResult,
-  ScenarioCompositionDetailResponse
+  ScenarioCompositionDetailResponse,
+  ScenarioOrchestratorCompileResult
 } from "../src/types";
 
 vi.mock("../src/lib/runner-client", () => ({
@@ -35,6 +37,10 @@ vi.mock("../src/lib/scenario-composition-client", () => ({
   fetchScenarioCompositionCatalog: vi.fn(),
   fetchScenarioCompositionDetail: vi.fn(),
   compileScenarioCompositionPreview: vi.fn()
+}));
+
+vi.mock("../src/lib/scenario-orchestrator-client", () => ({
+  compileScenarioOrchestratorPreview: vi.fn()
 }));
 
 afterEach(() => {
@@ -350,7 +356,12 @@ const scenarioCatalog: ScenarioCompositionCatalogItem[] = [
       status: "compile_ready",
       blockers: []
     },
-    eligibleForCompilePreview: true
+    eligibleForCompilePreview: true,
+    compositionPreviewAvailable: true,
+    orchestratorPreviewAvailable: true,
+    orchestratorCompileProfileId: "customer-complaint-orchestrator-profile",
+    orchestratorRuntimeSupported: false,
+    orchestratorBlockers: []
   },
   {
     compositionId: "ecommerce-refund-composition-demo",
@@ -373,7 +384,12 @@ const scenarioCatalog: ScenarioCompositionCatalogItem[] = [
       status: "compile_ready",
       blockers: []
     },
-    eligibleForCompilePreview: true
+    eligibleForCompilePreview: true,
+    compositionPreviewAvailable: true,
+    orchestratorPreviewAvailable: true,
+    orchestratorCompileProfileId: "ecommerce-refund-orchestrator-profile",
+    orchestratorRuntimeSupported: false,
+    orchestratorBlockers: []
   },
   {
     compositionId: "renewal-churn-warning-composition-demo",
@@ -400,7 +416,16 @@ const scenarioCatalog: ScenarioCompositionCatalogItem[] = [
         "lead-engagement Pack Config and compiler are unavailable"
       ]
     },
-    eligibleForCompilePreview: false
+    eligibleForCompilePreview: false,
+    compositionPreviewAvailable: false,
+    orchestratorPreviewAvailable: false,
+    orchestratorRuntimeSupported: false,
+    orchestratorBlockers: [
+      "Orchestrator Compile Profile is unavailable.",
+      "monitoring-response compiler unavailable",
+      "data-insight compiler unavailable",
+      "lead-engagement compiler unavailable"
+    ]
   }
 ];
 
@@ -539,7 +564,12 @@ function scenarioDetail(compositionId: string): ScenarioCompositionDetailRespons
       containsCommercialDeliveryAsset: false
     },
     compositionCompilerAvailable: true,
-    eligibleForCompilePreview: catalogItem.eligibleForCompilePreview
+    eligibleForCompilePreview: catalogItem.eligibleForCompilePreview,
+    compositionPreviewAvailable: catalogItem.compositionPreviewAvailable,
+    orchestratorPreviewAvailable: catalogItem.orchestratorPreviewAvailable,
+    orchestratorCompileProfileId: catalogItem.orchestratorCompileProfileId,
+    orchestratorRuntimeSupported: false,
+    orchestratorBlockers: catalogItem.orchestratorBlockers
   };
 }
 
@@ -601,6 +631,246 @@ function scenarioCompileResult(compositionId: string): ScenarioCompositionCompil
   };
 }
 
+function scenarioOrchestratorResult(
+  compositionId: string
+): ScenarioOrchestratorCompileResult {
+  const compositionResult = scenarioCompileResult(compositionId);
+  const isCustomer = compositionId === "customer-complaint-composition-demo";
+  const orchestratorId = isCustomer
+    ? "customer-complaint-orchestrator-demo"
+    : "ecommerce-refund-orchestrator-demo";
+  const primarySlotId = compositionResult.slots[0]?.slotId ?? "";
+  const terminalIds = [
+    ["$scenario_done", "completed", true],
+    ["$human_handoff", "handoff_required", false],
+    ["$fail_closed", "failed", false]
+  ] as const;
+  const routes = compositionResult.slots.flatMap((slot, index) => {
+    if (slot.role === "supporting") {
+      return [
+        {
+          routeId: `invoke_${slot.slotId}`,
+          fromSlotId: primarySlotId,
+          outcome: `${slot.slotId}_required`,
+          conditionRef: `${slot.slotId}_required`,
+          priority: index * 10,
+          effect: {
+            type: "invoke_slot",
+            targetSlotId: slot.slotId,
+            returnToSlotId: primarySlotId
+          },
+          provenanceRef: { compositionRouteId: `invoke_${slot.slotId}` }
+        },
+        {
+          routeId: `resume_${slot.slotId}`,
+          fromSlotId: slot.slotId,
+          outcome: `${slot.slotId}_available`,
+          conditionRef: `${slot.slotId}_available`,
+          priority: index * 10 + 5,
+          effect: { type: "resume_caller" },
+          provenanceRef: { compositionRouteId: `resume_${slot.slotId}` }
+        }
+      ];
+    }
+    return [];
+  });
+  routes.push({
+    routeId: "complete_from_primary",
+    fromSlotId: primarySlotId,
+    outcome: "primary_acceptance_satisfied",
+    conditionRef: "primary_acceptance_satisfied",
+    priority: 90,
+    effect: { type: "terminate", terminalId: "$scenario_done" },
+    provenanceRef: { compositionRouteId: "complete_from_primary" }
+  });
+  const publicExposure = {
+    mode: "demo_only" as const,
+    containsCustomerData: false as const,
+    containsRealEndpoint: false as const,
+    containsSecret: false as const,
+    containsCustomerSop: false as const,
+    containsCommercialDeliveryAsset: false as const
+  };
+  const document: ScenarioOrchestratorCompileResult["orchestratorDocument"] = {
+    schemaVersion: "1.0.0-preview",
+    kind: "scenario_orchestrator",
+    orchestratorId,
+    version: "0.1.0",
+    compositionRef: {
+      compositionId,
+      compositionVersion: compositionResult.compositionVersion,
+      patternId: compositionResult.patternId,
+      planHash: compositionResult.planHash,
+      bundleHash: compositionResult.bundleHash
+    },
+    executionModel: "single_active_slot_call_return",
+    previewOnly: true,
+    runtimeExecutable: false,
+    entrySlotId: primarySlotId,
+    slots: compositionResult.slots.map((slot) => ({
+      slotId: slot.slotId,
+      role: slot.role,
+      archetypeId: slot.archetypeId,
+      packConfigId: slot.packConfigId,
+      artifactRef: {
+        namespace: slot.namespace,
+        agentArtifactPath: `${slot.namespace}/agent.yutra.yaml`,
+        agentArtifactHash: slot.artifactHashes["agent.yutra.yaml"] ?? "",
+        configHash: slot.configHash
+      },
+      inputNamespace: `slots.${slot.slotId}.input`,
+      stateNamespace: `slots.${slot.slotId}.state`,
+      outputNamespace: `slots.${slot.slotId}.output`,
+      acceptedOutcomes:
+        slot.role === "primary"
+          ? ["primary_acceptance_satisfied"]
+          : [`${slot.slotId}_available`],
+      callableBySlotIds: slot.role === "primary" ? [] : [primarySlotId]
+    })),
+    routes,
+    bindings: [],
+    terminals: terminalIds.map(([terminalId, status, primaryOutputRequired]) => ({
+      terminalId,
+      status,
+      requiresAudit: true,
+      primaryOutputRequired
+    })),
+    contextPolicy: {
+      rootNamespace: "scenario",
+      sharedNamespace: "scenario.shared",
+      inputNamespace: "scenario.input",
+      outputNamespace: "scenario.output",
+      slotNamespacePattern: "slots.<slotId>",
+      writePolicy: {
+        scenarioInput: "read_only_after_start",
+        scenarioShared: "explicit_binding_only",
+        scenarioOutput: "primary_only",
+        slotContext: "own_slot_only"
+      },
+      implicitMergeAllowed: false,
+      implicitCrossSlotReadAllowed: false,
+      implicitCrossSlotWriteAllowed: false,
+      secretPropagationAllowed: false,
+      adapterInheritanceAllowed: false
+    },
+    executionPolicy: {
+      scheduling: "single_active_slot",
+      invocationModel: "call_return",
+      parallelism: "disabled",
+      recursion: "disabled",
+      implicitLooping: "disabled",
+      budgets: {
+        maxSlotInvocations: 6,
+        maxRouteEvaluations: 12,
+        maxBindingApplications: 4,
+        maxCallDepth: 1
+      }
+    },
+    failurePolicy: {
+      slotFailure: "explicit_route_or_fail_closed",
+      partialScenarioSuccessAllowed: false
+    },
+    handoffPolicy: {
+      terminalId: "$human_handoff",
+      reasonRequired: true
+    },
+    tracePolicy: {
+      contractVersion: "1.0.0-preview",
+      mandatoryEventTypes: [
+        "orchestrator.started",
+        "orchestrator.slot.invocation.started",
+        "orchestrator.slot.invocation.completed",
+        "orchestrator.slot.invocation.failed",
+        "orchestrator.route.evaluated",
+        "orchestrator.route.selected",
+        "orchestrator.binding.applied",
+        "orchestrator.binding.failed",
+        "orchestrator.overlay.evaluated",
+        "orchestrator.handoff.requested",
+        "orchestrator.budget.exhausted",
+        "orchestrator.completed",
+        "orchestrator.failed"
+      ],
+      eventEmissionImplemented: false,
+      auditRequired: true,
+      contextSnapshotRedactionRequired: true,
+      provenanceRequired: true
+    },
+    precedencePolicyRef: {
+      conflictMode: "fail_closed",
+      rules: ["deny_overrides", "human_review_over_automation"]
+    },
+    overlayRefs: [],
+    provenance: {
+      compositionId,
+      compositionVersion: compositionResult.compositionVersion,
+      patternId: compositionResult.patternId,
+      planHash: compositionResult.planHash,
+      bundleHash: compositionResult.bundleHash,
+      orchestratorHash: "sha256:orchestrator",
+      slotSources: compositionResult.slots.map((slot) => ({
+        slotId: slot.slotId
+      })),
+      routeSources: routes.map((route) => ({ routeId: route.routeId })),
+      bindingSources: [],
+      overlaySources: []
+    },
+    publicExposure
+  };
+  const filenames = [
+    "scenario.orchestrator.yaml",
+    "orchestrator.routes.json",
+    "orchestrator.context-policy.json",
+    "orchestrator.trace-contract.json",
+    "orchestrator.provenance.json",
+    "orchestrator-report.json"
+  ];
+  return {
+    schemaVersion: "1.0.0",
+    mode: "preview",
+    compositionId,
+    compositionVersion: compositionResult.compositionVersion,
+    patternId: compositionResult.patternId,
+    orchestratorId,
+    orchestratorVersion: "0.1.0",
+    previewOnly: true,
+    runtimeExecutable: false,
+    currentRuntimeSupported: false,
+    compilerVersion: "0.1.0",
+    planHash: compositionResult.planHash,
+    compositionBundleHash: compositionResult.bundleHash,
+    orchestratorHash: "sha256:orchestrator",
+    previewBundleHash: "sha256:preview-bundle",
+    compositionResult,
+    orchestratorDocument: document,
+    orchestratorArtifacts: Object.fromEntries(
+      filenames.map((filename) => [
+        filename,
+        filename === "scenario.orchestrator.yaml"
+          ? "kind: scenario_orchestrator\npreviewOnly: true\nruntimeExecutable: false\n"
+          : JSON.stringify({ filename, previewOnly: true }, null, 2)
+      ])
+    ),
+    artifactHashes: Object.fromEntries(
+      filenames.map((filename) => [filename, `sha256:${filename}`])
+    ),
+    compileReport: {
+      success: true,
+      slotCount: compositionResult.slots.length,
+      routeCount: routes.length,
+      bindingCount: 0,
+      overlayCount: 0,
+      warnings: [],
+      blockers: [],
+      previewOnly: true,
+      runtimeExecutable: false,
+      currentRuntimeSupported: false,
+      noAgentDslGenerated: true,
+      noRuntimeExecution: true
+    }
+  };
+}
+
 function mockScenarioCompositionApis() {
   vi.mocked(fetchScenarioCompositionCatalog).mockResolvedValue(scenarioCatalog);
   vi.mocked(fetchScenarioCompositionDetail).mockImplementation(async (compositionId) => scenarioDetail(compositionId));
@@ -608,6 +878,12 @@ function mockScenarioCompositionApis() {
     ok: true,
     result: scenarioCompileResult(compositionId)
   }));
+  vi.mocked(compileScenarioOrchestratorPreview).mockImplementation(
+    async (compositionId) => ({
+      ok: true,
+      result: scenarioOrchestratorResult(compositionId)
+    })
+  );
 }
 
 async function inspectAndApplyDsl() {
@@ -1422,5 +1698,142 @@ describe("@yutra/builder Studio UI", () => {
     );
     expect(compileScenarioCompositionPreview).not.toHaveBeenCalled();
     expect(screen.queryByLabelText("Composition Artifacts")).toBeNull();
+  });
+
+  it("Orchestrator Preview is explicit, read-only, and disabled before Composition Preview", async () => {
+    mockScenarioCompositionApis();
+    renderStudio();
+    fireEvent.click(screen.getByRole("button", { name: "Scenario Composition" }));
+
+    await waitFor(() =>
+      expect(screen.getByLabelText("Scenario Orchestrator Preview")).toBeTruthy()
+    );
+    const orchestratorButton = screen.getByRole("button", {
+      name: "Compile Orchestrator Preview"
+    }) as HTMLButtonElement;
+    expect(orchestratorButton.disabled).toBe(true);
+    expect(screen.getByLabelText("Scenario Orchestrator Boundary Notice").textContent).toContain(
+      "No Agent DSL generated"
+    );
+    expect(screen.getByLabelText("Scenario Orchestrator Boundary Notice").textContent).toContain(
+      "No Runtime execution"
+    );
+    expect(compileScenarioOrchestratorPreview).not.toHaveBeenCalled();
+    expect(inspectDsl).not.toHaveBeenCalled();
+    expect(runPreview).not.toHaveBeenCalled();
+  });
+
+  it("customer complaint Orchestrator Preview exposes six contract artifacts without Apply or Run", async () => {
+    mockScenarioCompositionApis();
+    renderStudio();
+    fireEvent.click(screen.getByRole("button", { name: "Scenario Composition" }));
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: "Compile Composition Preview" })).toBeTruthy()
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Compile Composition Preview" }));
+    await waitFor(() => expect(screen.getByLabelText("Composition Artifacts")).toBeTruthy());
+
+    const orchestratorButton = screen.getByRole("button", {
+      name: "Compile Orchestrator Preview"
+    }) as HTMLButtonElement;
+    expect(orchestratorButton.disabled).toBe(false);
+    fireEvent.click(orchestratorButton);
+    await waitFor(() =>
+      expect(compileScenarioOrchestratorPreview).toHaveBeenCalledWith(
+        "customer-complaint-composition-demo"
+      )
+    );
+    await waitFor(() => expect(screen.getByLabelText("Orchestrator Artifacts")).toBeTruthy());
+
+    for (const filename of [
+      "scenario.orchestrator.yaml",
+      "orchestrator.routes.json",
+      "orchestrator.context-policy.json",
+      "orchestrator.trace-contract.json",
+      "orchestrator.provenance.json",
+      "orchestrator-report.json"
+    ]) {
+      expect(screen.getByRole("button", { name: filename })).toBeTruthy();
+    }
+    const summary = screen.getByLabelText("Scenario Orchestrator Summary").textContent ?? "";
+    expect(summary).toContain("slotCount3");
+    expect(summary).toContain("previewOnlytrue");
+    expect(summary).toContain("runtimeExecutablefalse");
+    expect(summary).toContain("currentRuntimeSupportedfalse");
+    expect(summary).toContain("single_active_slot_call_return");
+    expect(screen.getByLabelText("Orchestrator Compile Profile").textContent).toContain(
+      "customer-complaint-orchestrator-profile"
+    );
+    const inspector = screen.getByLabelText("Orchestrator Contract Inspector").textContent ?? "";
+    expect(inspector).toContain("scenario.input");
+    expect(inspector).toContain("$scenario_done");
+    expect(inspector).toContain("$human_handoff");
+    expect(inspector).toContain("$fail_closed");
+    expect(inspector).toContain("13 mandatory event types");
+    expect(inspector).toContain("eventsEmittedInPreview=false");
+    expect(screen.getByLabelText("Orchestrator Artifacts").textContent).toContain(
+      "scenario.orchestrator.yaml is not Agent DSL"
+    );
+    expect(screen.queryByRole("button", { name: /Send Orchestrator/i })).toBeNull();
+    expect(screen.queryByRole("button", { name: /Apply Orchestrator/i })).toBeNull();
+    expect(screen.queryByRole("button", { name: /Run Orchestrator/i })).toBeNull();
+    expect(inspectDsl).not.toHaveBeenCalled();
+    expect(runPreview).not.toHaveBeenCalled();
+  });
+
+  it("ecommerce refund Orchestrator Preview has two Slot refs and switching clears it", async () => {
+    mockScenarioCompositionApis();
+    renderStudio();
+    fireEvent.click(screen.getByRole("button", { name: "Scenario Composition" }));
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: "Scenario ecommerce-refund-composition-demo" })).toBeTruthy()
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Scenario ecommerce-refund-composition-demo" }));
+    await waitFor(() =>
+      expect(fetchScenarioCompositionDetail).toHaveBeenCalledWith(
+        "ecommerce-refund-composition-demo"
+      )
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Compile Composition Preview" }));
+    await waitFor(() => expect(screen.getByLabelText("Composition Artifacts")).toBeTruthy());
+    fireEvent.click(screen.getByRole("button", { name: "Compile Orchestrator Preview" }));
+    await waitFor(() => expect(screen.getByLabelText("Scenario Orchestrator Summary")).toBeTruthy());
+    expect(screen.getByLabelText("Scenario Orchestrator Summary").textContent).toContain(
+      "slotCount2"
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Scenario customer-complaint-composition-demo" }));
+    await waitFor(() =>
+      expect(fetchScenarioCompositionDetail).toHaveBeenCalledWith(
+        "customer-complaint-composition-demo"
+      )
+    );
+    await waitFor(() => expect(screen.queryByLabelText("Scenario Orchestrator Summary")).toBeNull());
+    expect(
+      (screen.getByRole("button", {
+        name: "Compile Orchestrator Preview"
+      }) as HTMLButtonElement).disabled
+    ).toBe(true);
+  });
+
+  it("renewal churn also blocks Orchestrator Preview with explicit blockers", async () => {
+    mockScenarioCompositionApis();
+    renderStudio();
+    fireEvent.click(screen.getByRole("button", { name: "Scenario Composition" }));
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: "Scenario renewal-churn-warning-composition-demo" })).toBeTruthy()
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Scenario renewal-churn-warning-composition-demo" }));
+    await waitFor(() =>
+      expect(screen.getByLabelText("Scenario Orchestrator Preview").textContent).toContain(
+        "monitoring-response compiler unavailable"
+      )
+    );
+    expect(
+      (screen.getByRole("button", {
+        name: "Compile Orchestrator Preview"
+      }) as HTMLButtonElement).disabled
+    ).toBe(true);
+    expect(compileScenarioOrchestratorPreview).not.toHaveBeenCalled();
   });
 });
