@@ -233,4 +233,18 @@ describe("classification coverage and actual dispatch enforcement", () => {
     expect(output.projectionEvidence.controlSignal).toBe("handoff_required");
     expect(output.sideEffectSummary.externalEffectsOccurred).toBe(false);
   });
+
+  it("keeps demo fail-closed as a control signal with no external effect", async () => {
+    const result = customerComplaintFixture();
+    const output = await adapter(result).invokeSlot(
+      invocationRequest({
+        result,
+        slotId: "policy_explanation",
+        value: { knowledge_hit: false },
+        maximumAllowedLevel: "read"
+      })
+    );
+    expect(output.projectionEvidence.controlSignal).toBe("fail_closed");
+    expect(output.sideEffectSummary.externalEffectsOccurred).toBe(false);
+  });
 });
