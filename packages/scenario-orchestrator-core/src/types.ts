@@ -28,6 +28,68 @@ export type ScenarioOrchestratorPreviewBundleReference = {
   slots: ScenarioOrchestratorBundleSlotReference[];
 };
 
+export type SlotProjectionScalar = string | number | boolean | null;
+
+export type SlotOutcomeProjectionCondition =
+  | {
+      source: "runtime_status";
+      operator: "equals";
+      value: "completed" | "handoff_required" | "failed" | "timed_out" | "cancelled";
+    }
+  | {
+      source: "runtime_final_state";
+      operator: "equals";
+      value: string;
+    }
+  | {
+      source: "output_path";
+      path: string;
+      operator: "equals" | "exists" | "is_true";
+      value?: SlotProjectionScalar;
+    }
+  | {
+      source: "control_signal";
+      operator: "equals";
+      value: "handoff_required" | "fail_closed";
+    }
+  | {
+      source: "error_code";
+      operator: "equals";
+      value: string;
+    };
+
+export type SlotOutcomeProjectionRule = {
+  projectionId: string;
+  priority: number;
+  all: SlotOutcomeProjectionCondition[];
+  outcome: string;
+};
+
+export type SlotOutcomeProjectionContract = {
+  slotId: string;
+  rules: SlotOutcomeProjectionRule[];
+  fallback: "fail_closed";
+};
+
+export type SlotOutcomeProjectionEvidence = {
+  runtimeStatus: "completed" | "handoff_required" | "failed" | "timed_out" | "cancelled";
+  runtimeFinalState?: string;
+  outputMarkers: Record<string, SlotProjectionScalar>;
+  controlSignal?: "handoff_required" | "fail_closed";
+  errorCode?: string;
+};
+
+export type SlotOutcomeProjectionEvaluation = {
+  matched: boolean;
+  outcome?: string;
+  projectionId?: string;
+  fallbackApplied: boolean;
+  failureCode?:
+    | "ORCHESTRATOR_OUTCOME_PROJECTION_AMBIGUOUS"
+    | "ORCHESTRATOR_OUTCOME_PROJECTION_NO_MATCH"
+    | "ORCHESTRATOR_OUTCOME_PROJECTION_MARKER_UNKNOWN";
+};
+
 export type ScenarioOrchestratorSlot = {
   slotId: string;
   role: "primary" | "supporting";
@@ -44,6 +106,7 @@ export type ScenarioOrchestratorSlot = {
   outputNamespace: string;
   acceptedOutcomes: string[];
   callableBySlotIds: string[];
+  outcomeProjection: SlotOutcomeProjectionContract;
 };
 
 export type ScenarioRouteEffect =
@@ -238,6 +301,7 @@ export type ScenarioOrchestratorProvenance = {
     packConfigId: string;
     configHash: string;
     agentArtifactHash: string;
+    outcomeProjectionIds: string[];
   }>;
   routeSources: Array<{
     routeId: string;

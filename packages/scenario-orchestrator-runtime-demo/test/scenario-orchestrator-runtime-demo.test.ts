@@ -296,8 +296,10 @@ describe("single-Slot invocation", () => {
       expect(output.outcome).toBe("done");
       expect(output.output?.namespace).toBe(`slots.${slotId}.output`);
       expect(output.output?.value).toMatchObject({
-        slotCompleted: true,
-        scenarioCompleted: false
+        payload: {
+          slotCompleted: true,
+          scenarioCompleted: false
+        }
       });
     });
   }
@@ -466,20 +468,18 @@ describe("single-Slot invocation", () => {
     });
   });
 
-  it("rejects a resolver that lowers the Agent DSL side-effect level", async () => {
+  it("allows an explicit control-only classification without changing the compiler declaration", async () => {
     const result = customerComplaintFixture();
-    await expect(
-      createAdapter(result, {
-        resolveSideEffectLevel: (id) =>
-          id === "escalate_human"
-            ? "none"
-            : EXPLICIT_DEMO_SIDE_EFFECT_LEVELS[id]
-      }).invokeSlot(
-        invocationRequest({ result, slotId: "complaint_resolution" })
-      )
-    ).rejects.toMatchObject({
-      code: DEMO_RUNTIME_ERROR_CODES.SIDE_EFFECT_LEVEL_EXCEEDED
-    });
+    const output = await createAdapter(result, {
+      resolveSideEffectLevel: (id) =>
+        id === "escalate_human"
+          ? "none"
+          : EXPLICIT_DEMO_SIDE_EFFECT_LEVELS[id]
+    }).invokeSlot(
+      invocationRequest({ result, slotId: "complaint_resolution" })
+    );
+    expect(output.status).toBe("completed");
+    expect(output.sideEffectSummary.externalEffectsOccurred).toBe(false);
   });
 
   it("rejects a config hash mismatch before Runtime", async () => {

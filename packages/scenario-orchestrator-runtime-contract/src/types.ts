@@ -1,6 +1,7 @@
 import type {
   ScenarioOrchestratorDocument,
-  ScenarioOrchestratorExecutionModel
+  ScenarioOrchestratorExecutionModel,
+  SlotOutcomeProjectionEvidence
 } from "@yutra/scenario-orchestrator-core";
 
 export type RuntimeAdapterImplementationStatus =
@@ -163,6 +164,7 @@ export type ScenarioSlotInvocationResult = {
   idempotencyKey: string;
   runtimeRunId: string;
   status: ScenarioSlotInvocationStatus;
+  projectionEvidence: SlotOutcomeProjectionEvidence;
   outcome?: string;
   output?: {
     namespace: string;

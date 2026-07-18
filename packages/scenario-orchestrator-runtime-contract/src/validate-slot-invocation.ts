@@ -191,6 +191,32 @@ export function validateSlotInvocationResult(
   const result = parsed.data as ScenarioSlotInvocationResult;
   const { request, adapterDescriptor } = context;
   const issues: RuntimeAdapterContractIssue[] = [];
+  if (result.projectionEvidence.runtimeStatus !== result.status) {
+    issues.push(
+      issue(
+        "RUNTIME_ADAPTER_RESULT_INVALID",
+        "Projection evidence Runtime status must match the normalized Slot status.",
+        ["projectionEvidence", "runtimeStatus"]
+      )
+    );
+  }
+  if (
+    Object.keys(result.projectionEvidence.outputMarkers).some(
+      (path) =>
+        !/^[A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z_][A-Za-z0-9_]*)*$/.test(path) ||
+        path.split(".").some((segment) =>
+          ["__proto__", "prototype", "constructor"].includes(segment)
+        )
+    )
+  ) {
+    issues.push(
+      issue(
+        "RUNTIME_ADAPTER_RESULT_INVALID",
+        "Projection evidence contains an unsafe output marker path.",
+        ["projectionEvidence", "outputMarkers"]
+      )
+    );
+  }
   if (
     result.invocationId !== request.invocationId ||
     result.idempotencyKey !== request.idempotencyKey ||

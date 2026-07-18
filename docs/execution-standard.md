@@ -69,6 +69,12 @@ Trace/Audit correlation references. It does not select Routes, apply Bindings,
 maintain a Scenario call stack, emit Orchestrator events, or interpret Slot
 completion as Scenario completion.
 
+Slot execution status and Runtime final state are not Scenario semantic
+outcomes. Explicit Slot Outcome Projection rules consume allowlisted Adapter
+evidence; a future Engine, not the Adapter or Runtime, evaluates those rules.
+Action classification coverage happens before invocation, while invocation
+permission is enforced at actual Action dispatch before the handler.
+
 ## Boundaries
 
 The execution standard does not include:

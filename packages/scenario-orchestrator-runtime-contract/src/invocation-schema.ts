@@ -82,6 +82,24 @@ export const scenarioSlotInvocationResultSchema = z
       "cancelled",
       "timed_out"
     ]),
+    projectionEvidence: z
+      .object({
+        runtimeStatus: z.enum([
+          "completed",
+          "handoff_required",
+          "failed",
+          "cancelled",
+          "timed_out"
+        ]),
+        runtimeFinalState: z.string().min(1).optional(),
+        outputMarkers: z.record(
+          z.string(),
+          z.union([z.string(), z.number(), z.boolean(), z.null()])
+        ),
+        controlSignal: z.enum(["handoff_required", "fail_closed"]).optional(),
+        errorCode: z.string().min(1).optional()
+      })
+      .strict(),
     outcome: z.string().min(1).optional(),
     output: namespacedValueSchema.optional(),
     error: z

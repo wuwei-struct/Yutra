@@ -318,3 +318,16 @@ now exercises that boundary for one deterministic mock Slot at a time. It does
 not select Routes, apply Bindings, maintain the call stack, or execute the
 Scenario, so the Orchestrator Document remains non-executable by current
 Studio and Runtime surfaces.
+
+## Explicit Slot Outcome Projection
+
+Each Slot now carries a fail-closed Outcome Projection Contract. Runtime
+status, Runtime final state, and Semantic Slot outcome remain separate.
+`finalState=done` is not a business outcome and cannot select a Route by
+itself. The five canonical Slots use allowlisted
+`slotResult.semanticMarker` evidence and complete `acceptedOutcomes`
+coverage. Projection rules are included in the Orchestrator hash and
+provenance.
+
+See [Slot Outcome Projection and Side-effect Alignment](./slot-outcome-projection-and-side-effect-alignment.md).
+The Contract still defines no Engine and executes no Route or Binding.

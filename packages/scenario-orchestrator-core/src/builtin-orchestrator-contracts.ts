@@ -17,7 +17,8 @@ import type {
   ScenarioOrchestratorDocument,
   ScenarioOrchestratorPreviewBundleReference,
   ScenarioOrchestratorRoute,
-  ScenarioOrchestratorValidationContext
+  ScenarioOrchestratorValidationContext,
+  SlotOutcomeProjectionContract
 } from "./types";
 
 const SLOT_ARTIFACT_FILENAMES = [
@@ -31,6 +32,43 @@ const SLOT_ARTIFACT_FILENAMES = [
 
 function demoHash(character: string): string {
   return `sha256:${character.repeat(64)}`;
+}
+
+function createProjectionContract(
+  slotId: string,
+  acceptedOutcomes: string[]
+): SlotOutcomeProjectionContract {
+  return {
+    slotId,
+    rules: acceptedOutcomes.map((outcome, index) => ({
+      projectionId: `${slotId}.${outcome}`,
+      priority: (index + 1) * 10,
+      all: [
+        {
+          source: "runtime_status",
+          operator: "equals",
+          value: outcome === "human_review_required" ? "handoff_required" : "completed"
+        },
+        {
+          source: "output_path",
+          path: "slotResult.semanticMarker",
+          operator: "equals",
+          value: outcome
+        },
+        ...(outcome === "human_review_required"
+          ? [
+              {
+                source: "control_signal" as const,
+                operator: "equals" as const,
+                value: "handoff_required" as const
+              }
+            ]
+          : [])
+      ],
+      outcome
+    })),
+    fallback: "fail_closed"
+  };
 }
 
 function createBundleFixture(
@@ -112,6 +150,9 @@ function buildDocument(
         throw new Error(`ORCHESTRATOR_FIXTURE_SLOT_MISSING: ${planSlot.slotId}`);
       }
       const namespaces = expectedSlotNamespaces(planSlot.slotId);
+      const acceptedOutcomes = routes
+        .filter((route) => route.fromSlotId === planSlot.slotId)
+        .map((route) => route.outcome);
       return {
         slotId: planSlot.slotId,
         role: planSlot.role,
@@ -124,11 +165,10 @@ function buildDocument(
           configHash: bundleSlot.configHash
         },
         ...namespaces,
-        acceptedOutcomes: routes
-          .filter((route) => route.fromSlotId === planSlot.slotId)
-          .map((route) => route.outcome),
+        acceptedOutcomes,
         callableBySlotIds:
-          planSlot.role === "primary" ? [] : [...(invokeCallers.get(planSlot.slotId) ?? [])]
+          planSlot.role === "primary" ? [] : [...(invokeCallers.get(planSlot.slotId) ?? [])],
+        outcomeProjection: createProjectionContract(planSlot.slotId, acceptedOutcomes)
       };
     }),
     routes,
@@ -161,7 +201,10 @@ function buildDocument(
         archetypeId: slot.archetypeId,
         packConfigId: slot.packConfigId,
         configHash: slot.configHash,
-        agentArtifactHash: slot.artifactHashes["agent.yutra.yaml"]
+        agentArtifactHash: slot.artifactHashes["agent.yutra.yaml"],
+        outcomeProjectionIds: routes
+          .filter((route) => route.fromSlotId === slot.slotId)
+          .map((route) => `${slot.slotId}.${route.outcome}`)
       })),
       routeSources: routes.map((route) => ({
         routeId: route.routeId,

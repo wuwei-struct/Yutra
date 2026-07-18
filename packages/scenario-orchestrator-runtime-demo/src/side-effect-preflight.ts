@@ -6,7 +6,7 @@ import {
   DEMO_RUNTIME_ERROR_CODES,
   DemoRuntimeAdapterError
 } from "./errors";
-import type { SlotSideEffectPreflight } from "./types";
+import type { SlotSideEffectCoverage } from "./types";
 
 const SIDE_EFFECT_LEVELS: readonly ScenarioSideEffectLevel[] = [
   "none",
@@ -16,61 +16,45 @@ const SIDE_EFFECT_LEVELS: readonly ScenarioSideEffectLevel[] = [
   "financial",
   "approval"
 ];
-const DEMO_ALLOWED_LEVELS = new Set<ScenarioSideEffectLevel>([
-  "none",
-  "read",
-  "external"
-]);
-
 function rank(level: ScenarioSideEffectLevel): number {
   return SIDE_EFFECT_LEVELS.indexOf(level);
 }
 
-export function inspectSlotSideEffects(input: {
+export function inspectSlotSideEffectCoverage(input: {
   closure: SlotActionClosureReport;
-  maximumAllowedLevel: ScenarioSideEffectLevel;
-  declaredActionLevels?: Readonly<
-    Record<string, ScenarioSideEffectLevel | undefined>
-  >;
   resolveSideEffectLevel: (
     actionId: string
   ) => ScenarioSideEffectLevel | undefined;
-}): SlotSideEffectPreflight {
+}): SlotSideEffectCoverage {
   const actionLevels: Record<string, ScenarioSideEffectLevel> = {};
-  let highestLevel: ScenarioSideEffectLevel = "none";
+  const unclassifiedActionIds: string[] = [];
+  let potentialMaximumLevel: ScenarioSideEffectLevel = "none";
   for (const actionId of input.closure.referencedActionIds) {
     const level = input.resolveSideEffectLevel(actionId);
     if (!level) {
-      throw new DemoRuntimeAdapterError(
-        DEMO_RUNTIME_ERROR_CODES.ACTION_SIDE_EFFECT_UNCLASSIFIED,
-        `Action side-effect classification is required for ${actionId}.`,
-        { actionId }
-      );
-    }
-    const declaredLevel = input.declaredActionLevels?.[actionId] ?? "none";
-    if (rank(level) < rank(declaredLevel)) {
-      throw new DemoRuntimeAdapterError(
-        DEMO_RUNTIME_ERROR_CODES.SIDE_EFFECT_LEVEL_EXCEEDED,
-        `Action ${actionId} classification cannot lower the Agent DSL declaration.`,
-        { actionId }
-      );
-    }
-    if (
-      rank(level) > rank(input.maximumAllowedLevel) ||
-      !DEMO_ALLOWED_LEVELS.has(level)
-    ) {
-      throw new DemoRuntimeAdapterError(
-        DEMO_RUNTIME_ERROR_CODES.SIDE_EFFECT_LEVEL_EXCEEDED,
-        `Action ${actionId} exceeds the mock-only Slot side-effect boundary.`,
-        { actionId }
-      );
+      unclassifiedActionIds.push(actionId);
+      continue;
     }
     actionLevels[actionId] = level;
-    if (rank(level) > rank(highestLevel)) highestLevel = level;
+    if (rank(level) > rank(potentialMaximumLevel)) potentialMaximumLevel = level;
   }
+  if (unclassifiedActionIds.length > 0) {
+    const actionId = unclassifiedActionIds[0] ?? "unknown";
+    throw new DemoRuntimeAdapterError(
+      DEMO_RUNTIME_ERROR_CODES.ACTION_SIDE_EFFECT_UNCLASSIFIED,
+      `Action side-effect classification is required for ${actionId}.`,
+      { actionId }
+    );
+  }
+
+  const referencedActionIds = [...input.closure.referencedActionIds].sort();
+  const classifiedActionIds = Object.keys(actionLevels).sort();
   return {
     actionLevels: Object.freeze({ ...actionLevels }),
-    highestLevel,
-    effectCount: 0
+    referencedActionIds,
+    classifiedActionIds,
+    unclassifiedActionIds: [],
+    potentialMaximumLevel,
+    complete: classifiedActionIds.length === referencedActionIds.length
   };
 }

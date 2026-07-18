@@ -38,10 +38,23 @@ export type InMemoryScenarioRuntimeAdapterOptions = {
   now?: () => number;
 };
 
-export type SlotSideEffectPreflight = {
+export type SlotSideEffectCoverageReport = {
+  referencedActionIds: string[];
+  classifiedActionIds: string[];
+  unclassifiedActionIds: string[];
+  potentialMaximumLevel: ScenarioSideEffectLevel;
+  complete: boolean;
+};
+
+export type SlotSideEffectCoverage = SlotSideEffectCoverageReport & {
   actionLevels: Readonly<Record<string, ScenarioSideEffectLevel>>;
-  highestLevel: ScenarioSideEffectLevel;
+};
+
+export type SlotDispatchSummary = {
+  highestExecutedLevel: ScenarioSideEffectLevel;
   effectCount: number;
+  externalEffectsOccurred: boolean;
+  invocationCounts: Readonly<Record<string, number>>;
 };
 
 export type SlotTraceParentBindingRecord = {

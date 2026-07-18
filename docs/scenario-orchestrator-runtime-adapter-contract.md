@@ -305,3 +305,20 @@ This iteration:
 The next possible stage is an in-memory Scenario Orchestrator Engine that uses
 the demo Adapter without moving Route, Binding, call-stack, or terminal
 ownership into the Slot Runtime.
+
+## Projection Evidence and Dispatch Enforcement
+
+The Adapter result now includes allowlisted scalar Projection Evidence:
+Runtime status, Runtime final state, output markers, an optional control
+signal, and an optional safe error code. The Adapter does not map that
+evidence to a Scenario semantic outcome. A future Engine owns projection and
+Route selection.
+
+Action Closure preflight proves resolvability. Side-effect classification
+coverage separately proves every referenced Action is classified. Invocation
+permission is enforced again at actual Action dispatch, before the selected
+handler. Consequently, an unexecuted high-risk branch does not block a
+low-risk path, while an unclassified or selected over-limit Action still
+fails closed before side effects.
+
+See [Slot Outcome Projection and Side-effect Alignment](./slot-outcome-projection-and-side-effect-alignment.md).

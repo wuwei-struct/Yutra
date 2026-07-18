@@ -1,6 +1,7 @@
 import type { ScenarioCompositionPlan } from "@yutra/scenario-composition-core";
 import {
   DEFAULT_SCENARIO_TERMINALS,
+  validateSlotOutcomeProjectionContract,
   type ScenarioRouteEffect
 } from "@yutra/scenario-orchestrator-core";
 import type { ScenarioOrchestratorCompileIssue } from "./errors";
@@ -158,6 +159,21 @@ export function validateScenarioOrchestratorCompileProfile(
         )
       );
     }
+    issues.push(
+      ...validateSlotOutcomeProjectionContract({
+        contract: slotProfile.outcomeProjection,
+        slotId: slotProfile.slotId,
+        acceptedOutcomes: slotProfile.acceptedOutcomes
+      }).map((projectionIssue) =>
+        issue(
+          projectionIssue.code as ScenarioOrchestratorCompileIssue["code"],
+          projectionIssue.message,
+          plan,
+          undefined,
+          slotProfile.slotId
+        )
+      )
+    );
   }
 
   const planRouteIds = plan.routes.map((route) => route.routeId);

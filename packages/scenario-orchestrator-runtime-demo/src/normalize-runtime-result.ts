@@ -3,6 +3,9 @@ import {
   type RuntimeResult
 } from "@yutra/runtime";
 import type {
+  SlotProjectionScalar
+} from "@yutra/scenario-orchestrator-core";
+import type {
   ScenarioSlotInvocationRequest,
   ScenarioSlotInvocationResult
 } from "@yutra/scenario-orchestrator-runtime-contract";
@@ -10,7 +13,7 @@ import {
   DEMO_RUNTIME_ERROR_CODES,
   DemoRuntimeAdapterError
 } from "./errors";
-import type { SlotSideEffectPreflight } from "./types";
+import type { SlotDispatchSummary } from "./types";
 
 function jsonByteLength(value: unknown): number {
   return new TextEncoder().encode(JSON.stringify(value)).byteLength;
@@ -43,16 +46,53 @@ function traceReference(
 export function normalizeRuntimeResult(input: {
   runtimeResult: RuntimeResult;
   request: ScenarioSlotInvocationRequest;
-  sideEffects: SlotSideEffectPreflight;
+  sideEffects: SlotDispatchSummary;
   elapsedMs: number;
   maxOutputBytes: number;
 }): ScenarioSlotInvocationResult {
   const { runtimeResult, request } = input;
+  const slotResult =
+    runtimeResult.context?.slotResult &&
+    typeof runtimeResult.context.slotResult === "object" &&
+    !Array.isArray(runtimeResult.context.slotResult)
+      ? (runtimeResult.context.slotResult as Record<string, unknown>)
+      : undefined;
+  const semanticMarker =
+    typeof slotResult?.semanticMarker === "string"
+      ? slotResult.semanticMarker
+      : undefined;
+  const controlSignal: "handoff_required" | "fail_closed" | undefined =
+    slotResult?.controlSignal === "handoff_required" ||
+    slotResult?.controlSignal === "fail_closed"
+      ? slotResult.controlSignal
+      : undefined;
+  const outputMarkers: Record<string, SlotProjectionScalar> = semanticMarker
+    ? { "slotResult.semanticMarker": semanticMarker }
+    : {};
+
+  const normalizedStatus: ScenarioSlotInvocationResult["status"] =
+    runtimeResult.status === "completed"
+      ? "completed"
+      : runtimeResult.status === "handoff"
+        ? "handoff_required"
+        : runtimeResult.error?.code === RUNTIME_ERROR_CODES.ACTION_TIMEOUT ||
+            runtimeResult.error?.code === RUNTIME_ERROR_CODES.MAX_DURATION_EXCEEDED
+          ? "timed_out"
+          : "failed";
   const base = {
     schemaVersion: "1.0.0-preview" as const,
     invocationId: request.invocationId,
     idempotencyKey: request.idempotencyKey,
     runtimeRunId: runtimeResult.runId,
+    projectionEvidence: {
+      runtimeStatus: normalizedStatus,
+      ...(runtimeResult.finalState
+        ? { runtimeFinalState: runtimeResult.finalState }
+        : {}),
+      outputMarkers,
+      ...(controlSignal ? { controlSignal } : {}),
+      ...(runtimeResult.error?.code ? { errorCode: runtimeResult.error.code } : {})
+    },
     traceReference: traceReference(runtimeResult, request),
     auditReference: {
       runtimeRunId: runtimeResult.runId,
@@ -60,8 +100,8 @@ export function normalizeRuntimeResult(input: {
       redacted: true as const
     },
     sideEffectSummary: {
-      declaredLevel: input.sideEffects.highestLevel,
-      externalEffectsOccurred: false,
+      declaredLevel: input.sideEffects.highestExecutedLevel,
+      externalEffectsOccurred: input.sideEffects.externalEffectsOccurred,
       effectCount: input.sideEffects.effectCount
     },
     resourceUsage: {
@@ -78,9 +118,22 @@ export function normalizeRuntimeResult(input: {
       );
     }
     const value = {
-      finalState: runtimeResult.finalState,
-      slotCompleted: true,
-      scenarioCompleted: false
+      ...(semanticMarker
+        ? {
+            slotResult: {
+              semanticMarker,
+              ...(controlSignal ? { controlSignal } : {})
+            }
+          }
+        : {}),
+      payload: {
+        finalState: runtimeResult.finalState,
+        slotCompleted: true,
+        scenarioCompleted: false,
+        ...(runtimeResult.context?.result !== undefined
+          ? { result: structuredClone(runtimeResult.context.result) }
+          : {})
+      }
     };
     const byteLength = jsonByteLength(value);
     if (byteLength > input.maxOutputBytes) {

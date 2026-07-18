@@ -9,7 +9,9 @@ export type {
   InMemoryScenarioRuntimeAdapter,
   InMemoryScenarioRuntimeAdapterOptions,
   InMemorySlotArtifactRecord,
-  SlotSideEffectPreflight,
+  SlotDispatchSummary,
+  SlotSideEffectCoverage,
+  SlotSideEffectCoverageReport,
   SlotTraceParentBindingRecord,
   StoredSlotArtifactRecord
 } from "./types";
@@ -20,7 +22,14 @@ export {
   inspectSlotActionClosure,
   parseAndValidateSlotAgentDsl
 } from "./action-closure-preflight";
-export { inspectSlotSideEffects } from "./side-effect-preflight";
+export { inspectSlotSideEffectCoverage } from "./side-effect-preflight";
+export { createDispatchEnforcedActionRegistry } from "./dispatch-enforcement";
+export type { DemoSlotOutputEnvelope } from "./explicit-demo-actions";
+export {
+  EXPLICIT_DEMO_ACTION_REGISTRY,
+  EXPLICIT_DEMO_SIDE_EFFECT_LEVELS,
+  resolveExplicitDemoSideEffect
+} from "./explicit-demo-actions";
 export { SlotTraceParentLedger } from "./trace-parent-ledger";
 export { DemoAdapterAuditLedger } from "./audit-ledger";
 export { normalizeRuntimeResult } from "./normalize-runtime-result";

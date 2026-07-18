@@ -94,6 +94,7 @@ export function invocationRequest(input: {
   invocationIndex?: number;
   value?: Record<string, unknown>;
   timeoutMs?: number;
+  maximumAllowedLevel?: ScenarioSlotInvocationRequest["sideEffectPolicy"]["maximumAllowedLevel"];
 }): ScenarioSlotInvocationRequest {
   const slot = input.result.compositionResult.slots.find(
     (candidate) => candidate.slotId === input.slotId
@@ -151,7 +152,7 @@ export function invocationRequest(input: {
       maxRuntimeSteps: 25
     },
     sideEffectPolicy: {
-      maximumAllowedLevel: "external",
+      maximumAllowedLevel: input.maximumAllowedLevel ?? "read",
       requireExplicitDeclaration: true
     },
     retryPolicy: {

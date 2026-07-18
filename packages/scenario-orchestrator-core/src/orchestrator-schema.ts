@@ -25,6 +25,66 @@ export const scenarioOrchestratorPublicExposureSchema = z
   })
   .strict();
 
+const projectionScalarSchema = z.union([z.string(), z.number(), z.boolean(), z.null()]);
+
+export const slotOutcomeProjectionConditionSchema = z.discriminatedUnion("source", [
+  z
+    .object({
+      source: z.literal("runtime_status"),
+      operator: z.literal("equals"),
+      value: z.enum(["completed", "handoff_required", "failed", "timed_out", "cancelled"])
+    })
+    .strict(),
+  z
+    .object({
+      source: z.literal("runtime_final_state"),
+      operator: z.literal("equals"),
+      value: z.string().min(1)
+    })
+    .strict(),
+  z
+    .object({
+      source: z.literal("output_path"),
+      path: z.string().min(1),
+      operator: z.enum(["equals", "exists", "is_true"]),
+      value: projectionScalarSchema.optional()
+    })
+    .strict(),
+  z
+    .object({
+      source: z.literal("control_signal"),
+      operator: z.literal("equals"),
+      value: z.enum(["handoff_required", "fail_closed"])
+    })
+    .strict(),
+  z
+    .object({
+      source: z.literal("error_code"),
+      operator: z.literal("equals"),
+      value: z.string().min(1)
+    })
+    .strict()
+]);
+
+export const slotOutcomeProjectionContractSchema = z
+  .object({
+    slotId: z.string().min(1),
+    rules: z
+      .array(
+        z
+          .object({
+            projectionId: z.string().min(1),
+            priority: z.number().int().nonnegative().safe(),
+            all: z.array(slotOutcomeProjectionConditionSchema).min(1),
+            outcome: z.string().min(1)
+          })
+          .strict()
+      )
+      .min(1),
+    fallback: z.literal("fail_closed")
+  })
+  .strict();
+
 export const scenarioOrchestratorSlotSchema = z
   .object({
     slotId: z.string().min(1),
@@ -43,7 +103,8 @@ export const scenarioOrchestratorSlotSchema = z
     stateNamespace: z.string().min(1),
     outputNamespace: z.string().min(1),
     acceptedOutcomes: z.array(z.string().min(1)).min(1),
-    callableBySlotIds: z.array(z.string().min(1))
+    callableBySlotIds: z.array(z.string().min(1)),
+    outcomeProjection: slotOutcomeProjectionContractSchema
   })
   .strict();
 
@@ -233,7 +294,8 @@ const provenanceSchema = z
           archetypeId: z.string().min(1),
           packConfigId: z.string().min(1),
           configHash: hashSchema,
-          agentArtifactHash: hashSchema
+          agentArtifactHash: hashSchema,
+          outcomeProjectionIds: z.array(z.string().min(1)).min(1)
         })
         .strict()
     ),

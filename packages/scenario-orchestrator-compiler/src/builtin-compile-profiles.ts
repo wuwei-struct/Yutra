@@ -1,4 +1,7 @@
-import { DEFAULT_SCENARIO_TERMINALS } from "@yutra/scenario-orchestrator-core";
+import {
+  DEFAULT_SCENARIO_TERMINALS,
+  type SlotOutcomeProjectionContract
+} from "@yutra/scenario-orchestrator-core";
 import type { ScenarioOrchestratorCompileProfile } from "./types";
 
 function publicExposure() {
@@ -9,6 +12,43 @@ function publicExposure() {
     containsSecret: false as const,
     containsCustomerSop: false as const,
     containsCommercialDeliveryAsset: false as const
+  };
+}
+
+function projection(
+  slotId: string,
+  outcomes: string[]
+): SlotOutcomeProjectionContract {
+  return {
+    slotId,
+    rules: outcomes.map((outcome, index) => ({
+      projectionId: `${slotId}.${outcome}`,
+      priority: (index + 1) * 10,
+      all: [
+        {
+          source: "runtime_status",
+          operator: "equals",
+          value: outcome === "human_review_required" ? "handoff_required" : "completed"
+        },
+        {
+          source: "output_path",
+          path: "slotResult.semanticMarker",
+          operator: "equals",
+          value: outcome
+        },
+        ...(outcome === "human_review_required"
+          ? [
+              {
+                source: "control_signal" as const,
+                operator: "equals" as const,
+                value: "handoff_required" as const
+              }
+            ]
+          : [])
+      ],
+      outcome
+    })),
+    fallback: "fail_closed"
   };
 }
 
@@ -26,17 +66,29 @@ export const CUSTOMER_COMPLAINT_ORCHESTRATOR_PROFILE: ScenarioOrchestratorCompil
           "human_review_required",
           "primary_acceptance_satisfied"
         ],
-        callableBySlotIds: []
+        callableBySlotIds: [],
+        outcomeProjection: projection("complaint_resolution", [
+          "policy_clarification_required",
+          "compensation_approval_required",
+          "human_review_required",
+          "primary_acceptance_satisfied"
+        ])
       },
       {
         slotId: "policy_explanation",
         acceptedOutcomes: ["policy_explanation_available"],
-        callableBySlotIds: ["complaint_resolution"]
+        callableBySlotIds: ["complaint_resolution"],
+        outcomeProjection: projection("policy_explanation", [
+          "policy_explanation_available"
+        ])
       },
       {
         slotId: "compensation_decision",
         acceptedOutcomes: ["authorization_decision_available"],
-        callableBySlotIds: ["complaint_resolution"]
+        callableBySlotIds: ["complaint_resolution"],
+        outcomeProjection: projection("compensation_decision", [
+          "authorization_decision_available"
+        ])
       }
     ],
     routeProfiles: [
@@ -105,12 +157,20 @@ export const ECOMMERCE_REFUND_ORCHESTRATOR_PROFILE: ScenarioOrchestratorCompileP
           "human_review_required",
           "primary_acceptance_satisfied"
         ],
-        callableBySlotIds: []
+        callableBySlotIds: [],
+        outcomeProjection: projection("refund_resolution", [
+          "authorization_required",
+          "human_review_required",
+          "primary_acceptance_satisfied"
+        ])
       },
       {
         slotId: "refund_authorization",
         acceptedOutcomes: ["authorization_decision_available"],
-        callableBySlotIds: ["refund_resolution"]
+        callableBySlotIds: ["refund_resolution"],
+        outcomeProjection: projection("refund_authorization", [
+          "authorization_decision_available"
+        ])
       }
     ],
     routeProfiles: [

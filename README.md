@@ -200,6 +200,7 @@ Start here:
 - [Studio Scenario Orchestrator Preview](docs/studio-scenario-orchestrator-preview.md)
 - [Scenario Orchestrator Runtime Adapter Contract](docs/scenario-orchestrator-runtime-adapter-contract.md)
 - [In-memory Scenario Orchestrator Runtime Adapter](docs/scenario-orchestrator-in-memory-runtime-adapter.md)
+- [Slot Outcome Projection and Side-effect Alignment](docs/slot-outcome-projection-and-side-effect-alignment.md)
 - [Creator Archetype Selection](docs/creator-archetype-selection.md)
 - [Archetype Core](docs/archetype-core.md)
 - [Business Rule Config](docs/business-rule-config.md)

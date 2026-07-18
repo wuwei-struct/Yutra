@@ -22,7 +22,8 @@ import {
 } from "./errors";
 import { InMemoryInvocationLedger } from "./in-memory-idempotency-ledger";
 import { normalizeRuntimeResult } from "./normalize-runtime-result";
-import { inspectSlotSideEffects } from "./side-effect-preflight";
+import { createDispatchEnforcedActionRegistry } from "./dispatch-enforcement";
+import { inspectSlotSideEffectCoverage } from "./side-effect-preflight";
 import { SlotTraceParentLedger } from "./trace-parent-ledger";
 import type {
   InMemoryScenarioRuntimeAdapter,
@@ -143,25 +144,23 @@ export function createInMemoryScenarioRuntimeAdapter(
           { slotId: request.slotId }
         );
       }
-      const sideEffects = inspectSlotSideEffects({
+      const sideEffectCoverage = inspectSlotSideEffectCoverage({
         closure,
-        maximumAllowedLevel: request.sideEffectPolicy.maximumAllowedLevel,
-        declaredActionLevels: Object.fromEntries(
-          (spec.actions ?? []).map((action) => [
-            action.name,
-            action.sideEffect ?? "none"
-          ])
-        ),
         resolveSideEffectLevel: options.resolveSideEffectLevel
       });
+      const dispatch = createDispatchEnforcedActionRegistry({
+        actionRegistry: options.actionRegistry,
+        coverage: sideEffectCoverage,
+        maximumAllowedLevel: request.sideEffectPolicy.maximumAllowedLevel
+      });
       const actionPolicies = Object.fromEntries(
-        Object.entries(sideEffects.actionLevels).map(([actionId, sideEffect]) => [
+        Object.entries(sideEffectCoverage.actionLevels).map(([actionId, sideEffect]) => [
           actionId,
           {
             sideEffect:
-              sideEffect === "read" || sideEffect === "external"
-                ? sideEffect
-                : "none"
+              sideEffect === "financial" || sideEffect === "approval"
+                ? "external"
+                : sideEffect
           } satisfies ActionExecutionPolicy
         ])
       );
@@ -172,20 +171,22 @@ export function createInMemoryScenarioRuntimeAdapter(
         spec,
         input: runtimeInput(request),
         options: {
-          actionRegistry: options.actionRegistry,
+          actionRegistry: dispatch.actionRegistry,
           actionPolicies,
           retryPolicy: { maxAttempts: 1, backoffMs: 0 },
           maxSteps: request.budget.maxRuntimeSteps,
           maxDurationMs: request.budget.timeoutMs,
           actionTimeoutMs: request.budget.timeoutMs,
-          maxExternalCalls: 0,
+          maxExternalCalls: request.budget.maxRuntimeSteps,
           environment: "demo"
         }
       });
+      const dispatchViolation = dispatch.violation();
+      if (dispatchViolation) throw dispatchViolation;
       const result = normalizeRuntimeResult({
         runtimeResult,
         request,
-        sideEffects,
+        sideEffects: dispatch.summary(),
         elapsedMs: now() - startedAt,
         maxOutputBytes:
           YUTRA_IN_MEMORY_DEMO_RUNTIME_ADAPTER_V1.limits.maxInvocationOutputBytes

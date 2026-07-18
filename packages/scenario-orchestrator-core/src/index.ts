@@ -24,6 +24,12 @@ export type {
   ScenarioOrchestratorTraceEventContract,
   ScenarioOrchestratorTraceEventType,
   ScenarioOrchestratorValidationContext,
+  SlotOutcomeProjectionCondition,
+  SlotOutcomeProjectionContract,
+  SlotOutcomeProjectionEvaluation,
+  SlotOutcomeProjectionEvidence,
+  SlotOutcomeProjectionRule,
+  SlotProjectionScalar,
   ScenarioOverlayRef,
   ScenarioRouteEffect,
   ScenarioTerminalDefinition,
@@ -37,6 +43,15 @@ export {
   scenarioOrchestratorRouteSchema,
   scenarioOrchestratorSlotSchema
 } from "./orchestrator-schema";
+export {
+  slotOutcomeProjectionConditionSchema,
+  slotOutcomeProjectionContractSchema
+} from "./orchestrator-schema";
+export {
+  evaluateSlotOutcomeProjection,
+  isSafeProjectionOutputPath,
+  validateSlotOutcomeProjectionContract
+} from "./outcome-projection";
 export {
   DEFAULT_SCENARIO_CONTEXT_POLICY,
   expectedSlotNamespaces

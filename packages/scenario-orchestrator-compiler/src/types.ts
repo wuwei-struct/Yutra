@@ -3,7 +3,8 @@ import type { ScenarioCompositionPlan } from "@yutra/scenario-composition-core";
 import type {
   ScenarioOrchestratorDocument,
   ScenarioRouteEffect,
-  ScenarioTerminalDefinition
+  ScenarioTerminalDefinition,
+  SlotOutcomeProjectionContract
 } from "@yutra/scenario-orchestrator-core";
 import type { ScenarioOrchestratorCompileIssue } from "./errors";
 
@@ -15,6 +16,7 @@ export type ScenarioOrchestratorCompileProfile = {
     slotId: string;
     acceptedOutcomes: string[];
     callableBySlotIds: string[];
+    outcomeProjection: SlotOutcomeProjectionContract;
   }>;
   routeProfiles: Array<{
     compositionRouteId: string;

@@ -114,7 +114,8 @@ export function bindScenarioOrchestratorDocument(input: {
         },
         ...expectedSlotNamespaces(slot.slotId),
         acceptedOutcomes: [...slotProfile.acceptedOutcomes],
-        callableBySlotIds: [...slotProfile.callableBySlotIds]
+        callableBySlotIds: [...slotProfile.callableBySlotIds],
+        outcomeProjection: structuredClone(slotProfile.outcomeProjection)
       };
     }),
     routes,
@@ -148,7 +149,12 @@ export function bindScenarioOrchestratorDocument(input: {
         archetypeId: slot.archetypeId,
         packConfigId: slot.packConfigId,
         configHash: slot.configHash,
-        agentArtifactHash: slot.artifactHashes["agent.yutra.yaml"]
+        agentArtifactHash: slot.artifactHashes["agent.yutra.yaml"],
+        outcomeProjectionIds: [
+          ...(slotProfiles.get(slot.slotId)?.outcomeProjection.rules.map(
+            (rule) => rule.projectionId
+          ) ?? [])
+        ]
       })),
       routeSources: plan.routes.map((route) => ({
         routeId: route.routeId,

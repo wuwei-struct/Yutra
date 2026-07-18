@@ -141,6 +141,13 @@ function invocationResult(
     idempotencyKey: request.idempotencyKey,
     runtimeRunId: "runtime-run-demo",
     status: "completed",
+    projectionEvidence: {
+      runtimeStatus: "completed",
+      runtimeFinalState: "done",
+      outputMarkers: {
+        "slotResult.semanticMarker": "slot_result_available"
+      }
+    },
     outcome: "slot_result_available",
     output: {
       namespace: `slots.${request.slotId}.output`,

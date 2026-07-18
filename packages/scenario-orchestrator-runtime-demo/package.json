@@ -20,6 +20,7 @@
     "build": "tsup src/index.ts --format esm --dts",
     "test": "vitest run --passWithNoTests",
     "smoke": "vitest run scripts/smoke.test.ts --reporter=verbose",
+    "smoke:alignment": "vitest run scripts/alignment-smoke.test.ts --reporter=verbose",
     "lint": "eslint src scripts test --max-warnings=0"
   },
   "dependencies": {

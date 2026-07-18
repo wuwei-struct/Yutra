@@ -197,3 +197,20 @@ Studio continues to expose preview-only Orchestrator artifacts and no
 Orchestrator Run. A possible next stage is an in-memory Scenario Orchestrator
 Engine that consumes this one-Slot Adapter without changing its ownership
 boundary.
+
+## Explicit Outcome Evidence
+
+The demo Adapter now returns allowlisted Projection Evidence and keeps the
+runtime-native final state separate from the Semantic Slot outcome. Explicit
+demo Action handlers emit `slotResult.semanticMarker`; the Adapter copies the
+marker but does not choose a Route.
+
+Side-effect checks are split into classification coverage and actual dispatch
+enforcement. An unexecuted external branch no longer rejects a read-only
+path. A selected over-limit Action is rejected before its handler. Demo
+handoff and fail-closed Actions are control-only and report
+`externalEffectsOccurred=false`; they do not represent external dispatch.
+
+Use `pnpm --filter @yutra/scenario-orchestrator-runtime-demo smoke:alignment`
+for the five-Slot safe summary. See
+[Slot Outcome Projection and Side-effect Alignment](./slot-outcome-projection-and-side-effect-alignment.md).

@@ -29,6 +29,7 @@ export type {
   SlotActionClosureReport,
   SupportedOrchestratorExecutionModel
 } from "./types";
+export type { SlotOutcomeProjectionEvidence } from "@yutra/scenario-orchestrator-core";
 export {
   runtimeAdapterPublicExposureSchema,
   scenarioRuntimeAdapterDescriptorSchema

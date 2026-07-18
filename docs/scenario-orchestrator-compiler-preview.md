@@ -221,3 +221,14 @@ and one-Slot invocation boundary. The
 implements only that one-Slot boundary for deterministic mock smoke. The
 Compiler still does not run it, and no Route, Binding, Scenario terminal, or
 composed execution is performed.
+
+## Projection Contract in Preview Output
+
+Compile Profiles now define a complete Outcome Projection Contract for every
+canonical Slot. The Compiler validates accepted-outcome coverage, safe marker
+paths, and unique priorities, then binds the contract into
+`scenario.orchestrator.yaml`, hashes, and provenance. It does not evaluate
+Runtime evidence or infer an outcome from `done`.
+
+The evidence and enforcement alignment is documented in
+[Slot Outcome Projection and Side-effect Alignment](./slot-outcome-projection-and-side-effect-alignment.md).

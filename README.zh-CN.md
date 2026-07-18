@@ -189,6 +189,7 @@ LLM 可以生成配置草案，但不能绕过 Compiler、Runtime、Trace、Audi
 - [Studio Scenario Orchestrator Preview](docs/studio-scenario-orchestrator-preview.md)
 - [Scenario Orchestrator Runtime Adapter Contract](docs/scenario-orchestrator-runtime-adapter-contract.md)
 - [In-memory Scenario Orchestrator Runtime Adapter](docs/scenario-orchestrator-in-memory-runtime-adapter.md)
+- [Slot Outcome Projection 与副作用对齐](docs/slot-outcome-projection-and-side-effect-alignment.md)
 - [Creator Archetype Selection](docs/creator-archetype-selection.md)
 - [Archetype Core](docs/archetype-core.md)
 - [Business Rule Config](docs/business-rule-config.md)

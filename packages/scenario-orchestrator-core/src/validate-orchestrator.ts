@@ -10,6 +10,7 @@ import type {
 } from "./errors";
 import { DEFAULT_SCENARIO_TERMINALS, SCENARIO_TERMINAL_IDS } from "./execution-semantics";
 import { scenarioOrchestratorDocumentSchema } from "./orchestrator-schema";
+import { validateSlotOutcomeProjectionContract } from "./outcome-projection";
 import { SCENARIO_ORCHESTRATOR_TRACE_EVENT_TYPES } from "./trace-contract";
 import type {
   ScenarioOrchestratorDocument,
@@ -86,6 +87,9 @@ function schemaIssueCode(path: string[]): ScenarioOrchestratorIssueCode {
   }
   if (path[0] === "slots" && (path.includes("agentArtifactHash") || path.includes("configHash"))) {
     return "ORCHESTRATOR_SLOT_ARTIFACT_HASH_MISSING";
+  }
+  if (path[0] === "slots" && path.includes("outcomeProjection")) {
+    return "ORCHESTRATOR_OUTCOME_PROJECTION_INVALID";
   }
   if (path[0] === "routes") return "ORCHESTRATOR_ROUTE_TARGET_INVALID";
   if (path[0] === "bindings") return "ORCHESTRATOR_BINDING_INVALID";
@@ -318,6 +322,16 @@ export function validateScenarioOrchestrator(
         )
       );
     }
+    issues.push(
+      ...validateSlotOutcomeProjectionContract({
+        contract: slot.outcomeProjection,
+        slotId: slot.slotId,
+        acceptedOutcomes: slot.acceptedOutcomes
+      }).map((projectionIssue) => ({
+        ...projectionIssue,
+        path: ["slots", String(index), "outcomeProjection"]
+      }))
+    );
   }
   if (!exactUnorderedSet(document.slots.map((slot) => slot.slotId), plan.slots.map((slot) => slot.slotId))) {
     issues.push(
@@ -632,7 +646,11 @@ export function validateScenarioOrchestrator(
           source.archetypeId === slot.archetypeId &&
           source.packConfigId === slot.packConfigId &&
           source.configHash === slot.artifactRef.configHash &&
-          source.agentArtifactHash === slot.artifactRef.agentArtifactHash
+          source.agentArtifactHash === slot.artifactRef.agentArtifactHash &&
+          exactUnorderedSet(
+            source.outcomeProjectionIds,
+            slot.outcomeProjection.rules.map((rule) => rule.projectionId)
+          )
       )
     )
   ) {

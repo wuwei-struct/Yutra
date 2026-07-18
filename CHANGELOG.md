@@ -4,6 +4,7 @@
 
 ### Added
 
+- Explicit Slot Outcome Projection contracts for five canonical Slots, deterministic projection evidence/evaluation, and dispatch-time side-effect enforcement that permits unexecuted high-risk branches while rejecting an actually selected over-limit Action before its handler.
 - `@yutra/scenario-orchestrator-runtime-demo` with deterministic mock-only one-Slot execution through the existing Runtime, in-memory artifact/hash validation, Action Closure and side-effect preflight, idempotency replay, timeout/single-concurrency enforcement, and redacted Trace/Audit sidecars.
 - `@yutra/scenario-orchestrator-runtime-contract` with a fail-closed capability handshake, Slot invocation/result contracts, artifact and Action Closure binding, deterministic idempotency, Trace/Audit parent binding, side-effect limits, and an explicitly contract-only current Yutra Runtime descriptor.
 - Studio Scenario Orchestrator Preview with a strict canonical-ID Runner API, explicit Compile Profile inspection, six read-only Orchestrator artifacts, Context/Route/Terminal/Trace/Provenance views, and enforced non-Agent-DSL/non-Runtime boundaries.
