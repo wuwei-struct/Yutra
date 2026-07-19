@@ -302,9 +302,11 @@ This iteration:
 - does not change Runtime, Agent DSL, Trace, Skill, Audit, Compiler, or Studio
   behavior.
 
-The next possible stage is an in-memory Scenario Orchestrator Engine that uses
-the demo Adapter without moving Route, Binding, call-stack, or terminal
-ownership into the Slot Runtime.
+The separate
+[In-memory Scenario Orchestrator Engine](./in-memory-scenario-orchestrator-engine.md)
+now uses the demo Adapter in tests and explicit smoke while preserving this
+contract.
+Production Runtime support and Studio Scenario Run remain unavailable.
 
 ## Projection Evidence and Dispatch Enforcement
 

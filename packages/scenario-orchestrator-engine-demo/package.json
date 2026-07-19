@@ -1,0 +1,34 @@
+{
+  "name": "@yutra/scenario-orchestrator-engine-demo",
+  "version": "0.3.0-vnext-preview.1",
+  "private": false,
+  "description": "Deterministic mock-only in-memory Scenario Orchestrator Engine",
+  "type": "module",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --dts",
+    "test": "vitest run --passWithNoTests",
+    "smoke": "vitest run scripts/smoke.test.ts --reporter=verbose",
+    "lint": "eslint src scripts test --max-warnings=0"
+  },
+  "dependencies": {
+    "@yutra/scenario-composition-compiler": "workspace:*",
+    "@yutra/scenario-composition-core": "workspace:*",
+    "@yutra/scenario-orchestrator-compiler": "workspace:*",
+    "@yutra/scenario-orchestrator-core": "workspace:*",
+    "@yutra/scenario-orchestrator-runtime-contract": "workspace:*",
+    "@yutra/scenario-orchestrator-runtime-demo": "workspace:*"
+  },
+  "license": "MIT",
+  "author": "Yutra Contributors",
+  "keywords": ["yutra", "scenario-orchestrator", "engine", "in-memory", "demo"]
+}

@@ -198,6 +198,12 @@ Orchestrator Run. A possible next stage is an in-memory Scenario Orchestrator
 Engine that consumes this one-Slot Adapter without changing its ownership
 boundary.
 
+That separate
+[In-memory Scenario Orchestrator Engine](./in-memory-scenario-orchestrator-engine.md)
+now consumes this Adapter in package tests and explicit smoke. The Adapter
+still owns one Slot only; Route selection, Binding, call stack, and Scenario
+terminal ownership remain in the Engine. Studio remains disconnected.
+
 ## Explicit Outcome Evidence
 
 The demo Adapter now returns allowlisted Projection Evidence and keeps the

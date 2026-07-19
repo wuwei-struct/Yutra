@@ -330,4 +330,9 @@ coverage. Projection rules are included in the Orchestrator hash and
 provenance.
 
 See [Slot Outcome Projection and Side-effect Alignment](./slot-outcome-projection-and-side-effect-alignment.md).
-The Contract still defines no Engine and executes no Route or Binding.
+The Contract package itself executes no Route or Binding.
+The separate
+[In-memory Scenario Orchestrator Engine](./in-memory-scenario-orchestrator-engine.md)
+executes the canonical contracts only in deterministic package tests and
+explicit smoke. It does not change this document contract or add production
+Runtime/Studio support.

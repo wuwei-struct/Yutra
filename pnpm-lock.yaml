@@ -321,6 +321,27 @@ importers:
         specifier: ^3.24.2
         version: 3.25.76
 
+  packages/scenario-orchestrator-engine-demo:
+    dependencies:
+      '@yutra/scenario-composition-compiler':
+        specifier: workspace:*
+        version: link:../scenario-composition-compiler
+      '@yutra/scenario-composition-core':
+        specifier: workspace:*
+        version: link:../scenario-composition-core
+      '@yutra/scenario-orchestrator-compiler':
+        specifier: workspace:*
+        version: link:../scenario-orchestrator-compiler
+      '@yutra/scenario-orchestrator-core':
+        specifier: workspace:*
+        version: link:../scenario-orchestrator-core
+      '@yutra/scenario-orchestrator-runtime-contract':
+        specifier: workspace:*
+        version: link:../scenario-orchestrator-runtime-contract
+      '@yutra/scenario-orchestrator-runtime-demo':
+        specifier: workspace:*
+        version: link:../scenario-orchestrator-runtime-demo
+
   packages/scenario-orchestrator-runtime-contract:
     dependencies:
       '@yutra/scenario-orchestrator-compiler':

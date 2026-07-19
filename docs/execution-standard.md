@@ -85,3 +85,9 @@ The execution standard does not include:
 - multi-tenant SaaS control plane
 - real customer API integration
 - LLM-first runtime decision making
+
+`@yutra/scenario-orchestrator-engine-demo` composes the preview contract and
+one-Slot demo Adapter into a deterministic, in-memory, single-process Scenario
+execution for tests and explicit smoke. It uses explicit Projection, Route,
+Binding, Overlay, Budget, and Terminal contracts. It is not production
+Runtime support and is not connected to Studio.

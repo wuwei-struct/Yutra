@@ -29,7 +29,7 @@ function packageJsonPaths(): string[] {
 describe("P6-10C.1 fixed release version alignment", () => {
   it("aligns the root package and every workspace package", () => {
     const paths = packageJsonPaths();
-    expect(paths).toHaveLength(25);
+    expect(paths).toHaveLength(26);
 
     for (const path of paths) {
       const packageJson = JSON.parse(read(path)) as { version?: string };

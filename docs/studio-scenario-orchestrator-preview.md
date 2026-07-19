@@ -142,3 +142,8 @@ can execute one canonical Slot in package tests and smoke only. It is not
 wired into Builder Runner or Studio. This workbench still has no Orchestrator
 Run, does not call the Adapter, and keeps
 `orchestratorRuntimeSupported=false`.
+
+An [In-memory Scenario Orchestrator Engine](./in-memory-scenario-orchestrator-engine.md)
+now exists for package tests and explicit smoke only. It is not wired into
+Builder Runner or Studio; this workbench still has no Scenario Run, Apply, or
+Runtime execution action.

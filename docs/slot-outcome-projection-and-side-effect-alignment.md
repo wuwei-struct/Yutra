@@ -140,5 +140,7 @@ execute Routes, does not apply Composition Bindings, does not declare a
 Scenario completed, and does not add Studio Run. It does not change Runtime,
 Agent DSL, Trace, or single-Archetype Compiler semantics.
 
-The next stage can return to P6-11D.2 In-memory Scenario Orchestrator Engine
-with explicit semantic outcomes and dispatch-time side-effect enforcement.
+P6-11D.2 now provides a separate
+[In-memory Scenario Orchestrator Engine](./in-memory-scenario-orchestrator-engine.md)
+that consumes these explicit semantic outcomes in tests and smoke. The
+Projection and dispatch-time side-effect contracts remain unchanged.
