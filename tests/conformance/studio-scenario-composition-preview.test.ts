@@ -54,12 +54,17 @@ describe("Studio Scenario Composition Compile Preview conformance", () => {
     ).toContain("onSendSlotDsl");
   });
 
-  it("does not expose a Scenario Run action", () => {
+  it("gates manual Scenario Run behind successful previews", () => {
     const workbench = read(
       "apps/builder/src/components/scenario/ScenarioCompositionWorkbench.tsx"
     );
-    expect(workbench).not.toContain("Scenario Run");
-    expect(workbench).not.toContain("runPreview");
+    expect(workbench).toContain("ScenarioRunPreviewPanel");
+    expect(workbench).toContain("orchestratorReady={Boolean(orchestrator.result)}");
+    const state = read("apps/builder/src/lib/scenario-run-state.ts");
+    expect(state).toContain("if (!orchestratorReady");
+    const docs = read("docs/studio-manual-scenario-run-preview.md");
+    expect(docs).toContain("do not start a run");
+    expect(docs).toContain("only supported flow");
   });
 
   it("links the Studio preview documentation from both READMEs", () => {

@@ -1,9 +1,9 @@
 # In-memory Scenario Orchestrator Engine
 
 `@yutra/scenario-orchestrator-engine-demo` is a deterministic, mock-only
-reference Engine for tests and package smoke. It executes a complete Scenario
-in one process and in memory. It is not a production Runtime, is not durable,
-and is not connected to Studio.
+reference Engine for tests, package smoke, and the explicitly triggered Studio
+Manual Scenario Run Preview. It executes a complete canonical Scenario in one
+process and in memory. It is not a production Runtime and is not durable.
 
 ## Execution Model
 
@@ -116,6 +116,9 @@ filesystem knowledge source, real service, credential, or external side
 effect. It has no persistence, recovery, queue, distributed lock, parallel
 scheduler, or production certification.
 
-Studio and Builder Runner remain unchanged and expose no Scenario Run action.
-A possible next stage is Studio Manual Scenario Run Preview with an explicit
-manual boundary, not production Runtime integration.
+Builder Runner now exposes the Engine only through the strict canonical
+`POST /creator/scenario-runs/preview` surface documented in
+[Studio Manual Scenario Run Preview](./studio-manual-scenario-run-preview.md).
+Studio requires successful Composition and Orchestrator previews plus an
+explicit button click. It does not accept arbitrary execution input, persist a
+run, or claim production Runtime support.

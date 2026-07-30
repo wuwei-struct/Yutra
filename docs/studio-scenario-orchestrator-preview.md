@@ -122,7 +122,7 @@ does not represent or execute the full Scenario Composition.
 This workbench is demo/mock only:
 
 - no Agent DSL is generated at the Orchestrator level;
-- no Runtime execution or Orchestrator Trace Evidence;
+- Orchestrator compilation itself performs no Runtime execution or Trace emission;
 - no Pack Config deep merge;
 - no implicit adapter inheritance;
 - no secret propagation;
@@ -132,18 +132,20 @@ This workbench is demo/mock only:
 
 The separate
 [Orchestrator Runtime Adapter Contract](./scenario-orchestrator-runtime-adapter-contract.md)
-defines the future capability and one-Slot invocation boundary. Its current
-Yutra descriptor is `contract_only`; Studio still has no Orchestrator Apply or
-Run action.
+defines the future production capability and one-Slot invocation boundary. Its
+current Yutra descriptor remains `contract_only`; Studio has no production
+Orchestrator Apply or automatic Run action.
 
 The separate
 [In-memory Demo Runtime Adapter](./scenario-orchestrator-in-memory-runtime-adapter.md)
-can execute one canonical Slot in package tests and smoke only. It is not
-wired into Builder Runner or Studio. This workbench still has no Orchestrator
-Run, does not call the Adapter, and keeps
-`orchestratorRuntimeSupported=false`.
+executes one canonical Slot at a time. It is now composed by Builder Runner
+behind the strict manual Scenario Run Preview endpoint, but remains mock-only,
+in-memory, and separate from the current production Runtime descriptor.
+`orchestratorRuntimeSupported` therefore remains `false`.
 
 An [In-memory Scenario Orchestrator Engine](./in-memory-scenario-orchestrator-engine.md)
-now exists for package tests and explicit smoke only. It is not wired into
-Builder Runner or Studio; this workbench still has no Scenario Run, Apply, or
-Runtime execution action.
+now powers a separate
+[Manual Scenario Run Preview](./studio-manual-scenario-run-preview.md) after
+both previews succeed. It accepts only fixed demo cases and requires an
+explicit button click. The Orchestrator artifact viewer itself remains
+read-only: it still has no Apply, Deploy, Publish, or automatic Run action.

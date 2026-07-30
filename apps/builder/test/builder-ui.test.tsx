@@ -13,11 +13,14 @@ import {
   fetchScenarioCompositionDetail
 } from "../src/lib/scenario-composition-client";
 import { compileScenarioOrchestratorPreview } from "../src/lib/scenario-orchestrator-client";
+import { runScenarioPreview } from "../src/lib/scenario-run-client";
 import type {
   ScenarioCompositionCatalogItem,
   ScenarioCompositionCompileResult,
   ScenarioCompositionDetailResponse,
-  ScenarioOrchestratorCompileResult
+  ScenarioOrchestratorCompileResult,
+  ScenarioRunPreviewDemoCase,
+  ScenarioRunPreviewResult
 } from "../src/types";
 
 vi.mock("../src/lib/runner-client", () => ({
@@ -41,6 +44,10 @@ vi.mock("../src/lib/scenario-composition-client", () => ({
 
 vi.mock("../src/lib/scenario-orchestrator-client", () => ({
   compileScenarioOrchestratorPreview: vi.fn()
+}));
+
+vi.mock("../src/lib/scenario-run-client", () => ({
+  runScenarioPreview: vi.fn()
 }));
 
 afterEach(() => {
@@ -871,6 +878,179 @@ function scenarioOrchestratorResult(
   };
 }
 
+function scenarioRunResult(
+  compositionId: string,
+  demoCase: ScenarioRunPreviewDemoCase
+): ScenarioRunPreviewResult {
+  const definitions: Record<
+    ScenarioRunPreviewDemoCase,
+    {
+      status: ScenarioRunPreviewResult["status"];
+      terminalId: ScenarioRunPreviewResult["terminalId"];
+      slots: Array<[string, string]>;
+      routes: Array<[string, string]>;
+      bindings: string[];
+      overlayDecision: string;
+    }
+  > = {
+    complaint_policy: {
+      status: "completed",
+      terminalId: "$scenario_done",
+      slots: [
+        ["complaint_resolution", "policy_clarification_required"],
+        ["policy_explanation", "policy_explanation_available"],
+        ["complaint_resolution", "primary_acceptance_satisfied"]
+      ],
+      routes: [
+        ["request_policy_explanation", "invoke_slot"],
+        ["return_policy_explanation", "resume_caller"],
+        ["complete_from_primary", "terminate"]
+      ],
+      bindings: ["policy_explanation_to_resolution"],
+      overlayDecision: "allow"
+    },
+    complaint_compensation: {
+      status: "completed",
+      terminalId: "$scenario_done",
+      slots: [
+        ["complaint_resolution", "compensation_approval_required"],
+        ["compensation_decision", "authorization_decision_available"],
+        ["complaint_resolution", "primary_acceptance_satisfied"]
+      ],
+      routes: [
+        ["request_compensation_decision", "invoke_slot"],
+        ["return_compensation_decision", "resume_caller"],
+        ["complete_from_primary", "terminate"]
+      ],
+      bindings: ["compensation_decision_to_resolution"],
+      overlayDecision: "allow"
+    },
+    complaint_handoff: {
+      status: "handoff_required",
+      terminalId: "$human_handoff",
+      slots: [["complaint_resolution", "human_review_required"]],
+      routes: [["handoff_when_required", "request_handoff"]],
+      bindings: [],
+      overlayDecision: "allow"
+    },
+    refund_authorization: {
+      status: "completed",
+      terminalId: "$scenario_done",
+      slots: [
+        ["refund_resolution", "authorization_required"],
+        ["refund_authorization", "authorization_decision_available"],
+        ["refund_resolution", "primary_acceptance_satisfied"]
+      ],
+      routes: [
+        ["request_refund_authorization", "invoke_slot"],
+        ["return_refund_authorization", "resume_caller"],
+        ["refund_complete", "terminate"]
+      ],
+      bindings: ["refund_authorization_to_resolution"],
+      overlayDecision: "allow"
+    },
+    overlay_deny: {
+      status: "failed",
+      terminalId: "$fail_closed",
+      slots: [],
+      routes: [],
+      bindings: [],
+      overlayDecision: "deny"
+    }
+  };
+  const definition = definitions[demoCase];
+  const slotInvocations = definition.slots.map(
+    ([slotId, semanticOutcome], index) => ({
+      invocationIndex: index + 1,
+      slotId,
+      runtimeStatus: "completed",
+      runtimeFinalState: "done",
+      semanticOutcome,
+      projectionId: `${slotId}.${semanticOutcome}`,
+      runtimeRunId: `runtime-${index + 1}`,
+      traceReferenceAvailable: true,
+      auditReferenceStatus: "available" as const
+    })
+  );
+  const timeline = [
+    {
+      index: 1,
+      source: "orchestrator_trace" as const,
+      type: "orchestrator.started",
+      sequence: 1
+    },
+    ...slotInvocations.map((slot, index) => ({
+      index: index + 2,
+      source: "projection_evidence" as const,
+      type: "Outcome Projection",
+      slotId: slot.slotId,
+      semanticOutcome: slot.semanticOutcome,
+      projectionId: slot.projectionId,
+      runtimeStatus: slot.runtimeStatus
+    })),
+    {
+      index: slotInvocations.length + 2,
+      source: "orchestrator_trace" as const,
+      type:
+        definition.status === "completed"
+          ? "orchestrator.completed"
+          : definition.status === "handoff_required"
+            ? "orchestrator.handoff.requested"
+            : "orchestrator.failed",
+      terminalId: definition.terminalId
+    }
+  ];
+  return {
+    compositionId:
+      compositionId as ScenarioRunPreviewResult["compositionId"],
+    orchestratorRunId: `studio-${demoCase}`,
+    demoCase,
+    status: definition.status,
+    terminalId: definition.terminalId,
+    scenarioCompleted: definition.status === "completed",
+    slotInvocationCount: slotInvocations.length,
+    slotInvocations,
+    projectedOutcomes: slotInvocations.map((slot) => ({
+      slotId: slot.slotId,
+      semanticOutcome: slot.semanticOutcome,
+      projectionId: slot.projectionId
+    })),
+    selectedRoutes: definition.routes.map(([routeId, effect]) => ({
+      routeId,
+      effect
+    })),
+    appliedBindings: definition.bindings.map((bindingId) => ({ bindingId })),
+    evaluatedOverlays: [
+      {
+        overlayId: "complaint_policy_guard",
+        stage: "scenario_start",
+        decision: definition.overlayDecision
+      }
+    ],
+    traceSummary: {
+      eventCount: timeline.length,
+      firstSequence: 1,
+      lastSequence: timeline.length,
+      terminalEventType: timeline.at(-1)?.type ?? "orchestrator.failed"
+    },
+    timeline,
+    budgetUsage: {
+      slotInvocations: slotInvocations.length,
+      routeEvaluations: definition.routes.length,
+      bindingApplications: definition.bindings.length
+    },
+    auditSummary: {
+      status: "available",
+      redacted: true,
+      externalEffectsOccurred: false
+    },
+    externalEffectsOccurred: false,
+    manualTriggerOnly: true,
+    inMemoryOnly: true,
+    persisted: false
+  };
+}
+
 function mockScenarioCompositionApis() {
   vi.mocked(fetchScenarioCompositionCatalog).mockResolvedValue(scenarioCatalog);
   vi.mocked(fetchScenarioCompositionDetail).mockImplementation(async (compositionId) => scenarioDetail(compositionId));
@@ -883,6 +1063,44 @@ function mockScenarioCompositionApis() {
       ok: true,
       result: scenarioOrchestratorResult(compositionId)
     })
+  );
+  vi.mocked(runScenarioPreview).mockImplementation(
+    async (compositionId, demoCase) => ({
+      ok: true,
+      result: scenarioRunResult(compositionId, demoCase)
+    })
+  );
+}
+
+async function openScenarioRunPreview(
+  compositionId = "customer-complaint-composition-demo"
+) {
+  renderStudio();
+  fireEvent.click(screen.getByRole("button", { name: "Scenario Composition" }));
+  await waitFor(() =>
+    expect(
+      screen.getByRole("button", { name: "Compile Composition Preview" })
+    ).toBeTruthy()
+  );
+  if (compositionId !== "customer-complaint-composition-demo") {
+    fireEvent.click(
+      screen.getByRole("button", { name: `Scenario ${compositionId}` })
+    );
+    await waitFor(() =>
+      expect(fetchScenarioCompositionDetail).toHaveBeenCalledWith(compositionId)
+    );
+  }
+  fireEvent.click(
+    screen.getByRole("button", { name: "Compile Composition Preview" })
+  );
+  await waitFor(() =>
+    expect(screen.getByLabelText("Composition Artifacts")).toBeTruthy()
+  );
+  fireEvent.click(
+    screen.getByRole("button", { name: "Compile Orchestrator Preview" })
+  );
+  await waitFor(() =>
+    expect(screen.getByLabelText("Scenario Orchestrator Summary")).toBeTruthy()
   );
 }
 
@@ -1589,7 +1807,15 @@ describe("@yutra/builder Studio UI", () => {
     );
     expect(screen.getByLabelText("Scenario Composition Boundary Notice").textContent).toContain("No Deep Merge");
     expect(screen.getByLabelText("Scenario Composition Boundary Notice").textContent).toContain("No Orchestrator DSL");
-    expect(screen.queryByRole("button", { name: /Scenario Run/i })).toBeNull();
+    await waitFor(() =>
+      expect(screen.getByLabelText("Scenario Run Preview")).toBeTruthy()
+    );
+    expect(
+      (screen.getByRole("button", {
+        name: "Run Scenario Preview"
+      }) as HTMLButtonElement).disabled
+    ).toBe(true);
+    expect(runScenarioPreview).not.toHaveBeenCalled();
   });
 
   it("customer complaint Compile Preview shows seven composition artifacts and three namespaced Slots", async () => {
@@ -1835,5 +2061,143 @@ describe("@yutra/builder Studio UI", () => {
       }) as HTMLButtonElement).disabled
     ).toBe(true);
     expect(compileScenarioOrchestratorPreview).not.toHaveBeenCalled();
+  });
+
+  it("Scenario Run Preview stays manual and renders policy governance evidence after click", async () => {
+    mockScenarioCompositionApis();
+    await openScenarioRunPreview();
+
+    expect(runScenarioPreview).not.toHaveBeenCalled();
+    const runButton = screen.getByRole("button", {
+      name: "Run Scenario Preview"
+    }) as HTMLButtonElement;
+    expect(runButton.disabled).toBe(false);
+    fireEvent.click(runButton);
+
+    await waitFor(() =>
+      expect(runScenarioPreview).toHaveBeenCalledWith(
+        "customer-complaint-composition-demo",
+        "complaint_policy"
+      )
+    );
+    await waitFor(() =>
+      expect(screen.getByLabelText("Scenario Run Summary")).toBeTruthy()
+    );
+    const summary = screen.getByLabelText("Scenario Run Summary").textContent ?? "";
+    expect(summary).toContain("completed");
+    expect(summary).toContain("$scenario_done");
+    expect(summary).toContain("scenarioCompletedtrue");
+    expect(summary).toContain("externalEffectsOccurredfalse");
+    expect(screen.getByLabelText("Scenario Timeline").textContent).toContain(
+      "Outcome Projection"
+    );
+    expect(screen.getByLabelText("Scenario Slot Invocations").textContent).toContain(
+      "policy_explanation"
+    );
+    const governance =
+      screen.getByLabelText("Scenario Governance Evidence").textContent ?? "";
+    expect(governance).toContain("request_policy_explanation");
+    expect(governance).toContain("policy_explanation_to_resolution");
+    expect(governance).toContain("redacted=true");
+    expect(governance).toContain("externalEffectsOccurred=false");
+  });
+
+  it("compensation case shows Supporting invocation and Binding and clears on case switch", async () => {
+    mockScenarioCompositionApis();
+    await openScenarioRunPreview();
+    fireEvent.click(screen.getByLabelText(/Complaint compensation/));
+    expect(screen.queryByLabelText("Scenario Run Summary")).toBeNull();
+    fireEvent.click(
+      screen.getByRole("button", { name: "Run Scenario Preview" })
+    );
+    await waitFor(() =>
+      expect(runScenarioPreview).toHaveBeenCalledWith(
+        "customer-complaint-composition-demo",
+        "complaint_compensation"
+      )
+    );
+    await waitFor(() =>
+      expect(screen.getByLabelText("Scenario Slot Invocations")).toBeTruthy()
+    );
+    expect(screen.getByLabelText("Scenario Slot Invocations").textContent).toContain(
+      "compensation_decision"
+    );
+    expect(screen.getByLabelText("Scenario Governance Evidence").textContent).toContain(
+      "compensation_decision_to_resolution"
+    );
+    fireEvent.click(screen.getByLabelText(/Complaint policy explanation/));
+    expect(screen.queryByLabelText("Scenario Run Summary")).toBeNull();
+  });
+
+  it("handoff and overlay deny remain non-completed explicit terminals", async () => {
+    mockScenarioCompositionApis();
+    await openScenarioRunPreview();
+    fireEvent.click(screen.getByLabelText(/Complaint handoff/));
+    fireEvent.click(
+      screen.getByRole("button", { name: "Run Scenario Preview" })
+    );
+    await waitFor(() =>
+      expect(screen.getByLabelText("Scenario Run Summary").textContent).toContain(
+        "$human_handoff"
+      )
+    );
+    expect(screen.getByLabelText("Scenario Run Summary").textContent).toContain(
+      "scenarioCompletedfalse"
+    );
+
+    fireEvent.click(screen.getByLabelText(/Overlay deny/));
+    expect(screen.queryByLabelText("Scenario Run Summary")).toBeNull();
+    fireEvent.click(
+      screen.getByRole("button", { name: "Run Scenario Preview" })
+    );
+    await waitFor(() =>
+      expect(screen.getByLabelText("Scenario Run Summary").textContent).toContain(
+        "$fail_closed"
+      )
+    );
+    expect(screen.getByLabelText("Scenario Slot Invocations").textContent).toContain(
+      "No Slot was invoked"
+    );
+    expect(screen.getByLabelText("Scenario Governance Evidence").textContent).toContain(
+      "scenario_start=deny"
+    );
+  });
+
+  it("ecommerce refund authorization runs only after explicit click and switching Scenario clears evidence", async () => {
+    mockScenarioCompositionApis();
+    await openScenarioRunPreview("ecommerce-refund-composition-demo");
+    expect(runScenarioPreview).not.toHaveBeenCalled();
+    expect(screen.getByLabelText(/Refund authorization/)).toBeTruthy();
+    fireEvent.click(
+      screen.getByRole("button", { name: "Run Scenario Preview" })
+    );
+    await waitFor(() =>
+      expect(runScenarioPreview).toHaveBeenCalledWith(
+        "ecommerce-refund-composition-demo",
+        "refund_authorization"
+      )
+    );
+    await waitFor(() =>
+      expect(screen.getByLabelText("Scenario Run Summary").textContent).toContain(
+        "$scenario_done"
+      )
+    );
+    expect(screen.getByLabelText("Scenario Slot Invocations").textContent).toContain(
+      "refund_authorization"
+    );
+
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: "Scenario customer-complaint-composition-demo"
+      })
+    );
+    await waitFor(() =>
+      expect(screen.queryByLabelText("Scenario Run Summary")).toBeNull()
+    );
+    expect(
+      (screen.getByRole("button", {
+        name: "Run Scenario Preview"
+      }) as HTMLButtonElement).disabled
+    ).toBe(true);
   });
 });

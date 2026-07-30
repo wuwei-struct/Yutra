@@ -4,6 +4,7 @@
 
 ### Added
 
+- Studio Manual Scenario Run Preview for five canonical, explicitly triggered in-memory demo cases, with safe Timeline, Slot, Outcome Projection, Route, Binding, Overlay, Terminal, Budget, and redacted Audit summaries.
 - `@yutra/scenario-orchestrator-engine-demo` with deterministic in-memory `single_active_slot_call_return`, explicit Outcome Projection and Route conditions, identity Bindings, Overlay enforcement, fixed terminals, budgets, Scenario idempotency, and redacted Orchestrator Trace/Audit for customer complaint and ecommerce refund smoke paths.
 - Explicit Slot Outcome Projection contracts for five canonical Slots, deterministic projection evidence/evaluation, and dispatch-time side-effect enforcement that permits unexecuted high-risk branches while rejecting an actually selected over-limit Action before its handler.
 - `@yutra/scenario-orchestrator-runtime-demo` with deterministic mock-only one-Slot execution through the existing Runtime, in-memory artifact/hash validation, Action Closure and side-effect preflight, idempotency replay, timeout/single-concurrency enforcement, and redacted Trace/Audit sidecars.
@@ -22,7 +23,7 @@
 
 ### Intentionally Excluded
 
-- Production or persistent Scenario Orchestrator Runtime, distributed recovery, real external effects, and Studio Orchestrator Run.
+- Production or persistent Scenario Orchestrator Runtime, automatic Scenario execution, distributed recovery, and real external effects.
 - Runtime-executable Orchestrator DSL, Orchestrator Runtime, or composed Agent execution.
 - Executable top-level Orchestrator DSL, composed Agent execution, or generic Pack Config deep merge.
 - Composition Runtime execution, Plan authoring, and executable top-level Orchestrator DSL generation.

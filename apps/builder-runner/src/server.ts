@@ -17,6 +17,11 @@ import {
   compileBuiltInScenarioOrchestrator,
   parseScenarioOrchestratorCompileRequest
 } from "./scenario-orchestrators";
+import {
+  ScenarioRunPreviewApiError,
+  parseScenarioRunPreviewRequest,
+  runCanonicalScenarioPreview
+} from "./scenario-run-preview";
 
 const DEFAULT_PORT = 8788;
 
@@ -90,6 +95,28 @@ function sendScenarioOrchestratorError(res: ServerResponse, error: unknown): voi
     error: {
       code: "SCENARIO_ORCHESTRATOR_INTERNAL_ERROR",
       message: "Scenario Orchestrator request failed."
+    },
+    issues: []
+  });
+}
+
+function sendScenarioRunPreviewError(res: ServerResponse, error: unknown): void {
+  if (error instanceof ScenarioRunPreviewApiError) {
+    sendJson(res, error.statusCode, {
+      ok: false,
+      error: {
+        code: error.code,
+        message: sanitizeErrorMessage(error.message)
+      },
+      issues: []
+    });
+    return;
+  }
+  sendJson(res, 500, {
+    ok: false,
+    error: {
+      code: "SCENARIO_RUN_INTERNAL_ERROR",
+      message: "Scenario Run Preview failed."
     },
     issues: []
   });
@@ -256,6 +283,34 @@ async function handleScenarioOrchestratorCompilePreview(
   }
 }
 
+async function handleScenarioRunPreview(
+  req: IncomingMessage,
+  res: ServerResponse
+): Promise<void> {
+  try {
+    const input = await readJsonBody<unknown>(req, 4096);
+    const request = parseScenarioRunPreviewRequest(input);
+    const result = await runCanonicalScenarioPreview(request);
+    sendJson(res, 200, result);
+  } catch (error) {
+    if (
+      error instanceof SyntaxError ||
+      (error instanceof Error && error.message.startsWith("Request body"))
+    ) {
+      sendJson(res, 400, {
+        ok: false,
+        error: {
+          code: "SCENARIO_RUN_REQUEST_INVALID",
+          message: sanitizeErrorMessage(error.message)
+        },
+        issues: []
+      });
+      return;
+    }
+    sendScenarioRunPreviewError(res, error);
+  }
+}
+
 function requestHandler(req: IncomingMessage, res: ServerResponse): void {
   const method = req.method ?? "GET";
   const path = (req.url ?? "/").split("?")[0];
@@ -317,6 +372,11 @@ function requestHandler(req: IncomingMessage, res: ServerResponse): void {
 
   if (method === "POST" && path === "/creator/scenario-orchestrators/compile-preview") {
     void handleScenarioOrchestratorCompilePreview(req, res);
+    return;
+  }
+
+  if (method === "POST" && path === "/creator/scenario-runs/preview") {
+    void handleScenarioRunPreview(req, res);
     return;
   }
 

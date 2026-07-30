@@ -77,10 +77,15 @@ describe("P6-11D.1 in-memory Scenario Runtime Adapter conformance", () => {
     }
   });
 
-  it("keeps Studio without Orchestrator Run", () => {
+  it("keeps Studio execution manual, canonical, and mock-only", () => {
     const studioDocs = read("docs/studio-scenario-orchestrator-preview.md");
     expect(studioDocs).toMatch(/does\s+not expose Apply, Run/);
-    expect(studioDocs).toMatch(/no Orchestrator(?: Apply or)?\s+Run/);
+    expect(studioDocs).toContain("strict manual Scenario Run Preview endpoint");
+    expect(studioDocs).toContain("no Apply, Deploy, Publish, or automatic Run");
+    const runDocs = read("docs/studio-manual-scenario-run-preview.md");
+    expect(runDocs).toContain("canonical demo cases only");
+    expect(runDocs).toContain("manual trigger only");
+    expect(runDocs).toContain("mock-only");
   });
 
   it("links the demo Adapter documentation from both READMEs", () => {

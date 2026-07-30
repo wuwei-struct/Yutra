@@ -69,9 +69,11 @@ describe("P6-11D.2 in-memory Scenario Orchestrator Engine conformance", () => {
     ).toBe("ecommerce-refund-composition-demo");
   });
 
-  it("keeps Studio without Scenario Run", () => {
-    const studio = read("docs/studio-scenario-orchestrator-preview.md");
-    expect(studio).toMatch(/no Scenario Run|no Orchestrator(?: Apply or)? Run/);
+  it("keeps Studio execution manual, canonical, and mock-only", () => {
+    const studio = read("docs/studio-manual-scenario-run-preview.md");
+    expect(studio).toContain("manual trigger only");
+    expect(studio).toContain("canonical demo cases only");
+    expect(studio).toContain("mock-only");
     const enginePackage = read("packages/scenario-orchestrator-engine-demo/package.json");
     expect(enginePackage).not.toContain("@yutra/builder");
   });

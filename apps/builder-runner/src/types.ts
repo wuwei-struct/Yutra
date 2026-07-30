@@ -223,6 +223,103 @@ export type ScenarioOrchestratorCompilePreviewResponse =
       }>;
     };
 
+export type ScenarioRunPreviewCompositionId =
+  | "customer-complaint-composition-demo"
+  | "ecommerce-refund-composition-demo";
+
+export type ScenarioRunPreviewDemoCase =
+  | "complaint_policy"
+  | "complaint_compensation"
+  | "complaint_handoff"
+  | "refund_authorization"
+  | "overlay_deny";
+
+export interface ScenarioRunPreviewRequest {
+  compositionId: ScenarioRunPreviewCompositionId;
+  demoCase: ScenarioRunPreviewDemoCase;
+}
+
+export interface ScenarioRunPreviewSlotSummary {
+  invocationIndex: number;
+  slotId: string;
+  runtimeStatus: string;
+  runtimeFinalState?: string;
+  semanticOutcome?: string;
+  projectionId?: string;
+  runtimeRunId?: string;
+  traceReferenceAvailable: boolean;
+  auditReferenceStatus: "available" | "unavailable";
+}
+
+export interface ScenarioRunPreviewTimelineItem {
+  index: number;
+  source: "orchestrator_trace" | "projection_evidence";
+  type: string;
+  sequence?: number;
+  slotId?: string;
+  routeId?: string;
+  bindingId?: string;
+  overlayId?: string;
+  decision?: string;
+  semanticOutcome?: string;
+  projectionId?: string;
+  runtimeStatus?: string;
+  terminalId?: string;
+  errorCode?: string;
+}
+
+export interface ScenarioRunPreviewResult {
+  compositionId: ScenarioRunPreviewCompositionId;
+  orchestratorRunId: string;
+  demoCase: ScenarioRunPreviewDemoCase;
+  status: "completed" | "handoff_required" | "failed";
+  terminalId: "$scenario_done" | "$human_handoff" | "$fail_closed";
+  scenarioCompleted: boolean;
+  slotInvocationCount: number;
+  slotInvocations: ScenarioRunPreviewSlotSummary[];
+  projectedOutcomes: Array<{
+    slotId: string;
+    semanticOutcome: string;
+    projectionId: string;
+  }>;
+  selectedRoutes: Array<{ routeId: string; effect: string }>;
+  appliedBindings: Array<{ bindingId: string }>;
+  evaluatedOverlays: Array<{
+    overlayId: string;
+    stage: string;
+    decision: string;
+  }>;
+  traceSummary: {
+    eventCount: number;
+    firstSequence: number;
+    lastSequence: number;
+    terminalEventType: string;
+  };
+  timeline: ScenarioRunPreviewTimelineItem[];
+  budgetUsage: {
+    slotInvocations: number;
+    routeEvaluations: number;
+    bindingApplications: number;
+  };
+  auditSummary: {
+    status: "available";
+    redacted: true;
+    externalEffectsOccurred: false;
+  };
+  externalEffectsOccurred: false;
+  manualTriggerOnly: true;
+  inMemoryOnly: true;
+  persisted: false;
+}
+
+export type ScenarioRunPreviewResponse =
+  | { ok: true; result: ScenarioRunPreviewResult }
+  | {
+      ok: false;
+      error: { code: string; message: string };
+      issues: [];
+    };
+
 export interface LegacyBuilderRunPreviewRequest {
   form: BuilderFormConfig;
   input?: BuilderRunnerInput;

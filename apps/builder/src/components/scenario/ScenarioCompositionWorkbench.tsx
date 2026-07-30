@@ -1,6 +1,7 @@
 import { useI18n } from "../../i18n";
 import { useScenarioCompositionState } from "../../lib/scenario-composition-state";
 import { useScenarioOrchestratorState } from "../../lib/scenario-orchestrator-state";
+import { useScenarioRunState } from "../../lib/scenario-run-state";
 import { ScenarioCompositionArtifactsPanel } from "./ScenarioCompositionArtifactsPanel";
 import { ScenarioCompositionBoundaryNotice } from "./ScenarioCompositionBoundaryNotice";
 import { ScenarioCompositionOverview } from "./ScenarioCompositionOverview";
@@ -13,6 +14,7 @@ import {
   type ScenarioSlotDslMetadata
 } from "./ScenarioSlotArtifactsPanel";
 import { ScenarioOrchestratorPreviewPanel } from "./ScenarioOrchestratorPreviewPanel";
+import { ScenarioRunPreviewPanel } from "./ScenarioRunPreviewPanel";
 
 export function ScenarioCompositionWorkbench(props: {
   onSendSlotDsl: (dslText: string, metadata: ScenarioSlotDslMetadata) => void;
@@ -20,6 +22,10 @@ export function ScenarioCompositionWorkbench(props: {
   const { t } = useI18n();
   const state = useScenarioCompositionState();
   const orchestrator = useScenarioOrchestratorState(state.selectedCompositionId);
+  const scenarioRun = useScenarioRunState(
+    state.selectedCompositionId,
+    Boolean(orchestrator.result)
+  );
   return (
     <main className="scenario-workbench" aria-label="Scenario Composition Workbench">
       <header className="scenario-hero">
@@ -77,6 +83,19 @@ export function ScenarioCompositionWorkbench(props: {
           onCompile={() => void orchestrator.compilePreview()}
           onSelectArtifact={orchestrator.setSelectedArtifact}
           onSelectProfileSection={orchestrator.setSelectedProfileSection}
+        />
+      ) : null}
+      {state.detail ? (
+        <ScenarioRunPreviewPanel
+          orchestratorReady={Boolean(orchestrator.result)}
+          status={scenarioRun.status}
+          demoCase={scenarioRun.demoCase}
+          availableCases={scenarioRun.availableCases}
+          result={scenarioRun.result}
+          errorCode={scenarioRun.errorCode}
+          errorMessage={scenarioRun.errorMessage}
+          onSelectCase={scenarioRun.selectDemoCase}
+          onRun={() => void scenarioRun.runPreview()}
         />
       ) : null}
     </main>

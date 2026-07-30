@@ -949,4 +949,197 @@ describe("@yutra/builder-runner", () => {
     expect(body.error?.message).not.toContain("node_modules");
     expect(body.error?.message).not.toContain(process.cwd());
   });
+
+  it.each([
+    {
+      compositionId: "customer-complaint-composition-demo",
+      demoCase: "complaint_policy",
+      status: "completed",
+      terminalId: "$scenario_done",
+      scenarioCompleted: true,
+      slotCount: 3,
+      bindingCount: 1
+    },
+    {
+      compositionId: "customer-complaint-composition-demo",
+      demoCase: "complaint_compensation",
+      status: "completed",
+      terminalId: "$scenario_done",
+      scenarioCompleted: true,
+      slotCount: 3,
+      bindingCount: 1
+    },
+    {
+      compositionId: "customer-complaint-composition-demo",
+      demoCase: "complaint_handoff",
+      status: "handoff_required",
+      terminalId: "$human_handoff",
+      scenarioCompleted: false,
+      slotCount: 1,
+      bindingCount: 0
+    },
+    {
+      compositionId: "ecommerce-refund-composition-demo",
+      demoCase: "refund_authorization",
+      status: "completed",
+      terminalId: "$scenario_done",
+      scenarioCompleted: true,
+      slotCount: 3,
+      bindingCount: 1
+    },
+    {
+      compositionId: "customer-complaint-composition-demo",
+      demoCase: "overlay_deny",
+      status: "failed",
+      terminalId: "$fail_closed",
+      scenarioCompleted: false,
+      slotCount: 0,
+      bindingCount: 0
+    }
+  ])(
+    "POST Scenario Run Preview executes canonical $demoCase manually in memory",
+    async ({
+      compositionId,
+      demoCase,
+      status,
+      terminalId,
+      scenarioCompleted,
+      slotCount,
+      bindingCount
+    }) => {
+      const baseUrl = await startServer();
+      const res = await fetch(`${baseUrl}/creator/scenario-runs/preview`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ compositionId, demoCase })
+      });
+      const body = (await res.json()) as {
+        ok: boolean;
+        result?: {
+          status: string;
+          terminalId: string;
+          scenarioCompleted: boolean;
+          slotInvocationCount: number;
+          slotInvocations: Array<{
+            semanticOutcome?: string;
+            projectionId?: string;
+            traceReferenceAvailable: boolean;
+            auditReferenceStatus: string;
+          }>;
+          projectedOutcomes: unknown[];
+          selectedRoutes: unknown[];
+          appliedBindings: unknown[];
+          evaluatedOverlays: unknown[];
+          timeline: Array<{ source: string; type: string }>;
+          budgetUsage: {
+            slotInvocations: number;
+            routeEvaluations: number;
+            bindingApplications: number;
+          };
+          auditSummary: {
+            status: string;
+            redacted: boolean;
+            externalEffectsOccurred: boolean;
+          };
+          externalEffectsOccurred: boolean;
+          manualTriggerOnly: boolean;
+          inMemoryOnly: boolean;
+          persisted: boolean;
+        };
+      };
+
+      expect(res.status).toBe(200);
+      expect(body.ok).toBe(true);
+      expect(body.result).toMatchObject({
+        status,
+        terminalId,
+        scenarioCompleted,
+        slotInvocationCount: slotCount,
+        externalEffectsOccurred: false,
+        manualTriggerOnly: true,
+        inMemoryOnly: true,
+        persisted: false,
+        auditSummary: {
+          status: "available",
+          redacted: true,
+          externalEffectsOccurred: false
+        }
+      });
+      expect(body.result?.appliedBindings).toHaveLength(bindingCount);
+      expect(body.result?.budgetUsage.slotInvocations).toBe(slotCount);
+      expect(body.result?.budgetUsage.bindingApplications).toBe(bindingCount);
+      expect(body.result?.evaluatedOverlays.length).toBeGreaterThan(0);
+      if (slotCount > 0) {
+        expect(body.result?.projectedOutcomes).toHaveLength(slotCount);
+        expect(
+          body.result?.timeline.some(
+            (item) =>
+              item.source === "projection_evidence" &&
+              item.type === "Outcome Projection"
+          )
+        ).toBe(true);
+        expect(
+          body.result?.slotInvocations.every(
+            (slot) =>
+              Boolean(slot.semanticOutcome) &&
+              Boolean(slot.projectionId) &&
+              slot.traceReferenceAvailable &&
+              slot.auditReferenceStatus === "available"
+          )
+        ).toBe(true);
+      } else {
+        expect(body.result?.selectedRoutes).toHaveLength(0);
+      }
+      const serialized = JSON.stringify(body);
+      expect(serialized).not.toContain("scenario.input");
+      expect(serialized).not.toContain("agent.yutra.yaml");
+      expect(serialized).not.toContain(process.cwd());
+      expect(serialized).not.toContain("node_modules");
+    }
+  );
+
+  it("Scenario Run Preview rejects arbitrary input and mismatched canonical cases", async () => {
+    const baseUrl = await startServer();
+    for (const field of ["input", "plan", "profile", "hash", "route", "binding"]) {
+      const invalid = await fetch(`${baseUrl}/creator/scenario-runs/preview`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          compositionId: "customer-complaint-composition-demo",
+          demoCase: "complaint_policy",
+          [field]: {}
+        })
+      });
+      const body = (await invalid.json()) as { error?: { code?: string } };
+      expect(invalid.status).toBe(400);
+      expect(body.error?.code).toBe("SCENARIO_RUN_REQUEST_INVALID");
+    }
+
+    const mismatch = await fetch(`${baseUrl}/creator/scenario-runs/preview`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        compositionId: "ecommerce-refund-composition-demo",
+        demoCase: "complaint_policy"
+      })
+    });
+    const mismatchBody = (await mismatch.json()) as {
+      error?: { code?: string; message?: string };
+    };
+    expect(mismatch.status).toBe(422);
+    expect(mismatchBody.error?.code).toBe("SCENARIO_RUN_CASE_NOT_SUPPORTED");
+    expect(mismatchBody.error?.message).not.toContain(process.cwd());
+
+    const unknown = await fetch(`${baseUrl}/creator/scenario-runs/preview`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        compositionId: "not-a-composition",
+        demoCase: "complaint_policy"
+      })
+    });
+    const unknownBody = (await unknown.json()) as { error?: { code?: string } };
+    expect(unknown.status).toBe(404);
+    expect(unknownBody.error?.code).toBe("SCENARIO_RUN_COMPOSITION_NOT_FOUND");
+  });
 });

@@ -141,6 +141,9 @@ importers:
       '@yutra/scenario-orchestrator-compiler':
         specifier: workspace:*
         version: link:../../packages/scenario-orchestrator-compiler
+      '@yutra/scenario-orchestrator-engine-demo':
+        specifier: workspace:*
+        version: link:../../packages/scenario-orchestrator-engine-demo
       '@yutra/scenario-pattern-core':
         specifier: workspace:*
         version: link:../../packages/scenario-pattern-core

@@ -168,7 +168,7 @@ Current status:
 - `@yutra/scenario-orchestrator-runtime-contract` defines the future Engine/Slot Adapter boundary, fail-closed capability handshake, namespaced invocation, Action Closure, idempotency, Trace/Audit parent binding, and side-effect limits. The current Yutra Runtime descriptor remains `contract_only`.
 - `@yutra/scenario-orchestrator-runtime-demo` provides deterministic mock-only execution of one canonical Slot with in-memory artifact/hash checks, Action Closure, side-effect gates, idempotency, timeout, and redacted Trace/Audit sidecars. It does not provide the Scenario Engine.
 - Five canonical Slots have explicit Outcome Projection contracts and deterministic evidence markers; side-effect classification coverage remains separate from dispatch-time enforcement.
-- `@yutra/scenario-orchestrator-engine-demo` now executes customer complaint and ecommerce refund call-return paths in deterministic in-memory tests/smoke with explicit Routes, identity Bindings, Overlays, budgets, fixed terminals, idempotency, and redacted Trace/Audit. Studio and production Runtime remain unconnected.
+- `@yutra/scenario-orchestrator-engine-demo` executes customer complaint and ecommerce refund call-return paths with explicit Routes, identity Bindings, Overlays, budgets, fixed terminals, idempotency, and redacted Trace/Audit. Studio exposes five canonical demo cases only through a manual, in-memory, mock-only Run Preview; production Runtime remains unconnected.
 - Renewal churn remains contract-only; executable top-level Orchestrator DSL, Plan authoring, generic Pack Config deep merge, and Runtime execution remain deferred.
 
 ## First Priority Archetypes
