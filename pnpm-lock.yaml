@@ -83,6 +83,9 @@ importers:
       '@yutra/rule-compiler':
         specifier: workspace:*
         version: link:../../packages/rule-compiler
+      '@yutra/scenario-run-evidence-core':
+        specifier: workspace:*
+        version: link:../../packages/scenario-run-evidence-core
       react:
         specifier: ^19.0.0
         version: 19.2.4
@@ -147,6 +150,9 @@ importers:
       '@yutra/scenario-pattern-core':
         specifier: workspace:*
         version: link:../../packages/scenario-pattern-core
+      '@yutra/scenario-run-evidence-core':
+        specifier: workspace:*
+        version: link:../../packages/scenario-run-evidence-core
       '@yutra/trace':
         specifier: workspace:*
         version: link:../../packages/trace
@@ -384,6 +390,15 @@ importers:
       '@yutra/archetype-core':
         specifier: workspace:*
         version: link:../archetype-core
+      zod:
+        specifier: ^3.24.2
+        version: 3.25.76
+
+  packages/scenario-run-evidence-core:
+    dependencies:
+      '@yutra/scenario-orchestrator-runtime-contract':
+        specifier: workspace:*
+        version: link:../scenario-orchestrator-runtime-contract
       zod:
         specifier: ^3.24.2
         version: 3.25.76

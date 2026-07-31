@@ -1,6 +1,7 @@
 ﻿// @vitest-environment jsdom
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import * as aiDraftCore from "@yutra/builder-ai-core";
+import { createScenarioRunEvidenceBundle } from "@yutra/scenario-run-evidence-core";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import App from "../src/App";
 import { I18nProvider, STUDIO_LOCALE_STORAGE_KEY, resolveInitialLocale } from "../src/i18n";
@@ -962,6 +963,7 @@ function scenarioRunResult(
   const slotInvocations = definition.slots.map(
     ([slotId, semanticOutcome], index) => ({
       invocationIndex: index + 1,
+      invocationId: `invocation-${index + 1}`,
       slotId,
       runtimeStatus: "completed",
       runtimeFinalState: "done",
@@ -983,6 +985,7 @@ function scenarioRunResult(
       index: index + 2,
       source: "projection_evidence" as const,
       type: "Outcome Projection",
+      invocationIndex: slot.invocationIndex,
       slotId: slot.slotId,
       semanticOutcome: slot.semanticOutcome,
       projectionId: slot.projectionId,
@@ -997,10 +1000,11 @@ function scenarioRunResult(
           : definition.status === "handoff_required"
             ? "orchestrator.handoff.requested"
             : "orchestrator.failed",
-      terminalId: definition.terminalId
+      terminalId: definition.terminalId,
+      sequence: 2
     }
   ];
-  return {
+  const result: Omit<ScenarioRunPreviewResult, "evidenceBundle"> = {
     compositionId:
       compositionId as ScenarioRunPreviewResult["compositionId"],
     orchestratorRunId: `studio-${demoCase}`,
@@ -1011,6 +1015,7 @@ function scenarioRunResult(
     slotInvocationCount: slotInvocations.length,
     slotInvocations,
     projectedOutcomes: slotInvocations.map((slot) => ({
+      invocationIndex: slot.invocationIndex,
       slotId: slot.slotId,
       semanticOutcome: slot.semanticOutcome,
       projectionId: slot.projectionId
@@ -1048,6 +1053,65 @@ function scenarioRunResult(
     manualTriggerOnly: true,
     inMemoryOnly: true,
     persisted: false
+  };
+  const hash = `sha256:${"a".repeat(64)}`;
+  return {
+    ...result,
+    evidenceBundle: createScenarioRunEvidenceBundle({
+      schemaVersion: "1.0.0-preview",
+      evidenceId: `scenario-evidence:${result.orchestratorRunId}`,
+      run: {
+        orchestratorRunId: result.orchestratorRunId,
+        orchestratorId: "studio-demo-orchestrator",
+        compositionId: result.compositionId,
+        demoCase: result.demoCase,
+        status: result.status,
+        terminalId: result.terminalId,
+        scenarioCompleted: result.scenarioCompleted
+      },
+      sources: {
+        planHash: hash,
+        compositionBundleHash: hash,
+        orchestratorHash: hash,
+        previewBundleHash: hash
+      },
+      slotInvocations: result.slotInvocations.map((slot) => ({
+        invocationIndex: slot.invocationIndex,
+        invocationId: slot.invocationId,
+        slotId: slot.slotId,
+        runtimeStatus: slot.runtimeStatus,
+        ...(slot.runtimeFinalState ? { runtimeFinalState: slot.runtimeFinalState } : {}),
+        ...(slot.semanticOutcome ? { semanticOutcome: slot.semanticOutcome } : {}),
+        ...(slot.projectionId ? { projectionId: slot.projectionId } : {}),
+        ...(slot.runtimeRunId ? { runtimeRunId: slot.runtimeRunId } : {}),
+        traceReferenceStatus: slot.traceReferenceAvailable ? "available" : "unavailable",
+        auditReferenceStatus: slot.auditReferenceStatus
+      })),
+      decisions: {
+        projections: result.projectedOutcomes,
+        routes: result.selectedRoutes,
+        bindings: result.appliedBindings,
+        overlays: result.evaluatedOverlays
+      },
+      timeline: result.timeline,
+      budgetUsage: result.budgetUsage,
+      auditSummary: result.auditSummary,
+      redactionSummary: {
+        redacted: true,
+        completeInputIncluded: false,
+        completeOutputIncluded: false,
+        completeSlotTraceIncluded: false,
+        completeAuditIncluded: false
+      },
+      publicExposure: {
+        mode: "demo_only",
+        containsCustomerData: false,
+        containsRealEndpoint: false,
+        containsSecret: false,
+        containsCustomerSop: false,
+        containsCommercialDeliveryAsset: false
+      }
+    })
   };
 }
 
@@ -2072,6 +2136,10 @@ describe("@yutra/builder Studio UI", () => {
       name: "Run Scenario Preview"
     }) as HTMLButtonElement;
     expect(runButton.disabled).toBe(false);
+    expect(
+      (screen.getByRole("button", { name: "Replay Evidence" }) as HTMLButtonElement)
+        .disabled
+    ).toBe(true);
     fireEvent.click(runButton);
 
     await waitFor(() =>
@@ -2100,6 +2168,67 @@ describe("@yutra/builder Studio UI", () => {
     expect(governance).toContain("policy_explanation_to_resolution");
     expect(governance).toContain("redacted=true");
     expect(governance).toContain("externalEffectsOccurred=false");
+    const replayButton = screen.getByRole("button", {
+      name: "Replay Evidence"
+    }) as HTMLButtonElement;
+    expect(replayButton.disabled).toBe(false);
+    expect(runScenarioPreview).toHaveBeenCalledTimes(1);
+    fireEvent.click(replayButton);
+    expect(runScenarioPreview).toHaveBeenCalledTimes(1);
+    expect(screen.getByLabelText("Scenario Evidence Integrity").textContent).toContain(
+      "valid"
+    );
+    expect(screen.getByLabelText("Scenario Evidence Integrity").textContent).toContain(
+      "false"
+    );
+    expect(screen.getByLabelText("Scenario Evidence Provenance").textContent).toContain(
+      "redacted=true"
+    );
+    expect(screen.getByLabelText("Scenario Evidence Replay Timeline")).toBeTruthy();
+  });
+
+  it("shows integrity blockers and no replay success for damaged evidence", async () => {
+    mockScenarioCompositionApis();
+    const damaged = scenarioRunResult(
+      "customer-complaint-composition-demo",
+      "complaint_policy"
+    );
+    damaged.evidenceBundle.evidenceHash = `sha256:${"0".repeat(64)}`;
+    vi.mocked(runScenarioPreview).mockResolvedValue({ ok: true, result: damaged });
+    await openScenarioRunPreview();
+    fireEvent.click(screen.getByRole("button", { name: "Run Scenario Preview" }));
+    await waitFor(() => expect(screen.getByLabelText("Scenario Run Summary")).toBeTruthy());
+    fireEvent.click(screen.getByRole("button", { name: "Replay Evidence" }));
+    expect(screen.getByLabelText("Scenario Evidence Integrity").textContent).toContain(
+      "invalid"
+    );
+    expect(screen.getByRole("alert").textContent).toContain(
+      "SCENARIO_EVIDENCE_HASH_INVALID"
+    );
+    expect(screen.queryByLabelText("Scenario Evidence Replay Timeline")).toBeNull();
+  });
+
+  it.each([
+    ["complaint_compensation", "$scenario_done"],
+    ["complaint_handoff", "$human_handoff"],
+    ["overlay_deny", "$fail_closed"]
+  ] as const)("replays %s evidence without another Scenario Run request", async (demoCase, terminalId) => {
+    mockScenarioCompositionApis();
+    await openScenarioRunPreview();
+    const labels: Record<string, RegExp> = {
+      complaint_compensation: /Complaint compensation/,
+      complaint_handoff: /Complaint handoff/,
+      overlay_deny: /Overlay deny/
+    };
+    fireEvent.click(screen.getByLabelText(labels[demoCase]));
+    fireEvent.click(screen.getByRole("button", { name: "Run Scenario Preview" }));
+    await waitFor(() => expect(screen.getByLabelText("Scenario Run Summary")).toBeTruthy());
+    const callCount = vi.mocked(runScenarioPreview).mock.calls.length;
+    fireEvent.click(screen.getByRole("button", { name: "Replay Evidence" }));
+    expect(runScenarioPreview).toHaveBeenCalledTimes(callCount);
+    expect(screen.getByLabelText("Scenario Evidence Decision Summary").textContent).toContain(
+      `terminal=${terminalId}`
+    );
   });
 
   it("compensation case shows Supporting invocation and Binding and clears on case switch", async () => {
@@ -2185,6 +2314,10 @@ describe("@yutra/builder Studio UI", () => {
     expect(screen.getByLabelText("Scenario Slot Invocations").textContent).toContain(
       "refund_authorization"
     );
+    fireEvent.click(screen.getByRole("button", { name: "Replay Evidence" }));
+    expect(screen.getByLabelText("Scenario Evidence Decision Summary").textContent).toContain(
+      "terminal=$scenario_done"
+    );
 
     fireEvent.click(
       screen.getByRole("button", {
@@ -2194,6 +2327,11 @@ describe("@yutra/builder Studio UI", () => {
     await waitFor(() =>
       expect(screen.queryByLabelText("Scenario Run Summary")).toBeNull()
     );
+    expect(screen.queryByLabelText("Scenario Evidence Replay Timeline")).toBeNull();
+    expect(
+      (screen.getByRole("button", { name: "Replay Evidence" }) as HTMLButtonElement)
+        .disabled
+    ).toBe(true);
     expect(
       (screen.getByRole("button", {
         name: "Run Scenario Preview"

@@ -1,0 +1,29 @@
+{
+  "name": "@yutra/scenario-run-evidence-core",
+  "version": "0.3.0-vnext-preview.1",
+  "private": false,
+  "description": "Browser-safe Scenario Run evidence bundle and offline replay contract",
+  "type": "module",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --dts",
+    "test": "vitest run --passWithNoTests",
+    "lint": "eslint src test --max-warnings=0"
+  },
+  "dependencies": {
+    "@yutra/scenario-orchestrator-runtime-contract": "workspace:*",
+    "zod": "^3.24.2"
+  },
+  "license": "MIT",
+  "author": "Yutra Contributors",
+  "keywords": ["yutra", "scenario", "evidence", "replay", "integrity"]
+}

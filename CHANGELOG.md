@@ -4,6 +4,7 @@
 
 ### Added
 
+- `@yutra/scenario-run-evidence-core` with strict redacted Evidence Bundles, canonical integrity hashes, reference and terminal validation, offline replay, and a Studio Evidence Inspector that never re-executes Runtime.
 - Studio Manual Scenario Run Preview for five canonical, explicitly triggered in-memory demo cases, with safe Timeline, Slot, Outcome Projection, Route, Binding, Overlay, Terminal, Budget, and redacted Audit summaries.
 - `@yutra/scenario-orchestrator-engine-demo` with deterministic in-memory `single_active_slot_call_return`, explicit Outcome Projection and Route conditions, identity Bindings, Overlay enforcement, fixed terminals, budgets, Scenario idempotency, and redacted Orchestrator Trace/Audit for customer complaint and ecommerce refund smoke paths.
 - Explicit Slot Outcome Projection contracts for five canonical Slots, deterministic projection evidence/evaluation, and dispatch-time side-effect enforcement that permits unexecuted high-risk branches while rejecting an actually selected over-limit Action before its handler.

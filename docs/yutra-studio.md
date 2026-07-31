@@ -186,6 +186,12 @@ Route, Binding, Overlay, Terminal, Budget, and redacted Audit summaries. It
 does not accept arbitrary input, connect real systems, persist state, or claim
 production readiness.
 
+After a manual run, a separate Scenario Evidence & Replay Inspector validates
+the standardized redacted bundle and reconstructs Timeline, Slot tree,
+decisions, terminal, budget, and provenance entirely offline. Replay does not
+call the Scenario Run API or execute Runtime, and the bundle is not persisted.
+See [Scenario Run Evidence and Offline Replay](scenario-run-evidence-and-replay.md).
+
 See [Studio Scenario Composition Compile Preview](studio-scenario-composition-preview.md).
 See [Studio Scenario Orchestrator Preview](studio-scenario-orchestrator-preview.md).
 See [Studio Manual Scenario Run Preview](studio-manual-scenario-run-preview.md).
@@ -202,6 +208,7 @@ Relevant vNext docs:
 - [Studio Scenario Composition Compile Preview](studio-scenario-composition-preview.md)
 - [Studio Scenario Orchestrator Preview](studio-scenario-orchestrator-preview.md)
 - [Studio Manual Scenario Run Preview](studio-manual-scenario-run-preview.md)
+- [Scenario Run Evidence and Offline Replay](scenario-run-evidence-and-replay.md)
 - [vNext Roadmap](vnext-roadmap.md)
 
 ## Roadmap

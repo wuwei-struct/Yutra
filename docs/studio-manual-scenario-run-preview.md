@@ -70,6 +70,11 @@ configuration, credentials, endpoints, and local paths. Projection rows in the
 UI Timeline are explicitly identified as derived projection evidence; they do
 not add or rename Trace event types.
 
+Each successful response also contains a standardized, redacted
+`evidenceBundle`. Studio can validate and replay that bundle offline without
+calling this API or executing Runtime again. See
+[Scenario Run Evidence Bundle and Offline Replay](./scenario-run-evidence-and-replay.md).
+
 ## Canonical Results
 
 Customer complaint supports:

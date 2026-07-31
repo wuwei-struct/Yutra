@@ -1,0 +1,15 @@
+export const SCENARIO_EVIDENCE_ERROR_CODES = Object.freeze({
+  CREATION_FAILED: "SCENARIO_EVIDENCE_CREATION_FAILED",
+  SCHEMA_INVALID: "SCENARIO_EVIDENCE_SCHEMA_INVALID",
+  HASH_INVALID: "SCENARIO_EVIDENCE_HASH_INVALID",
+  TIMELINE_INVALID: "SCENARIO_EVIDENCE_TIMELINE_INVALID",
+  REFERENCE_INVALID: "SCENARIO_EVIDENCE_REFERENCE_INVALID",
+  TERMINAL_MISMATCH: "SCENARIO_EVIDENCE_TERMINAL_MISMATCH"
+} as const);
+
+export class ScenarioEvidenceError extends Error {
+  constructor(readonly code: string, message: string) {
+    super(message);
+    this.name = "ScenarioEvidenceError";
+  }
+}

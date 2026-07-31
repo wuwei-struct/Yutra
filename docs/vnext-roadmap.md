@@ -169,6 +169,7 @@ Current status:
 - `@yutra/scenario-orchestrator-runtime-demo` provides deterministic mock-only execution of one canonical Slot with in-memory artifact/hash checks, Action Closure, side-effect gates, idempotency, timeout, and redacted Trace/Audit sidecars. It does not provide the Scenario Engine.
 - Five canonical Slots have explicit Outcome Projection contracts and deterministic evidence markers; side-effect classification coverage remains separate from dispatch-time enforcement.
 - `@yutra/scenario-orchestrator-engine-demo` executes customer complaint and ecommerce refund call-return paths with explicit Routes, identity Bindings, Overlays, budgets, fixed terminals, idempotency, and redacted Trace/Audit. Studio exposes five canonical demo cases only through a manual, in-memory, mock-only Run Preview; production Runtime remains unconnected.
+- `@yutra/scenario-run-evidence-core` creates canonical redacted Evidence Bundles for those five demo cases and reconstructs integrity-checked Timeline, Slot, decision, terminal, budget, and provenance views offline without executing Runtime or persisting evidence.
 - Renewal churn remains contract-only; executable top-level Orchestrator DSL, Plan authoring, generic Pack Config deep merge, and Runtime execution remain deferred.
 
 ## First Priority Archetypes

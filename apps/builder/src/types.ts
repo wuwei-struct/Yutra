@@ -1,6 +1,7 @@
 import type { BuilderFormConfig, BuilderIssue } from "@yutra/builder-core";
 import type { AiDraftIssue, AiDraftValidationResult, FlowDraft, FlowDraftScenario, NaturalLanguageBrief, TagSelection } from "@yutra/builder-ai-core";
 import type { PackConfig } from "@yutra/pack-config-core";
+import type { ScenarioRunEvidenceBundle } from "@yutra/scenario-run-evidence-core";
 import type {
   CertificationReadinessGate,
   CertificationReadinessPreview,
@@ -604,6 +605,7 @@ export type ScenarioRunPreviewDemoCase =
 
 export interface ScenarioRunPreviewSlotSummary {
   invocationIndex: number;
+  invocationId: string;
   slotId: string;
   runtimeStatus: string;
   runtimeFinalState?: string;
@@ -619,6 +621,7 @@ export interface ScenarioRunPreviewTimelineItem {
   source: "orchestrator_trace" | "projection_evidence";
   type: string;
   sequence?: number;
+  invocationIndex?: number;
   slotId?: string;
   routeId?: string;
   bindingId?: string;
@@ -641,6 +644,7 @@ export interface ScenarioRunPreviewResult {
   slotInvocationCount: number;
   slotInvocations: ScenarioRunPreviewSlotSummary[];
   projectedOutcomes: Array<{
+    invocationIndex: number;
     slotId: string;
     semanticOutcome: string;
     projectionId: string;
@@ -673,6 +677,7 @@ export interface ScenarioRunPreviewResult {
   manualTriggerOnly: true;
   inMemoryOnly: true;
   persisted: false;
+  evidenceBundle: ScenarioRunEvidenceBundle;
 }
 
 export type ScenarioRunPreviewResponse =

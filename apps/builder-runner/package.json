@@ -32,6 +32,7 @@
     "@yutra/scenario-composition-core": "workspace:*",
     "@yutra/scenario-orchestrator-compiler": "workspace:*",
     "@yutra/scenario-orchestrator-engine-demo": "workspace:*",
+    "@yutra/scenario-run-evidence-core": "workspace:*",
     "@yutra/scenario-pattern-core": "workspace:*",
     "@yutra/trace": "workspace:*"
   },

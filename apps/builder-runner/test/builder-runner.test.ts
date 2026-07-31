@@ -9,6 +9,11 @@ import {
   type PackConfig
 } from "@yutra/pack-config-core";
 import { compilePackConfig } from "@yutra/rule-compiler";
+import {
+  replayScenarioEvidence,
+  validateScenarioEvidenceBundle,
+  type ScenarioRunEvidenceBundle
+} from "@yutra/scenario-run-evidence-core";
 import { assertCompiledActionsResolvable } from "../src/action-closure";
 import { creatorDemoActionRegistry } from "../src/actions/creator-demo-action-registry";
 import { inspectDslText } from "../src/dsl-inspect";
@@ -1045,6 +1050,7 @@ describe("@yutra/builder-runner", () => {
           manualTriggerOnly: boolean;
           inMemoryOnly: boolean;
           persisted: boolean;
+          evidenceBundle: ScenarioRunEvidenceBundle;
         };
       };
 
@@ -1069,6 +1075,17 @@ describe("@yutra/builder-runner", () => {
       expect(body.result?.budgetUsage.slotInvocations).toBe(slotCount);
       expect(body.result?.budgetUsage.bindingApplications).toBe(bindingCount);
       expect(body.result?.evaluatedOverlays.length).toBeGreaterThan(0);
+      expect(validateScenarioEvidenceBundle(body.result?.evidenceBundle).valid).toBe(true);
+      expect(replayScenarioEvidence(body.result?.evidenceBundle)).toMatchObject({
+        valid: true,
+        runtimeExecuted: false,
+        replayMode: "offline_evidence",
+        terminalSummary: { status, terminalId, scenarioCompleted }
+      });
+      expect(body.result?.evidenceBundle.run.demoCase).toBe(demoCase);
+      expect(body.result?.evidenceBundle.sources.previewBundleHash).toMatch(
+        /^sha256:[a-f0-9]{64}$/
+      );
       if (slotCount > 0) {
         expect(body.result?.projectedOutcomes).toHaveLength(slotCount);
         expect(
@@ -1083,6 +1100,7 @@ describe("@yutra/builder-runner", () => {
             (slot) =>
               Boolean(slot.semanticOutcome) &&
               Boolean(slot.projectionId) &&
+              Boolean((slot as { invocationId?: string }).invocationId) &&
               slot.traceReferenceAvailable &&
               slot.auditReferenceStatus === "available"
           )

@@ -1,5 +1,6 @@
 import { useI18n } from "../../i18n";
 import { useScenarioCompositionState } from "../../lib/scenario-composition-state";
+import { useScenarioEvidenceState } from "../../lib/scenario-evidence-state";
 import { useScenarioOrchestratorState } from "../../lib/scenario-orchestrator-state";
 import { useScenarioRunState } from "../../lib/scenario-run-state";
 import { ScenarioCompositionArtifactsPanel } from "./ScenarioCompositionArtifactsPanel";
@@ -7,6 +8,7 @@ import { ScenarioCompositionBoundaryNotice } from "./ScenarioCompositionBoundary
 import { ScenarioCompositionOverview } from "./ScenarioCompositionOverview";
 import { ScenarioCompositionReadinessPanel } from "./ScenarioCompositionReadinessPanel";
 import { ScenarioCompilePreviewPanel } from "./ScenarioCompilePreviewPanel";
+import { ScenarioEvidencePanel } from "./ScenarioEvidencePanel";
 import { ScenarioPatternSelector } from "./ScenarioPatternSelector";
 import { ScenarioPlanPreviewPanel } from "./ScenarioPlanPreviewPanel";
 import {
@@ -26,6 +28,7 @@ export function ScenarioCompositionWorkbench(props: {
     state.selectedCompositionId,
     Boolean(orchestrator.result)
   );
+  const evidence = useScenarioEvidenceState(scenarioRun.result?.evidenceBundle);
   return (
     <main className="scenario-workbench" aria-label="Scenario Composition Workbench">
       <header className="scenario-hero">
@@ -96,6 +99,14 @@ export function ScenarioCompositionWorkbench(props: {
           errorMessage={scenarioRun.errorMessage}
           onSelectCase={scenarioRun.selectDemoCase}
           onRun={() => void scenarioRun.runPreview()}
+        />
+      ) : null}
+      {state.detail ? (
+        <ScenarioEvidencePanel
+          bundle={scenarioRun.result?.evidenceBundle}
+          status={evidence.status}
+          result={evidence.result}
+          onReplay={evidence.replay}
         />
       ) : null}
     </main>

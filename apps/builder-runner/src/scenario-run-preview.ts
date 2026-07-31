@@ -5,6 +5,10 @@ import {
   type BuiltinDemoCompositionId,
   type OrchestratorTraceEvent
 } from "@yutra/scenario-orchestrator-engine-demo";
+import {
+  createScenarioRunEvidenceBundle,
+  ScenarioEvidenceError
+} from "@yutra/scenario-run-evidence-core";
 import type {
   ScenarioRunPreviewDemoCase,
   ScenarioRunPreviewRequest,
@@ -177,6 +181,7 @@ function timeline(
           index: items.length + 1,
           source: "projection_evidence",
           type: "Outcome Projection",
+          invocationIndex: slot.invocationIndex,
           slotId: slot.slotId,
           semanticOutcome: slot.semanticOutcome,
           projectionId: slot.projectionId,
@@ -238,6 +243,7 @@ export async function runCanonicalScenarioPreview(
   }
   const slotInvocations = result.slotInvocations.map((slot) => ({
     invocationIndex: slot.invocationIndex,
+    invocationId: slot.invocationId,
     slotId: slot.slotId,
     runtimeStatus: slot.runtimeStatus,
     ...(slot.runtimeFinalState
@@ -273,7 +279,7 @@ export async function runCanonicalScenarioPreview(
         decision: String(details.decision ?? "")
       };
     });
-  const safeResult: ScenarioRunPreviewResult = {
+  const safeResultBase: Omit<ScenarioRunPreviewResult, "evidenceBundle"> = {
     compositionId: request.compositionId,
     orchestratorRunId: result.orchestratorRunId,
     demoCase: request.demoCase,
@@ -286,6 +292,7 @@ export async function runCanonicalScenarioPreview(
       slot.semanticOutcome && slot.projectionId
         ? [
             {
+              invocationIndex: slot.invocationIndex,
               slotId: slot.slotId,
               semanticOutcome: slot.semanticOutcome,
               projectionId: slot.projectionId
@@ -308,6 +315,82 @@ export async function runCanonicalScenarioPreview(
     manualTriggerOnly: true,
     inMemoryOnly: true,
     persisted: false
+  };
+  let evidenceBundle: ScenarioRunPreviewResult["evidenceBundle"];
+  try {
+    evidenceBundle = createScenarioRunEvidenceBundle({
+      schemaVersion: "1.0.0-preview",
+      evidenceId: `scenario-evidence:${result.orchestratorRunId}`,
+      run: {
+        orchestratorRunId: result.orchestratorRunId,
+        orchestratorId: options.compileResult.orchestratorId,
+        compositionId: request.compositionId,
+        demoCase: request.demoCase,
+        status: result.status,
+        terminalId: result.terminalId,
+        scenarioCompleted: result.scenarioCompleted
+      },
+      sources: {
+        planHash: options.compileResult.planHash,
+        compositionBundleHash: options.compileResult.compositionBundleHash,
+        orchestratorHash: options.compileResult.orchestratorHash,
+        previewBundleHash: options.compileResult.previewBundleHash
+      },
+      slotInvocations: slotInvocations.map((slot) => ({
+        invocationIndex: slot.invocationIndex,
+        invocationId: slot.invocationId,
+        slotId: slot.slotId,
+        runtimeStatus: slot.runtimeStatus,
+        ...(slot.runtimeFinalState
+          ? { runtimeFinalState: slot.runtimeFinalState }
+          : {}),
+        ...(slot.semanticOutcome
+          ? { semanticOutcome: slot.semanticOutcome }
+          : {}),
+        ...(slot.projectionId ? { projectionId: slot.projectionId } : {}),
+        ...(slot.runtimeRunId ? { runtimeRunId: slot.runtimeRunId } : {}),
+        traceReferenceStatus: slot.traceReferenceAvailable
+          ? "available"
+          : "unavailable",
+        auditReferenceStatus: slot.auditReferenceStatus
+      })),
+      decisions: {
+        projections: structuredClone(safeResultBase.projectedOutcomes),
+        routes: structuredClone(selectedRoutes),
+        bindings: structuredClone(appliedBindings),
+        overlays: structuredClone(evaluatedOverlays)
+      },
+      timeline: structuredClone(safeResultBase.timeline),
+      budgetUsage: structuredClone(result.budgetUsage),
+      auditSummary: structuredClone(safeResultBase.auditSummary),
+      redactionSummary: {
+        redacted: true,
+        completeInputIncluded: false,
+        completeOutputIncluded: false,
+        completeSlotTraceIncluded: false,
+        completeAuditIncluded: false
+      },
+      publicExposure: {
+        mode: "demo_only",
+        containsCustomerData: false,
+        containsRealEndpoint: false,
+        containsSecret: false,
+        containsCustomerSop: false,
+        containsCommercialDeliveryAsset: false
+      }
+    });
+  } catch (error) {
+    throw new ScenarioRunPreviewApiError(
+      error instanceof ScenarioEvidenceError
+        ? error.code
+        : "SCENARIO_EVIDENCE_CREATION_FAILED",
+      "Scenario evidence creation failed closed.",
+      500
+    );
+  }
+  const safeResult: ScenarioRunPreviewResult = {
+    ...safeResultBase,
+    evidenceBundle
   };
   return { ok: true, result: safeResult };
 }

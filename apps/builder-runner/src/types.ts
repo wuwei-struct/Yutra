@@ -13,6 +13,7 @@ import type {
   ScenarioCompositionDraft,
   ScenarioCompositionPlan
 } from "@yutra/scenario-composition-core";
+import type { ScenarioRunEvidenceBundle } from "@yutra/scenario-run-evidence-core";
 import type { ScenarioCompositionCompileResult } from "@yutra/scenario-composition-compiler";
 import type { ScenarioOrchestratorCompileResult } from "@yutra/scenario-orchestrator-compiler";
 import type {
@@ -241,6 +242,7 @@ export interface ScenarioRunPreviewRequest {
 
 export interface ScenarioRunPreviewSlotSummary {
   invocationIndex: number;
+  invocationId: string;
   slotId: string;
   runtimeStatus: string;
   runtimeFinalState?: string;
@@ -256,6 +258,7 @@ export interface ScenarioRunPreviewTimelineItem {
   source: "orchestrator_trace" | "projection_evidence";
   type: string;
   sequence?: number;
+  invocationIndex?: number;
   slotId?: string;
   routeId?: string;
   bindingId?: string;
@@ -278,6 +281,7 @@ export interface ScenarioRunPreviewResult {
   slotInvocationCount: number;
   slotInvocations: ScenarioRunPreviewSlotSummary[];
   projectedOutcomes: Array<{
+    invocationIndex: number;
     slotId: string;
     semanticOutcome: string;
     projectionId: string;
@@ -310,6 +314,7 @@ export interface ScenarioRunPreviewResult {
   manualTriggerOnly: true;
   inMemoryOnly: true;
   persisted: false;
+  evidenceBundle: ScenarioRunEvidenceBundle;
 }
 
 export type ScenarioRunPreviewResponse =

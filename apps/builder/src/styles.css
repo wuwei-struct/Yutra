@@ -1668,6 +1668,67 @@ pre,
   overflow-wrap: anywhere;
 }
 
+.scenario-evidence-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  border: 1px solid #6d8f88;
+  border-radius: 14px;
+  padding: 16px;
+  background:
+    linear-gradient(135deg, rgba(21, 94, 85, 0.08), transparent 45%),
+    #fbfdfc;
+}
+
+.scenario-evidence-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.scenario-evidence-grid > section {
+  min-width: 0;
+  border: 1px solid #d1dfdc;
+  border-radius: 10px;
+  padding: 12px;
+  background: #ffffff;
+}
+
+.scenario-evidence-grid h3,
+.scenario-evidence-replay h3 {
+  margin-top: 0;
+}
+
+.scenario-evidence-identity code,
+.scenario-evidence-provenance code {
+  overflow-wrap: anywhere;
+}
+
+.scenario-evidence-card {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+  border-left: 4px solid #155e55;
+  padding: 8px 10px;
+  background: #edf7f5;
+}
+
+.scenario-evidence-replay ol {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.scenario-evidence-replay li {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 10px;
+}
+
 @media (max-width: 980px) {
   .studio-shell {
     grid-template-columns: 210px minmax(980px, 1fr);
@@ -1688,6 +1749,10 @@ pre,
   .scenario-overview-layout,
   .scenario-plan-panels,
   .scenario-artifact-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .scenario-evidence-grid {
     grid-template-columns: 1fr;
   }
 }

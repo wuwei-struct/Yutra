@@ -122,3 +122,8 @@ Builder Runner now exposes the Engine only through the strict canonical
 Studio requires successful Composition and Orchestrator previews plus an
 explicit button click. It does not accept arbitrary execution input, persist a
 run, or claim production Runtime support.
+
+Builder Runner can derive a redacted Evidence Bundle from the completed Engine
+result, safe Timeline, Audit summary, and compiler source hashes. Offline
+Evidence Replay reads that bundle only and never calls the Engine. See
+[Scenario Run Evidence Bundle and Offline Replay](./scenario-run-evidence-and-replay.md).
