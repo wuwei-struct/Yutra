@@ -185,6 +185,7 @@ LLMs may draft configuration, but they must not bypass the Compiler, Runtime, Tr
 - [v0.3.0-vnext-preview.1 Release Notes](docs/releases/v0.3.0-vnext-preview.1.md)
 - [vNext Preview Release Notes](docs/release-notes-vnext-preview.md)
 - [vNext Preview Release Candidate](docs/vnext-preview-release-candidate.md)
+- [v0.4 Preview Release Readiness](docs/v0.4-preview-release-readiness.md)
 
 Start here:
 
