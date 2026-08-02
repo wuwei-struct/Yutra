@@ -1,6 +1,6 @@
 {
   "name": "@yutra/scenario-orchestrator-core",
-  "version": "0.3.0-vnext-preview.1",
+  "version": "0.4.0-vnext-preview.1",
   "private": false,
   "description": "Yutra preview Scenario Orchestrator document contracts, validation, and explanation",
   "type": "module",

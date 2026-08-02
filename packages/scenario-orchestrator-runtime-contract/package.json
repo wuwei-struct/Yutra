@@ -1,6 +1,6 @@
 {
   "name": "@yutra/scenario-orchestrator-runtime-contract",
-  "version": "0.3.0-vnext-preview.1",
+  "version": "0.4.0-vnext-preview.1",
   "private": false,
   "description": "Yutra Scenario Orchestrator to Slot Runtime Adapter safety contract",
   "type": "module",

@@ -1,6 +1,6 @@
 {
   "name": "@yutra/scenario-run-evidence-core",
-  "version": "0.3.0-vnext-preview.1",
+  "version": "0.4.0-vnext-preview.1",
   "private": false,
   "description": "Browser-safe Scenario Run evidence bundle and offline replay contract",
   "type": "module",

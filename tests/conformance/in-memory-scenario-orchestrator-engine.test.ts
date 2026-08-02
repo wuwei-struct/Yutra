@@ -16,7 +16,7 @@ describe("P6-11D.2 in-memory Scenario Orchestrator Engine conformance", () => {
     expect(existsSync(resolve(root, packagePath))).toBe(true);
     expect(JSON.parse(read(packagePath))).toMatchObject({
       name: "@yutra/scenario-orchestrator-engine-demo",
-      version: "0.3.0-vnext-preview.1"
+      version: "0.4.0-vnext-preview.1"
     });
     expect(typeof createInMemoryScenarioOrchestratorEngine).toBe("function");
   });

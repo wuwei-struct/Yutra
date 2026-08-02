@@ -4,6 +4,7 @@
 
 ### Added
 
+- v0.4 Preview fixed-version alignment and full RC smoke evidence covering Creator, Composition, Orchestrator, five manual Scenario runs, and five offline Evidence replays while keeping release publication fail-closed.
 - v0.4 Preview release readiness audit with a frozen Scenario scope, explicit public boundaries, required browser/CLI smoke matrices, and fail-closed version, smoke, and tag blockers.
 - `@yutra/scenario-run-evidence-core` with strict redacted Evidence Bundles, canonical integrity hashes, reference and terminal validation, offline replay, and a Studio Evidence Inspector that never re-executes Runtime.
 - Studio Manual Scenario Run Preview for five canonical, explicitly triggered in-memory demo cases, with safe Timeline, Slot, Outcome Projection, Route, Binding, Overlay, Terminal, Budget, and redacted Audit summaries.

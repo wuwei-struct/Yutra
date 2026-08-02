@@ -4,8 +4,9 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
 const workspaceRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
-const targetVersion = "0.3.0-vnext-preview.1";
+const targetVersion = "0.4.0-vnext-preview.1";
 const candidateTag = `v${targetVersion}`;
+const readinessPath = "docs/v0.4-preview-release-readiness.md";
 
 function read(path: string): string {
   return readFileSync(resolve(workspaceRoot, path), "utf8");
@@ -26,7 +27,7 @@ function packageJsonPaths(): string[] {
   return paths.sort();
 }
 
-describe("P6-10C.1 fixed release version alignment", () => {
+describe("P6-12B fixed v0.4 Preview version alignment", () => {
   it("aligns the root package and every workspace package", () => {
     const paths = packageJsonPaths();
     expect(paths).toHaveLength(27);
@@ -42,28 +43,31 @@ describe("P6-10C.1 fixed release version alignment", () => {
     const rootPackage = JSON.parse(read("package.json")) as { version: string };
     expect(`v${rootPackage.version}`).toBe(candidateTag);
 
-    const candidate = read("docs/vnext-preview-release-candidate.md");
-    expect(candidate.includes(`candidateTag: ${candidateTag}`)).toBe(true);
+    const candidate = read(readinessPath);
+    expect(candidate.includes(`Candidate tag: \`${candidateTag}\``)).toBe(true);
   });
 
-  it("marks the release candidate tag as ready without a blocker", () => {
-    const candidate = read("docs/vnext-preview-release-candidate.md");
-    expect(candidate.includes("releaseSmokeReady: true")).toBe(true);
-    expect(candidate.includes("releaseTagReady: true")).toBe(true);
-    expect(candidate.includes("releaseTagBlocker: none")).toBe(true);
+  it("keeps release publication fail-closed after version alignment", () => {
+    const candidate = read(readinessPath);
+    expect(candidate.includes("versionAligned: true")).toBe(true);
+    expect(candidate.includes("releaseTagReady: false")).toBe(true);
+    expect(
+      candidate.includes("releaseTagBlocker: release_notes_and_publication_prep")
+    ).toBe(true);
   });
 
-  it("records prerelease publication while npm remains unpublished", () => {
-    const candidate = read("docs/vnext-preview-release-candidate.md");
-    expect(candidate.includes("tagCreated: true")).toBe(true);
-    expect(candidate.includes("githubReleaseCreated: true")).toBe(true);
-    expect(candidate.includes("githubReleaseType: prerelease")).toBe(true);
+  it("does not claim tag, GitHub Release, or npm publication", () => {
+    const candidate = read(readinessPath);
+    expect(candidate.includes("tagCreated: false")).toBe(true);
+    expect(candidate.includes("githubReleaseCreated: false")).toBe(true);
     expect(candidate.includes("npmPublished: false")).toBe(true);
   });
 
-  it("keeps the release smoke evidence linked and present", () => {
-    const candidate = read("docs/vnext-preview-release-candidate.md");
-    expect(candidate.includes("./vnext-preview-release-smoke.md")).toBe(true);
-    expect(existsSync(resolve(workspaceRoot, "docs/vnext-preview-release-smoke.md"))).toBe(true);
+  it("preserves the published v0.3 release record", () => {
+    const publication = read("docs/vnext-preview-release-candidate.md");
+    expect(publication).toContain("releasedTag: v0.3.0-vnext-preview.1");
+    expect(publication).toContain(
+      "releaseCommit: 90c006e3caddeb2395c0badb2d2dfb9c18b91451"
+    );
   });
 });

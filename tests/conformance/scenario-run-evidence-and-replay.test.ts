@@ -22,7 +22,7 @@ describe("P6-11D.4 Scenario Run Evidence and Replay conformance", () => {
     };
     expect(packageJson).toMatchObject({
       name: "@yutra/scenario-run-evidence-core",
-      version: "0.3.0-vnext-preview.1"
+      version: "0.4.0-vnext-preview.1"
     });
     expect(packageJson.dependencies).not.toHaveProperty("@yutra/runtime");
     expect(typeof createScenarioRunEvidenceBundle).toBe("function");

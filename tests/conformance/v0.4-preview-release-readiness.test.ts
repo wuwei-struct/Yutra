@@ -37,23 +37,29 @@ describe("P6-12A v0.4 Preview release readiness conformance", () => {
     }
   });
 
-  it("keeps unexecuted release stages closed", () => {
+  it("records completed RC smoke while keeping publication stages closed", () => {
     const readiness = read(readinessPath);
-    expect(readiness).toContain("browserSmokeReady: false");
-    expect(readiness).toContain("versionAligned: false");
+    expect(readiness).toContain("browserSmokeReady: true");
+    expect(readiness).toContain("cliSmokeReady: true");
+    expect(readiness).toContain("evidenceReplayReady: true");
+    expect(readiness).toContain("releaseSmokeReady: true");
+    expect(readiness).toContain("versionAligned: true");
     expect(readiness).toContain("releaseTagReady: false");
+    expect(readiness).toContain(
+      "releaseTagBlocker: release_notes_and_publication_prep"
+    );
     expect(readiness).toContain("tagCreated: false");
     expect(readiness).toContain("githubReleaseCreated: false");
     expect(readiness).toContain("npmPublished: false");
   });
 
-  it("defines the required browser and CLI smoke matrices", () => {
+  it("records the completed browser and CLI smoke matrices", () => {
     const readiness = read(readinessPath);
-    expect(readiness).toContain("Required Browser Smoke Matrix");
-    expect(readiness).toContain("Required CLI Smoke Matrix");
-    expect(readiness).toContain("complaint compensation completed");
-    expect(readiness).toContain("overlay deny fail-closed");
-    expect(readiness).toContain("Replay adds zero Scenario Run API requests");
+    expect(readiness).toContain("Browser Smoke Matrix");
+    expect(readiness).toContain("CLI Smoke Matrix");
+    expect(readiness).toContain("complaint policy and compensation completed");
+    expect(readiness).toContain("overlay deny reached `$fail_closed`");
+    expect(readiness).toContain("Replay added zero Scenario Run API requests");
     expect(readiness).toContain("runtimeExecuted=false");
   });
 
