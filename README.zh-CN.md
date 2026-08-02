@@ -172,6 +172,7 @@ LLM 可以生成配置草案，但不能绕过 Compiler、Runtime、Trace、Audi
 ## vNext Preview 发布说明
 
 - [v0.3.0-vnext-preview.1 发布说明](docs/releases/v0.3.0-vnext-preview.1.md)
+- [v0.4.0-vnext-preview.1 发布说明](docs/releases/v0.4.0-vnext-preview.1.md)
 - [vNext Preview 发布说明](docs/release-notes-vnext-preview.md)
 - [vNext Preview Release Candidate](docs/vnext-preview-release-candidate.md)
 - [v0.4 Preview Release Readiness](docs/v0.4-preview-release-readiness.md)

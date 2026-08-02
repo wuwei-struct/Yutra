@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+No changes recorded after the v0.4 Preview candidate scope freeze.
+
+## [0.4.0-vnext-preview.1] - Pending publication
+
 ### Added
 
 - v0.4 Preview fixed-version alignment and full RC smoke evidence covering Creator, Composition, Orchestrator, five manual Scenario runs, and five offline Evidence replays while keeping release publication fail-closed.

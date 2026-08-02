@@ -37,17 +37,17 @@ describe("P6-12A v0.4 Preview release readiness conformance", () => {
     }
   });
 
-  it("records completed RC smoke while keeping publication stages closed", () => {
+  it("records completed preparation without claiming publication", () => {
     const readiness = read(readinessPath);
     expect(readiness).toContain("browserSmokeReady: true");
     expect(readiness).toContain("cliSmokeReady: true");
     expect(readiness).toContain("evidenceReplayReady: true");
     expect(readiness).toContain("releaseSmokeReady: true");
     expect(readiness).toContain("versionAligned: true");
-    expect(readiness).toContain("releaseTagReady: false");
-    expect(readiness).toContain(
-      "releaseTagBlocker: release_notes_and_publication_prep"
-    );
+    expect(readiness).toContain("releaseNotesReady: true");
+    expect(readiness).toContain("publicationPreflightReady: true");
+    expect(readiness).toContain("releaseTagReady: true");
+    expect(readiness).toContain("releaseTagBlocker: none");
     expect(readiness).toContain("tagCreated: false");
     expect(readiness).toContain("githubReleaseCreated: false");
     expect(readiness).toContain("npmPublished: false");

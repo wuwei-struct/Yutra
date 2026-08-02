@@ -47,13 +47,13 @@ describe("P6-12B fixed v0.4 Preview version alignment", () => {
     expect(candidate.includes(`Candidate tag: \`${candidateTag}\``)).toBe(true);
   });
 
-  it("keeps release publication fail-closed after version alignment", () => {
+  it("opens release tagging only after publication preparation", () => {
     const candidate = read(readinessPath);
     expect(candidate.includes("versionAligned: true")).toBe(true);
-    expect(candidate.includes("releaseTagReady: false")).toBe(true);
-    expect(
-      candidate.includes("releaseTagBlocker: release_notes_and_publication_prep")
-    ).toBe(true);
+    expect(candidate.includes("releaseNotesReady: true")).toBe(true);
+    expect(candidate.includes("publicationPreflightReady: true")).toBe(true);
+    expect(candidate.includes("releaseTagReady: true")).toBe(true);
+    expect(candidate.includes("releaseTagBlocker: none")).toBe(true);
   });
 
   it("does not claim tag, GitHub Release, or npm publication", () => {
