@@ -16,13 +16,14 @@ describe("P6-09B knowledge-answering Studio integration", () => {
     expect(doc).toContain("does not inspect, apply, or run automatically");
   });
 
-  it("Creator Workbench docs mention four enabled archetypes", () => {
+  it("Creator Workbench docs retain knowledge-answering among five enabled archetypes", () => {
     const doc = read("docs/creator-workbench.md");
-    expect(doc).toContain("supports four archetypes");
+    expect(doc).toContain("supports five archetypes");
     expect(doc).toContain("enabled: `request-resolution`");
     expect(doc).toContain("enabled: `approval-decision`");
     expect(doc).toContain("enabled: `knowledge-answering`");
     expect(doc).toContain("enabled: `intake-collector`");
+    expect(doc).toContain("enabled: `diagnostic-resolution`");
   });
 
   it("README states Creator Workbench supports knowledge-answering without real providers", () => {

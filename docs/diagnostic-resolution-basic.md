@@ -28,7 +28,9 @@ The current implementation includes:
 - six canonical compiler artifacts
 - a generic demo/mock Pack Config example
 
-Studio is not enabled for `diagnostic-resolution`, and it is not connected to Runtime. This iteration compiles and inspects artifacts only.
+Creator Workbench is enabled for `diagnostic-resolution`, while Runtime remains disconnected. Studio edits only the existing generic demo fields, compiles artifacts in memory, and requires an explicit manual action to send `agent.yutra.yaml` to the DSL Editor.
+
+The dedicated editor exposes the Core allowlist for `requiredSignals`; it does not accept arbitrary device, shell, API, endpoint, or credential input. Rule Impact, compile warnings, the six artifacts, and Certification Readiness use the existing Core and shared Compile Preview path. Sending DSL does not automatically Inspect, Apply, or Run.
 
 ## Pack Config
 
@@ -93,6 +95,6 @@ This implementation is generic demo/mock only:
 - no shell execution
 - no real endpoint, external API, credential, LLM, RAG, or knowledge base
 - no Runtime execution
-- no Studio UI integration
+- no automatic Inspect, Apply, Run, or Runtime integration
 
 It does not represent production diagnostic or repair capability.

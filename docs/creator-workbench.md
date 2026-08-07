@@ -185,17 +185,18 @@ P6-05B adds a manual bridge from the compiled `agent.yutra.yaml` artifact to the
 
 ## Current MVP: Compile Preview
 
-The current Creator Workbench MVP supports four archetypes:
+The current Creator Workbench MVP supports five archetypes:
 
 - enabled: `request-resolution`
 - enabled: `approval-decision`
 - enabled: `knowledge-answering`
 - enabled: `intake-collector`
+- enabled: `diagnostic-resolution`
 - disabled / coming later: all other main and cross-cutting archetypes
 
-The archetype selector is taxonomy-aware. It shows why `request-resolution` is appropriate for business action results, why `approval-decision` is appropriate for authorization decisions, why `knowledge-answering` is appropriate for governed source-constrained answers, and why `intake-collector` is appropriate for structured intake records. It does not claim that all 14 archetypes are compile-enabled.
+The archetype selector is taxonomy-aware. It shows why `request-resolution` is appropriate for business action results, why `approval-decision` is appropriate for authorization decisions, why `knowledge-answering` is appropriate for governed source-constrained answers, why `intake-collector` is appropriate for structured intake records, and why `diagnostic-resolution` is appropriate for diagnostic dispositions. It does not claim that all 14 archetypes are compile-enabled.
 
-The request-resolution, approval-decision, knowledge-answering, and intake-collector forms edit public demo/mock Pack Configs:
+The request-resolution, approval-decision, knowledge-answering, intake-collector, and diagnostic-resolution forms edit public demo/mock Pack Configs:
 
 - capabilities
 - refund policy basics
@@ -205,13 +206,14 @@ The request-resolution, approval-decision, knowledge-answering, and intake-colle
 - knowledge policy basics
 - source policy basics
 - intake, validation, clarification-budget, duplicate, and confirmation policy basics
+- diagnostic signal, diagnostic/remediation budget, evidence, verification, and fail-closed policy basics
 - response style basics
 
 Each editable field shows source provenance, affected artifact chips, and an Impact control that opens the Rule Impact Explanation panel.
 
 The UI now separates business rules, rule explanation, compile output, and readiness evidence into distinct sections so the workbench reads as an Agent Creation Workbench rather than a stacked feature panel.
 
-Adapters remain fixed to `mock`. The UI does not expose secret fields, real endpoints, customer adapter mappings, customer SOP fields, real LLM providers, real RAG providers, real knowledge base paths, source URLs, or document IDs.
+Adapters remain fixed to `mock`. The UI does not expose secret fields, real endpoints, customer adapter mappings, customer SOP fields, real LLM providers, real RAG providers, real knowledge base paths, source URLs, device access, shell commands, or document IDs.
 
 Compile Preview calls the local builder-runner endpoint:
 
@@ -242,7 +244,7 @@ Important boundaries:
 
 ## Rule Impact Explanation
 
-The Creator Workbench includes a Rule Impact panel for public `request-resolution`, `approval-decision`, `knowledge-answering`, and `intake-collector` demo configs.
+The Creator Workbench includes a Rule Impact panel for public `request-resolution`, `approval-decision`, `knowledge-answering`, `intake-collector`, and `diagnostic-resolution` demo configs.
 
 The panel explains:
 

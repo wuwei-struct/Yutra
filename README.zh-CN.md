@@ -52,7 +52,7 @@ Yutra 关注这些问题：
 - Creator Workbench Compile Preview。
 - Creator Workbench UI 信息架构整理。
 - Creator Workbench taxonomy-aware 母型选择体验。
-- Creator Workbench 当前支持四个 demo-enabled 产物型主母型：`request-resolution`、`approval-decision`、`knowledge-answering` 与 `intake-collector`。
+- Creator Workbench 当前支持五个 demo-enabled 产物型主母型：`request-resolution`、`approval-decision`、`knowledge-answering`、`intake-collector` 与 `diagnostic-resolution`。
 - `@yutra/archetype-core` 中的 Archetype Taxonomy metadata。
 - Rule Impact Explanation。
 - Certification Readiness Preview。
@@ -61,7 +61,7 @@ Yutra 关注这些问题：
 - approval-decision 第二母型支持（Pack Config + Rule Compiler + CLI + Creator Workbench demo UI）。
 - knowledge-answering 第三母型支持（Pack Config + Rule Impact + Rule Compiler + CLI + Creator Workbench demo UI）。
 - intake-collector 第四母型支持（Pack Config + Rule Impact + Rule Compiler + CLI + Creator Workbench；尚未接入 Runtime）。
-- diagnostic-resolution 第五母型 Core 支持（Pack Config + Rule Impact + Rule Compiler + CLI；尚未接入 Studio 与 Runtime）。
+- diagnostic-resolution 第五母型支持（Pack Config + Rule Impact + Rule Compiler + CLI + Creator Workbench；尚未接入 Runtime）。
 
 ## 开源边界
 

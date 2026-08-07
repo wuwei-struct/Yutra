@@ -21,8 +21,8 @@ Builder Core
 - AI Draft Assistant with mock provider by default.
 - Manual Apply to Editor.
 - DSL editor with Validate DSL, Inspect DSL, Apply DSL as Run Source, Reset from Builder, and Copy DSL.
-- Creator Workbench Compile Preview for public `request-resolution`, `approval-decision`, `knowledge-answering`, and `intake-collector` demo Pack Configs.
-- Rule Impact Explanation for public `request-resolution`, `approval-decision`, `knowledge-answering`, and `intake-collector` demo fields.
+- Creator Workbench Compile Preview for public `request-resolution`, `approval-decision`, `knowledge-answering`, `intake-collector`, and `diagnostic-resolution` demo Pack Configs.
+- Rule Impact Explanation for public `request-resolution`, `approval-decision`, `knowledge-answering`, `intake-collector`, and `diagnostic-resolution` demo fields.
 - Certification Readiness Preview for demo/mock compile output.
 - Manual Run Preview Evidence for showing user-triggered run evidence in the readiness panel.
 - Manual bridge from compiled `agent.yutra.yaml` to the DSL Editor.
@@ -37,6 +37,8 @@ Builder Core
 The `intake-collector` editor exposes only generic demo field identifiers and existing intake/validation policies. It displays six canonical artifacts, compile warnings, and Certification Readiness through the shared in-memory Compile Preview path. Sending its `agent.yutra.yaml` to the DSL Editor remains manual and does not automatically Inspect, Apply, or Run.
 
 No real personal information, customer form, database, CRM/ERP, endpoint, credential, or automatic Runtime execution is enabled for intake collection.
+
+The `diagnostic-resolution` editor exposes only Core-defined generic demo signals and existing diagnostic/remediation policies. Diagnostics and remediation remain mock-only: Studio does not access real devices, execute shell commands, call external systems or LLMs, or automatically Inspect, Apply, or Run the compiled DSL.
 
 The language switch only affects Studio UI labels. DSL text, Trace event type strings, payload raw fields, file paths, code blocks, and canonical IR are not translated or rewritten.
 
@@ -99,7 +101,7 @@ The DSL Editor remains valuable as an advanced inspection and override surface, 
 P6-05A is the first step in that direction:
 
 ```text
-request-resolution, approval-decision, knowledge-answering, or intake-collector Pack Config
+request-resolution, approval-decision, knowledge-answering, intake-collector, or diagnostic-resolution Pack Config
 -> /creator/compile-preview
 -> six demo/mock compiler artifacts
 -> compile report
@@ -127,7 +129,7 @@ Pack Config field
 -> affected compiler artifacts
 ```
 
-This explanation layer helps users understand generated behavior for request-resolution, approval-decision, knowledge-answering, and intake-collector demo configs. It does not run Runtime, does not auto-apply DSL, and does not include customer SOP, real approval procedures, real personal information, real LLM calls, or real RAG / knowledge provider integration.
+This explanation layer helps users understand generated behavior for request-resolution, approval-decision, knowledge-answering, intake-collector, and diagnostic-resolution demo configs. It does not run Runtime, does not auto-apply DSL, and does not include customer SOP, real approval procedures, real personal information, real device access, shell commands, real LLM calls, or real RAG / knowledge provider integration.
 
 P6-06B adds Certification Readiness Preview:
 

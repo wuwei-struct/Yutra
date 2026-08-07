@@ -1,5 +1,6 @@
 import type { PackConfig } from "@yutra/pack-config-core";
 import { ApprovalDecisionConfigEditor } from "./ApprovalDecisionConfigEditor";
+import { DiagnosticResolutionConfigEditor } from "./DiagnosticResolutionConfigEditor";
 import { IntakeCollectorConfigEditor } from "./IntakeCollectorConfigEditor";
 import { KnowledgeAnsweringConfigEditor } from "./KnowledgeAnsweringConfigEditor";
 import { RequestResolutionConfigEditor } from "./RequestResolutionConfigEditor";
@@ -17,6 +18,9 @@ export function CreatorConfigSection(props: {
   }
   if (props.config.archetypeId === "intake-collector") {
     return <IntakeCollectorConfigEditor config={props.config} onChange={props.onChange} onSelectImpact={props.onSelectImpact} />;
+  }
+  if (props.config.archetypeId === "diagnostic-resolution") {
+    return <DiagnosticResolutionConfigEditor config={props.config} onChange={props.onChange} onSelectImpact={props.onSelectImpact} />;
   }
   if (props.config.archetypeId === "request-resolution") {
     return <RequestResolutionConfigEditor config={props.config} onChange={props.onChange} onSelectImpact={props.onSelectImpact} />;

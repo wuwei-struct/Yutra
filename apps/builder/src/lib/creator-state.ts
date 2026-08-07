@@ -2,13 +2,19 @@ import type { ConfigField, PackConfig } from "@yutra/pack-config-core";
 import type { RuleCompilerArtifacts } from "@yutra/rule-compiler";
 import {
   APPROVAL_DECISION_BASIC_CONFIG,
+  DIAGNOSTIC_RESOLUTION_BASIC_CONFIG,
   INTAKE_COLLECTOR_BASIC_CONFIG,
   KNOWLEDGE_ANSWERING_BASIC_CONFIG,
   REQUEST_RESOLUTION_ECOMMERCE_BASIC_CONFIG
 } from "../../../../packages/pack-config-core/src/sample-configs";
 
 export type CreatorArtifactTab = keyof RuleCompilerArtifacts;
-export type SupportedCreatorArchetype = "request-resolution" | "approval-decision" | "knowledge-answering" | "intake-collector";
+export type SupportedCreatorArchetype =
+  | "request-resolution"
+  | "approval-decision"
+  | "knowledge-answering"
+  | "intake-collector"
+  | "diagnostic-resolution";
 
 export const creatorArtifactTabs: Array<{ key: CreatorArtifactTab; label: string; note?: string }> = [
   { key: "agent", label: "agent.yutra.yaml", note: "not executed" },
@@ -24,7 +30,7 @@ export const creatorArchetypes: Array<{ id: string; label: string; enabled: bool
   { id: "approval-decision", label: "approval-decision / 审批裁决型", enabled: true },
   { id: "intake-collector", label: "intake-collector / 信息采集型", enabled: true },
   { id: "knowledge-answering", label: "knowledge-answering / 知识问答型", enabled: true },
-  { id: "diagnostic-resolution", label: "diagnostic-resolution / 诊断排障型", enabled: false },
+  { id: "diagnostic-resolution", label: "diagnostic-resolution / 诊断排障型", enabled: true },
   { id: "process-orchestration", label: "process-orchestration / 流程编排型", enabled: false },
   { id: "content-production", label: "content-production / 内容生成型", enabled: false },
   { id: "data-insight", label: "data-insight / 数据洞察型", enabled: false },
@@ -50,6 +56,9 @@ export function getDefaultPackConfigForArchetype(archetypeId: SupportedCreatorAr
   if (archetypeId === "intake-collector") {
     return cloneConfig(INTAKE_COLLECTOR_BASIC_CONFIG);
   }
+  if (archetypeId === "diagnostic-resolution") {
+    return cloneConfig(DIAGNOSTIC_RESOLUTION_BASIC_CONFIG);
+  }
   return cloneConfig(REQUEST_RESOLUTION_ECOMMERCE_BASIC_CONFIG);
 }
 
@@ -62,6 +71,9 @@ export function getDefaultImpactPathForArchetype(archetypeId: SupportedCreatorAr
   }
   if (archetypeId === "intake-collector") {
     return "rules.intakePolicy.requiredFields";
+  }
+  if (archetypeId === "diagnostic-resolution") {
+    return "rules.diagnosticPolicy.requiredSignals";
   }
   return "rules.refundPolicy.autoRefundMaxAmount";
 }
@@ -80,6 +92,10 @@ export function createKnowledgeAnsweringDemoConfig(): PackConfig {
 
 export function createIntakeCollectorDemoConfig(): PackConfig {
   return getDefaultPackConfigForArchetype("intake-collector");
+}
+
+export function createDiagnosticResolutionDemoConfig(): PackConfig {
+  return getDefaultPackConfigForArchetype("diagnostic-resolution");
 }
 
 export function updateConfigField<T>(field: ConfigField<T> | undefined, value: T): ConfigField<T> {

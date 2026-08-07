@@ -525,7 +525,8 @@ button:disabled {
 }
 
 .knowledge-answering-editor h4,
-.intake-collector-editor h4 {
+.intake-collector-editor h4,
+.diagnostic-resolution-editor h4 {
   margin-top: 16px;
   border-left: 3px solid #3d7c59;
   padding-left: 8px;
@@ -543,6 +544,15 @@ button:disabled {
 .intake-collector-editor .creator-adapter-summary {
   border-color: #ddb78f;
   background: #fff8f0;
+}
+
+.diagnostic-resolution-editor h4 {
+  border-left-color: #356d8b;
+}
+
+.diagnostic-resolution-editor .creator-adapter-summary {
+  border-color: #9bbfd1;
+  background: #f1f8fb;
 }
 
 .generic-field-options {

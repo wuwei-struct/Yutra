@@ -14,9 +14,10 @@ describe("P6-13B intake-collector Studio integration conformance", () => {
     );
   });
 
-  it("declares exactly four enabled Creator Product Archetypes", () => {
+  it("retains intake-collector among the five enabled Creator Product Archetypes", () => {
     const state = read("apps/builder/src/lib/creator-state.ts");
-    expect(state).toContain('"request-resolution" | "approval-decision" | "knowledge-answering" | "intake-collector"');
+    expect(state).toContain('| "intake-collector"');
+    expect(state).toContain('| "diagnostic-resolution"');
     expect(state).toContain('{ id: "intake-collector", label: "intake-collector / 信息采集型", enabled: true }');
   });
 

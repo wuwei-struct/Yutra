@@ -1278,16 +1278,17 @@ describe("@yutra/builder Studio UI", () => {
     expect(workflow.textContent).toContain("Run preview manually");
   });
 
-  it("four Product Archetypes are enabled and other archetypes are disabled", () => {
+  it("five Product Archetypes are enabled and other archetypes are disabled", () => {
     renderStudio();
     expect((screen.getByRole("button", { name: /request-resolution/ }) as HTMLButtonElement).disabled).toBe(false);
     expect((screen.getByRole("button", { name: /approval-decision/ }) as HTMLButtonElement).disabled).toBe(false);
     expect((screen.getByRole("button", { name: /knowledge-answering/ }) as HTMLButtonElement).disabled).toBe(false);
     expect((screen.getByRole("button", { name: /intake-collector/ }) as HTMLButtonElement).disabled).toBe(false);
+    expect((screen.getByRole("button", { name: /diagnostic-resolution/ }) as HTMLButtonElement).disabled).toBe(false);
     const enabledArchetypeButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('.creator-archetype-card button[aria-pressed="false"], .creator-archetype-card button[aria-pressed="true"]')).filter(
       (button) => !button.disabled
     );
-    expect(enabledArchetypeButtons).toHaveLength(4);
+    expect(enabledArchetypeButtons).toHaveLength(5);
     expect(screen.getByLabelText("Archetype Selector").textContent).toContain("selected");
     expect(screen.getAllByText("Coming soon").length).toBeGreaterThan(0);
   });
@@ -1361,6 +1362,22 @@ describe("@yutra/builder Studio UI", () => {
     expect(screen.getByLabelText("Maximum Clarification Rounds")).toBeTruthy();
     expect(screen.getByLabelText("PackConfig Preview").textContent).toContain('"archetypeId": "intake-collector"');
     expect(screen.getByLabelText("Intake Adapter Boundary").textContent).toContain("no personal data");
+  });
+
+  it("diagnostic-resolution config editor exposes only generic Core signals and mock policies", () => {
+    renderStudio();
+    fireEvent.click(screen.getByRole("button", { name: /diagnostic-resolution/ }));
+    expect(screen.getByLabelText("Diagnostic Resolution Config Editor")).toBeTruthy();
+    expect(screen.getByText("Diagnostic Policy")).toBeTruthy();
+    expect(screen.getByText("Validation Policy")).toBeTruthy();
+    const requiredSignals = screen.getByLabelText("Required Signals");
+    expect(requiredSignals.textContent).toContain("symptom_summary");
+    expect(requiredSignals.textContent).toContain("environment_hint");
+    expect(requiredSignals.textContent).toContain("observed_behavior");
+    expect(requiredSignals.querySelector('input[type="text"]')).toBeNull();
+    expect(requiredSignals.textContent).not.toContain("unknown_signal");
+    expect(screen.getByLabelText("Diagnostic Adapter Boundary").textContent).toContain("no real device");
+    expect(screen.getByLabelText("PackConfig Preview").textContent).toContain('"archetypeId": "diagnostic-resolution"');
   });
 
   it("Creator Workbench renders rule impact controls", () => {
@@ -1449,6 +1466,38 @@ describe("@yutra/builder Studio UI", () => {
     const preview = screen.getByLabelText("PackConfig Preview").textContent ?? "";
     expect(preview).toContain('"value": 4');
     expect(preview).toContain('"source": "confirmedByUser"');
+  });
+
+  it("editing diagnostic and remediation budgets records confirmedByUser provenance", () => {
+    renderStudio();
+    fireEvent.click(screen.getByRole("button", { name: /diagnostic-resolution/ }));
+    fireEvent.change(screen.getByLabelText("Maximum Diagnostic Rounds"), { target: { value: "5" } });
+    fireEvent.change(screen.getByLabelText("Maximum Remediation Attempts"), { target: { value: "2" } });
+    const preview = screen.getByLabelText("PackConfig Preview").textContent ?? "";
+    expect(preview).toContain('"value": 5');
+    expect(preview).toContain('"value": 2');
+    expect(preview).toContain('"source": "confirmedByUser"');
+  });
+
+  it("diagnostic Rule Impact uses Core metadata for signals, budgets, fallback, evidence, and verification", () => {
+    renderStudio();
+    fireEvent.click(screen.getByRole("button", { name: /diagnostic-resolution/ }));
+
+    const assertImpact = (label: string, expected: string) => {
+      const field = screen.getByText(label).closest(".creator-field-row") ?? screen.getByLabelText(label).closest(".creator-field-row");
+      expect(field?.querySelector("button")).toBeTruthy();
+      fireEvent.click(field!.querySelector("button")!);
+      expect(screen.getByLabelText("Rule Impact Panel").textContent).toContain(expected);
+    };
+
+    assertImpact("Required Signals", "missing_signals");
+    assertImpact("Maximum Diagnostic Rounds", "diagnostic_budget_exhausted");
+    assertImpact("Inconclusive Strategy", "request_more_signals / handoff / stopped");
+    assertImpact("Check Failure Strategy", "diagnostic_check_failed");
+    assertImpact("Remediation Strategy", "perform_mock_safe_remediation");
+    assertImpact("Maximum Remediation Attempts", "remediation_attempts_exhausted");
+    assertImpact("Require Evidence Before Diagnosis", "evidence_available");
+    assertImpact("Require Verification Before Complete", "resolution_verified");
   });
 
   it("intake Rule Impact uses Core metadata for missing, validation, duplicate, budget, confirmation, and fallback paths", () => {
@@ -1540,6 +1589,51 @@ describe("@yutra/builder Studio UI", () => {
     expect(screen.getByLabelText("Compiled Artifact Content").textContent).toContain("intake-collector-basic");
     expect(screen.getByLabelText("Compile Issues").textContent).toContain("RULE_COMPILER_DSL_INVALID");
     expect(screen.getByLabelText("Certification Readiness Panel")).toBeTruthy();
+  });
+
+  it("diagnostic-resolution Compile Preview renders six artifacts, warning, and readiness without blocking", async () => {
+    mockCompilePreviewSuccess({
+      agentName: "diagnostic-resolution-basic",
+      archetypeId: "diagnostic-resolution",
+      packConfigId: "diagnostic-resolution:basic-demo",
+      withWarning: true
+    });
+    renderStudio();
+    fireEvent.click(screen.getByRole("button", { name: /diagnostic-resolution/ }));
+    fireEvent.click(screen.getByRole("button", { name: "Compile Preview" }));
+
+    await waitFor(() =>
+      expect(compileCreatorPreview).toHaveBeenCalledWith(
+        expect.objectContaining({ config: expect.objectContaining({ archetypeId: "diagnostic-resolution" }) })
+      )
+    );
+    await waitFor(() => expect(screen.getByLabelText("Artifact Preview")).toBeTruthy());
+    expect(screen.getByLabelText("Artifact Preview").querySelectorAll(".tabs button")).toHaveLength(6);
+    expect(screen.getByLabelText("Compiled Artifact Content").textContent).toContain("diagnostic-resolution-basic");
+    expect(screen.getByLabelText("Compile Issues").textContent).toContain("RULE_COMPILER_DSL_INVALID");
+    expect(screen.getByLabelText("Certification Readiness Panel")).toBeTruthy();
+  });
+
+  it("diagnostic agent can be sent to DSL Editor manually without Inspect, Apply, or Run", async () => {
+    mockCompilePreviewSuccess({
+      agentName: "diagnostic-resolution-basic",
+      archetypeId: "diagnostic-resolution",
+      packConfigId: "diagnostic-resolution:basic-demo"
+    });
+    renderStudio();
+    fireEvent.click(screen.getByRole("button", { name: /diagnostic-resolution/ }));
+    fireEvent.click(screen.getByRole("button", { name: "Compile Preview" }));
+    await waitFor(() => expect(screen.getByRole("button", { name: "Send agent.yutra.yaml to DSL Editor" })).toBeTruthy());
+
+    fireEvent.click(screen.getByRole("button", { name: "Send agent.yutra.yaml to DSL Editor" }));
+    expect((screen.getByLabelText("DSL Editor Text") as HTMLTextAreaElement).value).toBe("agent: diagnostic-resolution-basic\n");
+    expect(screen.getByLabelText("Compiled DSL Metadata").textContent).toContain("Not inspected yet");
+    expect(inspectDsl).not.toHaveBeenCalled();
+    expect(runPreview).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getByRole("button", { name: /intake-collector/ }));
+    expect(screen.queryByLabelText("Compiled DSL Metadata")).toBeNull();
+    expect(screen.queryByLabelText("Artifact Preview")).toBeNull();
   });
 
   it("intake agent can be sent to DSL Editor manually and archetype switching clears bridge metadata", async () => {

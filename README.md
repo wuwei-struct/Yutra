@@ -44,7 +44,7 @@ Implemented today:
 - Creator Workbench Compile Preview
 - Creator Workbench UI flow polish
 - Taxonomy-aware Creator Workbench archetype selection
-- Creator Workbench currently supports four demo-enabled product archetypes: `request-resolution`, `approval-decision`, `knowledge-answering`, and `intake-collector`.
+- Creator Workbench currently supports five demo-enabled product archetypes: `request-resolution`, `approval-decision`, `knowledge-answering`, `intake-collector`, and `diagnostic-resolution`.
 - Archetype Taxonomy metadata in `@yutra/archetype-core`
 - Rule Impact Explanation
 - Certification Readiness Preview
@@ -53,7 +53,7 @@ Implemented today:
 - approval-decision second archetype support (Pack Config + Rule Compiler + CLI + Creator Workbench demo-enabled UI)
 - knowledge-answering third archetype support (Pack Config + Rule Impact + Rule Compiler + CLI + Creator Workbench demo-enabled UI)
 - intake-collector fourth archetype support (Pack Config + Rule Impact + Rule Compiler + CLI + Creator Workbench; Runtime not enabled)
-- diagnostic-resolution fifth archetype Core support (Pack Config + Rule Impact + Rule Compiler + CLI; Studio and Runtime not enabled)
+- diagnostic-resolution fifth archetype support (Pack Config + Rule Impact + Rule Compiler + CLI + Creator Workbench; Runtime not enabled)
 
 ## Why Yutra
 

@@ -4,6 +4,7 @@ import { agentSpecToChineseDsl, ecommerceSupportTemplate, formConfigToAgentSpec 
 import type { AgentSpec } from "@yutra/spec";
 import {
   APPROVAL_DECISION_BASIC_CONFIG,
+  DIAGNOSTIC_RESOLUTION_BASIC_CONFIG,
   INTAKE_COLLECTOR_BASIC_CONFIG,
   KNOWLEDGE_ANSWERING_BASIC_CONFIG,
   REQUEST_RESOLUTION_ECOMMERCE_BASIC_CONFIG,
@@ -639,6 +640,44 @@ describe("@yutra/builder-runner", () => {
     expect(body.artifacts?.testCases.filename).toBe("test-cases.json");
     expect(body.artifacts?.traceExpectation.filename).toBe("trace.expectation.json");
     expect(body.artifacts?.agent.content).toContain("intake-collector-basic");
+    expect(body.report?.packConfigHash).toMatch(/^sha256:/);
+    expect(body.report?.failClosedPolicy).toBe("enabled");
+    expect(body.issues?.every((issue) => issue.severity !== "error")).toBe(true);
+    expect(body.certificationReadiness?.overall).toBe("warning");
+    expect(body.certificationReadiness?.certificationBoundary?.runtimeExecuted).toBe(false);
+    expect(body.events).toBeUndefined();
+  });
+
+  it("POST /creator/compile-preview valid diagnostic-resolution config returns six artifacts and readiness", async () => {
+    const baseUrl = await startServer();
+    const res = await fetch(`${baseUrl}/creator/compile-preview`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        config: DIAGNOSTIC_RESOLUTION_BASIC_CONFIG,
+        mode: "preview",
+        locale: "en"
+      })
+    });
+    const body = (await res.json()) as {
+      ok: boolean;
+      artifacts?: Record<string, { filename: string; content?: string }>;
+      issues?: Array<{ severity: string }>;
+      report?: { packConfigHash?: string; failClosedPolicy?: string };
+      certificationReadiness?: { overall?: string; certificationBoundary?: { runtimeExecuted?: boolean } };
+      events?: unknown[];
+    };
+
+    expect(res.status).toBe(200);
+    expect(body.ok).toBe(true);
+    expect(Object.keys(body.artifacts ?? {})).toHaveLength(6);
+    expect(body.artifacts?.agent.filename).toBe("agent.yutra.yaml");
+    expect(body.artifacts?.policy.filename).toBe("policy.yaml");
+    expect(body.artifacts?.adapterConfig.filename).toBe("adapter.config.json");
+    expect(body.artifacts?.templates.filename).toBe("templates.json");
+    expect(body.artifacts?.testCases.filename).toBe("test-cases.json");
+    expect(body.artifacts?.traceExpectation.filename).toBe("trace.expectation.json");
+    expect(body.artifacts?.agent.content).toContain("diagnostic-resolution-basic");
     expect(body.report?.packConfigHash).toMatch(/^sha256:/);
     expect(body.report?.failClosedPolicy).toBe("enabled");
     expect(body.issues?.every((issue) => issue.severity !== "error")).toBe(true);

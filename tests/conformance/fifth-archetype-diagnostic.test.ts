@@ -24,10 +24,10 @@ describe("P6-14A diagnostic-resolution fifth archetype conformance", () => {
     expect(docs).toContain("six canonical compiler artifacts");
   });
 
-  it("keeps Studio and Runtime outside this iteration", () => {
+  it("records subsequent Studio support while keeping Runtime outside", () => {
     const docs = read("docs/diagnostic-resolution-basic.md");
-    expect(docs).toContain("Studio is not enabled");
-    expect(docs).toContain("not connected to Runtime");
+    expect(docs).toContain("Creator Workbench is enabled");
+    expect(docs).toContain("Runtime remains disconnected");
   });
 
   it("records diagnostic and remediation budgets plus explicit fail-closed paths", () => {

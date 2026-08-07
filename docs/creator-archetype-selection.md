@@ -12,16 +12,17 @@ This keeps users focused on Product Archetypes instead of low-level Behavior Pri
 
 ## Current compile-enabled archetypes
 
-Creator Workbench currently enables four demo/mock Product Archetypes:
+Creator Workbench currently enables five demo/mock Product Archetypes:
 
 - `request-resolution`
 - `approval-decision`
 - `knowledge-answering`
 - `intake-collector`
+- `diagnostic-resolution`
 
 Other Product Archetypes and all Cross-cutting Archetypes are visible as taxonomy metadata, but they are still `coming soon` for Creator Workbench compile preview.
 
-## Four compile-enabled Product Archetypes
+## Five compile-enabled Product Archetypes
 
 Use `request-resolution` when the primary output is a business action result.
 
@@ -58,6 +59,16 @@ Examples:
 - detect duplicate demo records
 - require confirmation before completion
 - hand off or stop safely after the clarification budget is exhausted
+
+Use `diagnostic-resolution` when the primary output is a diagnostic disposition.
+
+Examples:
+
+- collect allowlisted generic demo signals
+- enforce diagnostic and mock-remediation budgets
+- suggest or simulate a side-effect-free remediation
+- verify the disposition before completion
+- hand off or stop safely when evidence is insufficient
 
 If one real business case mixes multiple outputs, it is probably a Scenario Pattern rather than a new main archetype.
 
