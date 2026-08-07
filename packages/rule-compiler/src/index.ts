@@ -13,6 +13,7 @@ export { createCertificationReadinessPreview } from "./certification-readiness";
 export { compilePackConfig } from "./compile-pack-config";
 export { approvalDecisionCompiler } from "./approval-decision-compiler";
 export { knowledgeAnsweringCompiler } from "./knowledge-answering-compiler";
+export { intakeCollectorCompiler } from "./intake-collector-compiler";
 export { requestResolutionCompiler } from "./request-resolution-compiler";
 export { validateCompileInput } from "./fail-closed";
 export { validateCompileOutput } from "./validate-compile-output";

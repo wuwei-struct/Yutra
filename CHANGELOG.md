@@ -2,7 +2,9 @@
 
 ## Unreleased
 
-No changes recorded after the v0.4 Preview candidate scope freeze.
+### Added
+
+- `intake-collector` fourth Product Archetype Core chain with Pack Config validation, Rule Impact metadata, deterministic Rule Compiler, CLI compile/export, six canonical demo/mock artifacts, and a generic no-personal-data example; Studio and Runtime integration remain excluded.
 
 ## [0.4.0-vnext-preview.1] - 2026-08-07
 

@@ -11,6 +11,7 @@ const workspaceRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..
 const compileConfigPath = "examples/request-resolution-ecommerce-basic/pack.config.json";
 const approvalCompileConfigPath = "examples/approval-decision-basic/pack.config.json";
 const knowledgeCompileConfigPath = "examples/knowledge-answering-basic/pack.config.json";
+const intakeCompileConfigPath = "examples/intake-collector-basic/pack.config.json";
 const customerCompositionPlanPath = "examples/customer-complaint-composition/plan.json";
 const ecommerceCompositionPlanPath = "examples/ecommerce-refund-composition/plan.json";
 const compiledArtifactFiles = [
@@ -563,7 +564,7 @@ describe("@yutra/cli", () => {
   it("compile unsupported archetype returns non-zero", async () => {
     const dir = await mkdtemp(join(tmpdir(), "yutra-compile-unsupported-"));
     const config = JSON.parse(readFileSync(resolve(workspaceRoot, compileConfigPath), "utf8")) as Record<string, unknown>;
-    config.archetypeId = "intake-collector";
+    config.archetypeId = "content-production";
     const configPath = join(dir, "unsupported.json");
     await writeFile(configPath, JSON.stringify(config, null, 2), "utf8");
 
@@ -631,6 +632,36 @@ describe("@yutra/cli", () => {
     const inspected = inspectDsl(parseDsl(agentYaml, "yaml"), { format: "yaml" });
     expect(inspected.issues).toHaveLength(0);
     expect(inspected.canonical.agent).toBe("knowledge_answering_basic");
+    await rm(dir, { recursive: true, force: true });
+  });
+
+  it("compile intake-collector demo config --dry-run succeeds without writing", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "yutra-compile-intake-dry-"));
+    const outDir = join(dir, "out");
+    const { io, stdout, stderr } = createMemoryIO();
+    const code = await runCli(["compile", intakeCompileConfigPath, "--out", outDir, "--dry-run"], io);
+
+    expect(code, [...stdout, ...stderr].join("\n")).toBe(0);
+    expect(stdout.some((line) => line.includes("dryRun: true"))).toBe(true);
+    expect(stdout.some((line) => line.includes("agent.yutra.yaml"))).toBe(true);
+    expect(existsSync(outDir)).toBe(false);
+    await rm(dir, { recursive: true, force: true });
+  });
+
+  it("compile intake-collector demo config writes inspectable canonical artifacts", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "yutra-compile-intake-out-"));
+    const { io, stdout, stderr } = createMemoryIO();
+    const code = await runCli(["compile", intakeCompileConfigPath, "--out", dir], io);
+
+    expect(code, [...stdout, ...stderr].join("\n")).toBe(0);
+    for (const file of compiledArtifactFiles) {
+      expect(existsSync(join(dir, file))).toBe(true);
+    }
+    const inspected = inspectDsl(parseDsl(readFileSync(join(dir, "agent.yutra.yaml"), "utf8"), "yaml"), {
+      format: "yaml"
+    });
+    expect(inspected.issues).toHaveLength(0);
+    expect(inspected.canonical.agent).toBe("intake_collector_basic");
     await rm(dir, { recursive: true, force: true });
   });
 

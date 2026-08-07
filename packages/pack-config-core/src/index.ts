@@ -27,6 +27,10 @@ export {
   APPROVAL_DECISION_FIELD_IDS
 } from "./approval-decision-config";
 export {
+  INTAKE_COLLECTOR_FIELD_DEFINITIONS,
+  INTAKE_COLLECTOR_FIELD_IDS
+} from "./intake-collector-config";
+export {
   KNOWLEDGE_ANSWERING_FIELD_DEFINITIONS,
   KNOWLEDGE_ANSWERING_FIELD_IDS
 } from "./knowledge-answering-config";
@@ -42,6 +46,7 @@ export type {
 } from "./rule-impact";
 export {
   APPROVAL_DECISION_RULE_IMPACTS,
+  INTAKE_COLLECTOR_RULE_IMPACTS,
   KNOWLEDGE_ANSWERING_RULE_IMPACTS,
   REQUEST_RESOLUTION_RULE_IMPACTS,
   explainRuleImpact,
@@ -50,6 +55,7 @@ export {
 } from "./rule-impact";
 export {
   APPROVAL_DECISION_BASIC_CONFIG,
+  INTAKE_COLLECTOR_BASIC_CONFIG,
   KNOWLEDGE_ANSWERING_BASIC_CONFIG,
   REQUEST_RESOLUTION_ECOMMERCE_BASIC_CONFIG
 } from "./sample-configs";
@@ -57,9 +63,15 @@ export { createPackConfigFingerprint, stripFieldVolatileMetadata } from "./confi
 export {
   canPublishPackConfig,
   validateApprovalDecisionConfig,
+  validateIntakeCollectorConfig,
   validateKnowledgeAnsweringConfig,
   validatePackConfig,
   validateRequestResolutionConfig
 } from "./validate-pack-config";
 export { explainPackConfig } from "./explain-pack-config";
-export { APPROVAL_DECISION_BASIC_CONFIG_ID, REQUEST_RESOLUTION_ECOMMERCE_BASIC_CONFIG_ID, isSafePublicConfigId } from "./ids";
+export {
+  APPROVAL_DECISION_BASIC_CONFIG_ID,
+  INTAKE_COLLECTOR_BASIC_CONFIG_ID,
+  REQUEST_RESOLUTION_ECOMMERCE_BASIC_CONFIG_ID,
+  isSafePublicConfigId
+} from "./ids";

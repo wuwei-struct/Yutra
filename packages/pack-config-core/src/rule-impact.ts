@@ -568,7 +568,107 @@ export const KNOWLEDGE_ANSWERING_RULE_IMPACTS: RuleImpactDefinition[] = [
   })
 ];
 
+export const INTAKE_COLLECTOR_RULE_IMPACTS: RuleImpactDefinition[] = [
+  impact({
+    fieldPath: "rules.intakePolicy.requiredFields",
+    label: { en: "Required intake fields", zhCN: "采集必填字段" },
+    summary: {
+      en: "Defines the generic fields required before a demo intake record can complete.",
+      zhCN: "定义演示采集记录完成前必须具备的通用字段。"
+    },
+    affects: [
+      target("guard", "missing_fields", "Missing-fields guard", "缺失字段 Guard"),
+      target("transition", "detect_missing -> complete / request_clarification", "Completeness transition", "完整性转移"),
+      target("test_case", "missing fields", "Missing-field test cases", "缺失字段测试"),
+      target("trace_expectation", "field_completeness", "Field completeness evidence", "字段完整性证据")
+    ],
+    artifacts: ["agent.yutra.yaml", "policy.yaml", "test-cases.json", "trace.expectation.json"],
+    safetyNotes: failClosedNotes
+  }),
+  impact({
+    fieldPath: "rules.intakePolicy.maxClarificationRounds",
+    label: { en: "Maximum clarification rounds", zhCN: "最大补问轮次" },
+    summary: {
+      en: "Sets the clarification budget and the fallback boundary when information remains incomplete.",
+      zhCN: "设置补问预算，以及信息持续不完整时的兜底边界。"
+    },
+    affects: [
+      target("guard", "clarification_budget_exhausted", "Clarification budget guard", "补问预算 Guard"),
+      target("transition", "request_clarification -> handoff / stopped", "Budget fallback", "预算耗尽兜底"),
+      target("policy", "clarification budget", "Clarification budget", "补问预算"),
+      target("test_case", "clarification boundary", "Clarification boundary test", "补问边界测试")
+    ],
+    artifacts: ["agent.yutra.yaml", "policy.yaml", "test-cases.json", "trace.expectation.json"],
+    safetyNotes: failClosedNotes
+  }),
+  impact({
+    fieldPath: "rules.intakePolicy.incompleteStrategy",
+    label: { en: "Incomplete intake strategy", zhCN: "采集不完整策略" },
+    summary: {
+      en: "Selects explicit ask-missing-fields, handoff, or stop-with-reason handling.",
+      zhCN: "显式选择补问缺失字段、转人工或说明原因后停止。"
+    },
+    affects: [
+      target("transition", "detect_missing -> request_clarification", "Ask missing fields", "补问缺失字段"),
+      target("transition", "detect_missing -> handoff", "Incomplete handoff", "不完整转人工"),
+      target("transition", "detect_missing -> stopped", "Stop with reason", "说明原因后停止"),
+      target("template", "ask_missing_fields / stop_with_reason", "Incomplete intake responses", "采集不完整回复")
+    ],
+    artifacts: ["agent.yutra.yaml", "policy.yaml", "templates.json", "test-cases.json"],
+    safetyNotes: failClosedNotes
+  }),
+  impact({
+    fieldPath: "rules.intakePolicy.invalidFieldStrategy",
+    label: { en: "Invalid field strategy", zhCN: "非法字段策略" },
+    summary: {
+      en: "Routes failed field validation to an explicit correction or handoff path.",
+      zhCN: "将字段校验失败显式路由到修正或转人工路径。"
+    },
+    affects: [
+      target("guard", "field_validation_failed", "Field validation guard", "字段校验失败 Guard"),
+      target("transition", "validate_fields -> request_correction / handoff", "Invalid field transition", "非法字段转移"),
+      target("template", "ask_field_correction", "Field correction response", "字段修正回复"),
+      target("test_case", "invalid field", "Invalid-field test", "非法字段测试")
+    ],
+    artifacts: ["agent.yutra.yaml", "policy.yaml", "templates.json", "test-cases.json"],
+    safetyNotes: failClosedNotes
+  }),
+  impact({
+    fieldPath: "rules.intakePolicy.duplicateStrategy",
+    label: { en: "Duplicate strategy", zhCN: "重复记录策略" },
+    summary: {
+      en: "Routes duplicate detection to explicit confirmation, handoff, or rejection behavior.",
+      zhCN: "将重复检测显式路由到确认、转人工或拒绝路径。"
+    },
+    affects: [
+      target("guard", "duplicate_detected", "Duplicate guard", "重复记录 Guard"),
+      target("transition", "check_duplicate -> confirm_record / handoff / stopped", "Duplicate transition", "重复记录转移"),
+      target("template", "duplicate_confirmation", "Duplicate confirmation response", "重复确认回复"),
+      target("test_case", "duplicate path", "Duplicate strategy test", "重复策略测试")
+    ],
+    artifacts: ["agent.yutra.yaml", "policy.yaml", "templates.json", "test-cases.json", "trace.expectation.json"],
+    safetyNotes: failClosedNotes
+  }),
+  impact({
+    fieldPath: "rules.validationPolicy.requireConfirmationBeforeComplete",
+    label: { en: "Confirmation before completion", zhCN: "完成前确认" },
+    summary: {
+      en: "Controls the confirmation guard before the structured demo record can complete.",
+      zhCN: "控制结构化演示记录完成前的确认 Guard。"
+    },
+    affects: [
+      target("guard", "record_confirmed", "Record confirmation guard", "记录确认 Guard"),
+      target("transition", "confirm_record -> complete", "Confirmed completion", "确认后完成"),
+      target("test_case", "confirmation required", "Confirmation test", "确认测试"),
+      target("trace_expectation", "confirmation_guard", "Confirmation evidence", "确认 Guard 证据")
+    ],
+    artifacts: ["agent.yutra.yaml", "policy.yaml", "test-cases.json", "trace.expectation.json"],
+    safetyNotes: failClosedNotes
+  })
+];
+
 const ALL_RULE_IMPACTS = [
+  ...INTAKE_COLLECTOR_RULE_IMPACTS,
   ...KNOWLEDGE_ANSWERING_RULE_IMPACTS,
   ...REQUEST_RESOLUTION_RULE_IMPACTS,
   ...APPROVAL_DECISION_RULE_IMPACTS

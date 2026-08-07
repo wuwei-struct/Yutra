@@ -639,7 +639,7 @@ describe("@yutra/builder-runner", () => {
       body: JSON.stringify({
         config: {
           ...REQUEST_RESOLUTION_ECOMMERCE_BASIC_CONFIG,
-          archetypeId: "intake-collector"
+          archetypeId: "content-production"
         }
       })
     });

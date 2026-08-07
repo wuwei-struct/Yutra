@@ -45,7 +45,7 @@ Non-goal:
 
 Goal: define Pack Config as the customer-facing configuration model.
 
-Current status: `@yutra/pack-config-core` provides the Pack Config contract, field provenance, validation, publish gate, fingerprint, and demo-only `request-resolution`, `approval-decision`, and `knowledge-answering` samples.
+Current status: `@yutra/pack-config-core` provides the Pack Config contract, field provenance, validation, publish gate, fingerprint, and demo-only `request-resolution`, `approval-decision`, `knowledge-answering`, and `intake-collector` samples.
 
 Scope:
 
@@ -70,7 +70,7 @@ Field types:
 
 Goal: compile Pack Config into executable and certifiable assets.
 
-Current status: `@yutra/rule-compiler` provides public demo/mock compilers for `request-resolution`, `approval-decision`, and `knowledge-answering`. `yutra compile` can export those artifacts locally. Creator Workbench demo UI supports request-resolution, approval-decision, and knowledge-answering.
+Current status: `@yutra/rule-compiler` provides public demo/mock compilers for `request-resolution`, `approval-decision`, `knowledge-answering`, and `intake-collector`. `yutra compile` can export those artifacts locally. Creator Workbench demo UI supports the first three; intake-collector Studio integration remains a later task.
 
 Scope:
 
@@ -139,6 +139,7 @@ Current status:
 
 - `approval-decision` Pack Config, Rule Impact metadata, Rule Compiler, CLI demo, and Creator Workbench demo UI are supported.
 - `knowledge-answering` Pack Config, Rule Impact metadata, Rule Compiler, CLI demo, and Creator Workbench demo UI are supported.
+- `intake-collector` Pack Config, Rule Impact metadata, Rule Compiler, CLI demo, and six canonical artifacts are supported; Studio UI and Runtime are not connected.
 - Studio UI remains demo/mock only and does not model real approval systems.
 
 Expected proof:

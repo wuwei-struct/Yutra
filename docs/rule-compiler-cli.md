@@ -12,6 +12,7 @@ Yutra Studio also has a Creator Workbench Compile Preview. That preview shows th
 pnpm exec yutra compile examples/request-resolution-ecommerce-basic/pack.config.json --out .tmp/compiled-request-resolution
 pnpm exec yutra compile examples/approval-decision-basic/pack.config.json --out .tmp/compiled-approval-decision
 pnpm exec yutra compile examples/knowledge-answering-basic/pack.config.json --out .tmp/compiled-knowledge-answering
+pnpm exec yutra compile examples/intake-collector-basic/pack.config.json --out .tmp/intake-collector
 ```
 
 Options:
@@ -94,6 +95,7 @@ The public example configs are:
 examples/request-resolution-ecommerce-basic/pack.config.json
 examples/approval-decision-basic/pack.config.json
 examples/knowledge-answering-basic/pack.config.json
+examples/intake-collector-basic/pack.config.json
 ```
 
 It is demo/mock only:
@@ -106,10 +108,13 @@ It is demo/mock only:
 - no customer SOP
 - no real organization data or approval hierarchy
 - no real knowledge base content, real retrieval provider configuration, or real source endpoints
+- no real personal data, customer form, database, CRM/ERP connection, or production collection workflow
 
 `approval-decision` is supported by the compiler core, CLI, and Creator Workbench demo UI. The UI remains demo/mock only and does not connect a real approval system.
 
 `knowledge-answering` is supported by the compiler core, CLI, and Creator Workbench demo UI. It remains demo/mock only and does not call a real LLM or connect a real retrieval provider.
+
+`intake-collector` is supported by Pack Config Core, Rule Compiler Core, and this CLI. Studio UI and Runtime integration are not enabled for it in this iteration.
 
 ## Scenario Composition Compile Preview
 

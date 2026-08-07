@@ -52,6 +52,7 @@ Implemented today:
 - Manual Run Preview Evidence in the readiness panel
 - approval-decision second archetype support (Pack Config + Rule Compiler + CLI + Creator Workbench demo-enabled UI)
 - knowledge-answering third archetype support (Pack Config + Rule Impact + Rule Compiler + CLI + Creator Workbench demo-enabled UI)
+- intake-collector fourth archetype Core support (Pack Config + Rule Impact + Rule Compiler + CLI; Studio and Runtime not enabled)
 
 ## Why Yutra
 
@@ -129,6 +130,7 @@ pnpm exec yutra compile examples/request-resolution-ecommerce-basic/pack.config.
 pnpm exec yutra compile examples/request-resolution-ecommerce-basic/pack.config.json --out .tmp/compiled-request-resolution --force
 pnpm exec yutra compile examples/approval-decision-basic/pack.config.json --out .tmp/compiled-approval-decision --dry-run
 pnpm exec yutra compile examples/knowledge-answering-basic/pack.config.json --out .tmp/compiled-knowledge-answering --dry-run
+pnpm exec yutra compile examples/intake-collector-basic/pack.config.json --out .tmp/intake-collector --dry-run
 pnpm builder:runner
 pnpm builder:dev
 ```
@@ -219,6 +221,7 @@ Start here:
 - [vNext Preview Release Notes](docs/release-notes-vnext-preview.md)
 - [Approval Decision Basic Demo](docs/approval-decision-basic.md)
 - [Knowledge Answering Basic Demo](docs/knowledge-answering-basic.md)
+- [Intake Collector Basic Demo](docs/intake-collector-basic.md)
 - [Creator Workbench](docs/creator-workbench.md)
 - [Creator Workbench UI](docs/creator-workbench-ui.md)
 - [vNext Roadmap](docs/vnext-roadmap.md)

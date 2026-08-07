@@ -6,6 +6,7 @@ import { hasCompilerErrors, type RuleCompilerIssue } from "./errors";
 import { validateCompileInput } from "./fail-closed";
 import { approvalDecisionCompiler } from "./approval-decision-compiler";
 import { knowledgeAnsweringCompiler } from "./knowledge-answering-compiler";
+import { intakeCollectorCompiler } from "./intake-collector-compiler";
 import { requestResolutionCompiler } from "./request-resolution-compiler";
 import { sha256, stableJson } from "./serialize-artifacts";
 import type { RuleCompilerInput, RuleCompilerOutput } from "./types";
@@ -95,7 +96,8 @@ export function compilePackConfig(input: RuleCompilerInput): RuleCompilerOutput 
   if (
     input.config.archetypeId !== "request-resolution" &&
     input.config.archetypeId !== "approval-decision" &&
-    input.config.archetypeId !== "knowledge-answering"
+    input.config.archetypeId !== "knowledge-answering" &&
+    input.config.archetypeId !== "intake-collector"
   ) {
     const issues: RuleCompilerIssue[] = [
       {
@@ -120,7 +122,9 @@ export function compilePackConfig(input: RuleCompilerInput): RuleCompilerOutput 
       ? approvalDecisionCompiler(input.config, options.locale)
       : input.config.archetypeId === "knowledge-answering"
         ? knowledgeAnsweringCompiler(input.config)
-      : requestResolutionCompiler(input.config, options.locale);
+        : input.config.archetypeId === "intake-collector"
+          ? intakeCollectorCompiler(input.config)
+          : requestResolutionCompiler(input.config, options.locale);
   const outputShell: RuleCompilerOutput = {
     ok: true,
     compileId: compileId(input.config, configHash, options.mode),

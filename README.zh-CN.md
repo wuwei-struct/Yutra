@@ -60,6 +60,7 @@ Yutra 关注这些问题：
 - Certification Readiness Panel 中的手动 Run Preview Evidence。
 - approval-decision 第二母型支持（Pack Config + Rule Compiler + CLI + Creator Workbench demo UI）。
 - knowledge-answering 第三母型支持（Pack Config + Rule Impact + Rule Compiler + CLI + Creator Workbench demo UI）。
+- intake-collector 第四母型 Core 支持（Pack Config + Rule Impact + Rule Compiler + CLI；尚未接入 Studio 与 Runtime）。
 
 ## 开源边界
 
@@ -111,6 +112,7 @@ pnpm exec yutra compile examples/request-resolution-ecommerce-basic/pack.config.
 pnpm exec yutra compile examples/request-resolution-ecommerce-basic/pack.config.json --out .tmp/compiled-request-resolution --force
 pnpm exec yutra compile examples/approval-decision-basic/pack.config.json --out .tmp/compiled-approval-decision --dry-run
 pnpm exec yutra compile examples/knowledge-answering-basic/pack.config.json --out .tmp/compiled-knowledge-answering --dry-run
+pnpm exec yutra compile examples/intake-collector-basic/pack.config.json --out .tmp/intake-collector --dry-run
 pnpm builder:runner
 pnpm builder:dev
 ```
@@ -208,6 +210,7 @@ LLM 可以生成配置草案，但不能绕过 Compiler、Runtime、Trace、Audi
 - [vNext Preview Release Notes](docs/release-notes-vnext-preview.md)
 - [Approval Decision Basic Demo](docs/approval-decision-basic.md)
 - [Knowledge Answering Basic Demo](docs/knowledge-answering-basic.md)
+- [Intake Collector Basic Demo](docs/intake-collector-basic.md)
 - [Creator Workbench](docs/creator-workbench.md)
 - [Creator Workbench UI](docs/creator-workbench-ui.md)
 - [vNext Roadmap](docs/vnext-roadmap.md)

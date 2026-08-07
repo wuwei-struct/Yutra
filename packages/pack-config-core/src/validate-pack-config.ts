@@ -2,6 +2,7 @@ import { isArchetypeId, type SideEffectLevel } from "@yutra/archetype-core";
 import { packConfigSchema, type AdapterConfig, type PackConfig } from "./pack-config-schema";
 import { APPROVAL_DECISION_FIELD_IDS } from "./approval-decision-config";
 import { KNOWLEDGE_ANSWERING_FIELD_IDS } from "./knowledge-answering-config";
+import { INTAKE_COLLECTOR_FIELD_IDS } from "./intake-collector-config";
 import { REQUEST_RESOLUTION_FIELD_IDS } from "./request-resolution-config";
 import type { PackConfigIssue, PackConfigValidationResult } from "./errors";
 import { makeResult } from "./errors";
@@ -219,6 +220,43 @@ export function validateKnowledgeAnsweringConfig(input: unknown): PackConfigVali
         code: "PACK_CONFIG_UNKNOWN_CAPABILITY",
         severity: "warning",
         message: `Unknown knowledge-answering capability ${capabilityId}.`,
+        path: ["capabilities", capabilityId]
+      });
+    }
+  }
+
+  return makeResult(issues);
+}
+
+export function validateIntakeCollectorConfig(input: unknown): PackConfigValidationResult {
+  const base = validatePackConfig(input);
+  const issues = [...base.issues];
+  const parsed = packConfigSchema.safeParse(input);
+  if (!parsed.success) {
+    return makeResult(issues);
+  }
+
+  const config = parsed.data;
+  if (config.archetypeId !== "intake-collector") {
+    issues.push({
+      code: "PACK_CONFIG_ARCHETYPE_INVALID",
+      severity: "error",
+      message: "Intake-collector config must use archetypeId=intake-collector.",
+      path: ["archetypeId"]
+    });
+  }
+
+  const knownCapabilityIds = new Set(
+    INTAKE_COLLECTOR_FIELD_IDS.filter((id) => id.startsWith("capabilities.")).map(
+      (id) => id.replace("capabilities.", "")
+    )
+  );
+  for (const capabilityId of Object.keys(config.capabilities)) {
+    if (!knownCapabilityIds.has(capabilityId)) {
+      issues.push({
+        code: "PACK_CONFIG_UNKNOWN_CAPABILITY",
+        severity: "warning",
+        message: `Unknown intake-collector capability ${capabilityId}.`,
         path: ["capabilities", capabilityId]
       });
     }

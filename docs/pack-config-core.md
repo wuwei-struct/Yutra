@@ -27,6 +27,8 @@ This package only defines and validates Pack Config. It does not compile DSL and
 - approval-decision public rule impact metadata
 - knowledge-answering public base field definitions
 - knowledge-answering public rule impact metadata
+- intake-collector public base field definitions
+- intake-collector public rule impact metadata
 - demo-only sample config
 - publish gate validation
 - deterministic config fingerprint
@@ -119,9 +121,17 @@ Fields cover:
 
 These fields are public demo/basic contract fields. They are not a real knowledge base, not real FAQ content, not real document content, not real retrieval provider configuration, and not customer SOP.
 
+## Intake-collector Base Config
+
+The package includes public base field definitions for `intake-collector`.
+
+Fields cover field collection and validation capabilities, required generic fields, missing-field and duplicate handling, clarification budget, completion confirmation, and response style. `INTAKE_COLLECTOR_BASIC_CONFIG` uses ConfigField provenance and mock adapter metadata throughout.
+
+This is a demo/mock contract only. It contains no real personal data, customer form, database, CRM/ERP connection, endpoint, secret, or production collection workflow.
+
 ## Rule Impact Metadata
 
-`REQUEST_RESOLUTION_RULE_IMPACTS`, `APPROVAL_DECISION_RULE_IMPACTS`, and `KNOWLEDGE_ANSWERING_RULE_IMPACTS` explain how public demo/basic fields affect generated governed behavior.
+`REQUEST_RESOLUTION_RULE_IMPACTS`, `APPROVAL_DECISION_RULE_IMPACTS`, `KNOWLEDGE_ANSWERING_RULE_IMPACTS`, and `INTAKE_COLLECTOR_RULE_IMPACTS` explain how public demo/basic fields affect generated governed behavior.
 
 Examples:
 
@@ -132,12 +142,14 @@ Examples:
 - `rules.approvalPolicy.highRiskStrategy` affects high-risk guards, human review transitions, policy summary, and handoff trace expectations.
 - `rules.knowledgePolicy.minConfidence` affects confidence guards, clarification or handoff transitions, low-confidence tests, and trace expectations.
 - `rules.sourcePolicy.requireSourceCitation` affects citation policy, generic answer templates, source-reference tests, and trace expectations.
+- `rules.intakePolicy.requiredFields` affects the missing-fields Guard, completion transition, test cases, and field-completeness trace expectations.
+- `rules.intakePolicy.maxClarificationRounds` affects the clarification budget and handoff/stop fallback boundary.
 
 This metadata is explanatory. It does not compile DSL, change Runtime behavior, or define customer SOP.
 
 ## Sample Config
 
-`REQUEST_RESOLUTION_ECOMMERCE_BASIC_CONFIG`, `APPROVAL_DECISION_BASIC_CONFIG`, and `KNOWLEDGE_ANSWERING_BASIC_CONFIG` are mock/demo samples.
+`REQUEST_RESOLUTION_ECOMMERCE_BASIC_CONFIG`, `APPROVAL_DECISION_BASIC_CONFIG`, `KNOWLEDGE_ANSWERING_BASIC_CONFIG`, and `INTAKE_COLLECTOR_BASIC_CONFIG` are mock/demo samples.
 
 It uses:
 

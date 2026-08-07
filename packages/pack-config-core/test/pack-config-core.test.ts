@@ -6,6 +6,9 @@ import {
   KNOWLEDGE_ANSWERING_BASIC_CONFIG,
   KNOWLEDGE_ANSWERING_FIELD_DEFINITIONS,
   KNOWLEDGE_ANSWERING_RULE_IMPACTS,
+  INTAKE_COLLECTOR_BASIC_CONFIG,
+  INTAKE_COLLECTOR_FIELD_DEFINITIONS,
+  INTAKE_COLLECTOR_RULE_IMPACTS,
   REQUEST_RESOLUTION_ECOMMERCE_BASIC_CONFIG,
   REQUEST_RESOLUTION_FIELD_DEFINITIONS,
   REQUEST_RESOLUTION_RULE_IMPACTS,
@@ -17,6 +20,7 @@ import {
   getRuleImpact,
   validateApprovalDecisionConfig,
   validateKnowledgeAnsweringConfig,
+  validateIntakeCollectorConfig,
   validatePackConfig,
   validateRequestResolutionConfig
 } from "../src";
@@ -291,5 +295,46 @@ describe("@yutra/pack-config-core", () => {
     expect(serialized).not.toContain("knowledgebase");
     expect(KNOWLEDGE_ANSWERING_BASIC_CONFIG.adapters.every((adapter) => adapter.mode === "mock")).toBe(true);
     expect(KNOWLEDGE_ANSWERING_BASIC_CONFIG.adapters.every((adapter) => adapter.containsRealEndpoint === false && adapter.containsSecret === false)).toBe(true);
+  });
+
+  it("intake-collector basic config validates with deterministic fingerprint", () => {
+    expect(validatePackConfig(INTAKE_COLLECTOR_BASIC_CONFIG).ok).toBe(true);
+    expect(validateIntakeCollectorConfig(INTAKE_COLLECTOR_BASIC_CONFIG).ok).toBe(true);
+    const first = createPackConfigFingerprint(INTAKE_COLLECTOR_BASIC_CONFIG);
+    expect(first).toBe(createPackConfigFingerprint(INTAKE_COLLECTOR_BASIC_CONFIG));
+    expect(first).toMatch(/^sha256:/);
+  });
+
+  it("intake-collector fields cover collection, validation, completeness, duplicate, and confirmation policy", () => {
+    const ids = INTAKE_COLLECTOR_FIELD_DEFINITIONS.map((field) => field.fieldId);
+    expect(ids).toContain("capabilities.fieldCollection");
+    expect(ids).toContain("rules.intakePolicy.requiredFields");
+    expect(ids).toContain("rules.intakePolicy.maxClarificationRounds");
+    expect(ids).toContain("rules.intakePolicy.incompleteStrategy");
+    expect(ids).toContain("rules.intakePolicy.invalidFieldStrategy");
+    expect(ids).toContain("rules.intakePolicy.duplicateStrategy");
+    expect(ids).toContain("rules.validationPolicy.requireConfirmationBeforeComplete");
+  });
+
+  it("intake-collector rule impacts stay archetype-specific and cover fail-closed paths", () => {
+    expect(INTAKE_COLLECTOR_RULE_IMPACTS).toHaveLength(6);
+    expect(getRuleImpact("rules.intakePolicy.requiredFields")?.affects.some((target) => target.id === "missing_fields")).toBe(true);
+    expect(getRuleImpact("rules.intakePolicy.maxClarificationRounds")?.affects.some((target) => target.id === "clarification_budget_exhausted")).toBe(true);
+    expect(getRuleImpact("rules.intakePolicy.invalidFieldStrategy")?.affects.some((target) => target.id === "field_validation_failed")).toBe(true);
+    expect(getRuleImpact("rules.intakePolicy.duplicateStrategy")?.affects.some((target) => target.id === "duplicate_detected")).toBe(true);
+    expect(getRuleImpact("rules.validationPolicy.requireConfirmationBeforeComplete")?.affects.some((target) => target.id === "record_confirmed")).toBe(true);
+  });
+
+  it("intake-collector sample is generic, mock-only, and contains no personal-data or real-system markers", () => {
+    const serialized = JSON.stringify(INTAKE_COLLECTOR_BASIC_CONFIG).toLowerCase();
+    expect(serialized).not.toContain("https://");
+    expect(serialized).not.toContain("api_key");
+    expect(serialized).not.toContain("bearer ");
+    expect(serialized).not.toContain("phone_number");
+    expect(serialized).not.toContain("identity_number");
+    expect(serialized).not.toContain("street_address");
+    expect(serialized).not.toContain("crm_endpoint");
+    expect(INTAKE_COLLECTOR_BASIC_CONFIG.adapters.every((adapter) => adapter.mode === "mock")).toBe(true);
+    expect(INTAKE_COLLECTOR_BASIC_CONFIG.adapters.every((adapter) => adapter.containsRealEndpoint === false && adapter.containsSecret === false)).toBe(true);
   });
 });

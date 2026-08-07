@@ -24,7 +24,7 @@ See [Archetype Taxonomy](archetype-taxonomy.md).
 
 ## Current Scope
 
-The current public implementation covers request-resolution, approval-decision, and knowledge-answering demo/basic fields. request-resolution and approval-decision are visible in Creator Workbench demo UI; knowledge-answering is core/CLI only for now:
+The current public implementation covers request-resolution, approval-decision, knowledge-answering, and intake-collector demo/basic fields. The first three are visible in Creator Workbench demo UI; intake-collector is Core/Compiler/CLI only for now:
 
 - capabilities
 - refund policy basics
@@ -33,6 +33,7 @@ The current public implementation covers request-resolution, approval-decision, 
 - risk policy basics
 - knowledge policy basics
 - source citation policy basics
+- intake, validation, duplicate, clarification, and confirmation policy basics
 - response style basics
 
 This is public demo metadata. It is not a customer SOP, not a complete industry rule matrix, and not a production adapter mapping.
@@ -81,6 +82,17 @@ rules.knowledgePolicy.minConfidence
 -> policy: minimum confidence threshold
 -> test_case: low-confidence question path
 -> trace_expectation: guard.evaluated + clarification.requested
+```
+
+Example:
+
+```text
+rules.intakePolicy.requiredFields
+-> guard: missing_fields
+-> transition: detect_missing -> complete / request_clarification
+-> policy: required field policy
+-> test_case: missing fields
+-> trace_expectation: field completeness
 ```
 
 ## Relationship to Rule Compiler

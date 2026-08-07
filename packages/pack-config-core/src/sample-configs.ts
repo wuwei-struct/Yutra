@@ -1,5 +1,9 @@
 import type { PackConfig } from "./pack-config-schema";
-import { APPROVAL_DECISION_BASIC_CONFIG_ID, REQUEST_RESOLUTION_ECOMMERCE_BASIC_CONFIG_ID } from "./ids";
+import {
+  APPROVAL_DECISION_BASIC_CONFIG_ID,
+  INTAKE_COLLECTOR_BASIC_CONFIG_ID,
+  REQUEST_RESOLUTION_ECOMMERCE_BASIC_CONFIG_ID
+} from "./ids";
 
 export const REQUEST_RESOLUTION_ECOMMERCE_BASIC_CONFIG: PackConfig = {
   packConfigId: REQUEST_RESOLUTION_ECOMMERCE_BASIC_CONFIG_ID,
@@ -420,5 +424,157 @@ export const KNOWLEDGE_ANSWERING_BASIC_CONFIG: PackConfig = {
     containsCustomerData: false,
     containsRealKnowledgeAssets: false,
     containsRealProviderConfig: false
+  }
+};
+
+export const INTAKE_COLLECTOR_BASIC_CONFIG: PackConfig = {
+  packConfigId: INTAKE_COLLECTOR_BASIC_CONFIG_ID,
+  packConfigVersion: "0.1.0",
+  archetypeId: "intake-collector",
+  archetypeVersion: "0.1.0",
+  variantId: "basic-demo",
+  variantVersion: "0.1.0",
+  locale: "en",
+  capabilities: {
+    fieldCollection: { value: true, source: "confirmedByUser", required: true },
+    fieldValidation: { value: true, source: "confirmedByUser", required: true },
+    missingFieldDetection: { value: true, source: "confirmedByUser", required: true },
+    duplicateCheck: { value: true, source: "confirmedByUser" },
+    confirmation: { value: true, source: "confirmedByUser" },
+    handoff: { value: true, source: "confirmedByUser", required: true }
+  },
+  businessObjects: [
+    {
+      objectId: "intake_record",
+      label: { en: "Demo intake record", zhCN: "演示采集记录" },
+      fields: ["topic", "request_summary", "context_note"]
+    }
+  ],
+  rules: {
+    "intakePolicy.requiredFields": {
+      value: ["topic", "request_summary"],
+      source: "defaultFromPack",
+      required: true
+    },
+    "intakePolicy.maxClarificationRounds": {
+      value: 2,
+      source: "defaultFromPack",
+      required: true
+    },
+    "intakePolicy.incompleteStrategy": {
+      value: "ask_missing_fields",
+      source: "defaultFromPack",
+      required: true
+    },
+    "intakePolicy.invalidFieldStrategy": {
+      value: "ask_correction",
+      source: "defaultFromPack",
+      required: true
+    },
+    "intakePolicy.duplicateStrategy": {
+      value: "warn_and_confirm",
+      source: "defaultFromPack",
+      required: true
+    },
+    "validationPolicy.requireConfirmationBeforeComplete": {
+      value: true,
+      source: "defaultFromPack",
+      required: true
+    },
+    "validationPolicy.rejectUnknownFields": {
+      value: true,
+      source: "defaultFromPack"
+    },
+    "validationPolicy.trimTextFields": {
+      value: true,
+      source: "defaultFromPack"
+    },
+    "validationPolicy.allowPartialDraft": {
+      value: false,
+      source: "defaultFromPack"
+    },
+    "responseStyle.tone": { value: "neutral", source: "defaultFromPack" },
+    "responseStyle.includeMissingFieldList": {
+      value: true,
+      source: "defaultFromPack"
+    },
+    "responseStyle.includeValidationReason": {
+      value: true,
+      source: "defaultFromPack"
+    },
+    "responseStyle.includeNextSteps": {
+      value: true,
+      source: "defaultFromPack"
+    }
+  },
+  policies: {
+    "intakeCollector.failClosed": {
+      value: true,
+      source: "defaultFromPack",
+      label: { en: "Intake fail-closed", zhCN: "采集流程 fail-closed" }
+    }
+  },
+  adapters: [
+    {
+      adapterId: "demo-intake-record-store",
+      mode: "mock",
+      contractRef: "contracts/demo-intake-record-store.md",
+      fieldMappings: {
+        topic: "topic",
+        requestSummary: "request_summary",
+        contextNote: "context_note"
+      },
+      containsRealEndpoint: false,
+      containsSecret: false
+    }
+  ],
+  templates: [
+    {
+      templateId: "ask_missing_fields",
+      purpose: "Ask for generic fields missing from a demo intake record.",
+      text: { value: "Demo: provide the listed generic fields.", source: "defaultFromPack" }
+    },
+    {
+      templateId: "ask_field_correction",
+      purpose: "Ask for correction of a generic invalid field.",
+      text: { value: "Demo: correct the field identified by validation.", source: "defaultFromPack" }
+    },
+    {
+      templateId: "intake_complete",
+      purpose: "Confirm that a generic demo intake record is complete.",
+      text: { value: "Demo: the structured intake record is complete.", source: "defaultFromPack" }
+    }
+  ],
+  tests: [
+    {
+      testCaseId: "intake_complete_demo",
+      title: "Complete generic intake record",
+      input: { topic: "demo_topic", request_summary: "demo_summary", record_confirmed: true },
+      expectedOutcome: "complete"
+    },
+    {
+      testCaseId: "intake_missing_fields_demo",
+      title: "Missing generic field requests clarification",
+      input: { topic: "demo_topic", missing_fields: true },
+      expectedOutcome: "ask_missing_fields"
+    }
+  ],
+  governance: {
+    environment: "demo",
+    publishable: false,
+    requiresHumanReview: true,
+    unconfirmedFieldPolicy: "block_publish",
+    missingFieldPolicy: "block_compile",
+    sideEffectPolicy: {
+      maxAutoSideEffect: "read",
+      requiresPolicyGuardFrom: "write"
+    }
+  },
+  metadata: {
+    publicDemo: true,
+    containsCustomerData: false,
+    containsPersonalData: false,
+    containsRealForm: false,
+    containsRealDatabaseConfig: false
   }
 };

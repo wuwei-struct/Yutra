@@ -1,6 +1,7 @@
 import { parseDsl, inspectDsl } from "@yutra/dsl";
 import {
   APPROVAL_DECISION_BASIC_CONFIG,
+  INTAKE_COLLECTOR_BASIC_CONFIG,
   REQUEST_RESOLUTION_ECOMMERCE_BASIC_CONFIG,
   type PackConfig
 } from "@yutra/pack-config-core";
@@ -142,7 +143,7 @@ describe("@yutra/rule-compiler", () => {
 
   it("unsupported archetype returns unsupported issue", () => {
     const config = cloneConfig({
-      archetypeId: "intake-collector"
+      archetypeId: "content-production"
     });
     const output = compilePackConfig({ config });
     expect(output.ok).toBe(false);
@@ -265,6 +266,83 @@ describe("@yutra/rule-compiler", () => {
     expect(combined).not.toContain("sourceurl");
     expect(combined).not.toContain("documentid");
     expect(combined).not.toContain("knowledgebase");
+  });
+
+  it("supports intake-collector demo config and returns six deterministic artifacts", () => {
+    const first = compilePackConfig({ config: INTAKE_COLLECTOR_BASIC_CONFIG });
+    const second = compilePackConfig({ config: INTAKE_COLLECTOR_BASIC_CONFIG });
+    expect(first.ok, JSON.stringify(first.issues, null, 2)).toBe(true);
+    expect(first.report.archetypeId).toBe("intake-collector");
+    expect(Object.keys(first.artifacts ?? {})).toEqual([
+      "agent",
+      "policy",
+      "adapterConfig",
+      "templates",
+      "testCases",
+      "traceExpectation"
+    ]);
+    expect(second.report.artifactHashes).toEqual(first.report.artifactHashes);
+  });
+
+  it("intake-collector generated DSL parses and exposes guarded collection paths", () => {
+    const output = compilePackConfig({ config: INTAKE_COLLECTOR_BASIC_CONFIG });
+    expect(output.ok, JSON.stringify(output.issues, null, 2)).toBe(true);
+    const inspected = inspectDsl(parseDsl(output.artifacts?.agent.content ?? "", "yaml"), { format: "yaml" });
+    expect(inspected.issues).toEqual([]);
+    expect(inspected.canonical.agent).toBe("intake_collector_basic");
+    expect(Object.keys(inspected.canonical.states)).toEqual(
+      expect.arrayContaining([
+        "collect_fields",
+        "validate_fields",
+        "detect_missing",
+        "check_duplicate",
+        "request_clarification",
+        "confirm_record",
+        "complete",
+        "handoff",
+        "stopped"
+      ])
+    );
+    expect(inspected.canonical.states.handoff?.handoff).toBe(true);
+  });
+
+  it("intake-collector artifacts include budget, duplicate, invalid, incomplete, and confirmation contracts", () => {
+    const output = compilePackConfig({ config: INTAKE_COLLECTOR_BASIC_CONFIG });
+    expect(output.ok).toBe(true);
+    expect(output.artifacts?.policy.data.clarificationBudget).toMatchObject({ maxRounds: 2 });
+    expect(output.artifacts?.policy.data.duplicateStrategy).toBe("warn_and_confirm");
+    expect(output.artifacts?.policy.data.failClosedBoundary).toMatchObject({ enabled: true });
+    expect(output.artifacts?.templates.data).toHaveProperty("ask_missing_fields");
+    expect(output.artifacts?.templates.data).toHaveProperty("ask_field_correction");
+    expect(output.artifacts?.templates.data).toHaveProperty("duplicate_confirmation");
+    const tests = output.artifacts?.testCases.data.testCases as Array<Record<string, unknown>>;
+    expect(tests).toHaveLength(6);
+    expect(tests.map((test) => test.testCaseId)).toEqual(
+      expect.arrayContaining([
+        "intake_missing_fields",
+        "intake_invalid_field",
+        "intake_clarification_budget_exhausted",
+        "intake_duplicate",
+        "intake_confirmation_required"
+      ])
+    );
+    const events = output.artifacts?.traceExpectation.data.expectedEventTypes as string[];
+    expect(events).toEqual(expect.arrayContaining(["guard.evaluated", "handoff.requested", "run.completed", "run.failed"]));
+  });
+
+  it("intake-collector compiled artifacts remain mock-only and exclude personal-data markers", () => {
+    const output = compilePackConfig({ config: INTAKE_COLLECTOR_BASIC_CONFIG });
+    expect(output.ok).toBe(true);
+    const combined = Object.values(output.artifacts ?? {})
+      .map((artifact) => artifact.content)
+      .join("\n")
+      .toLowerCase();
+    expect(combined).not.toContain("https://");
+    expect(combined).not.toContain("api_key");
+    expect(combined).not.toContain("phone_number");
+    expect(combined).not.toContain("identity_number");
+    const adapters = output.artifacts?.adapterConfig.data.adapters as Array<Record<string, unknown>>;
+    expect(adapters.every((adapter) => adapter.containsRealEndpoint === false && adapter.containsSecret === false)).toBe(true);
   });
 
   it("generated agent.yutra.yaml can be parsed and inspected by @yutra/dsl", () => {

@@ -39,6 +39,7 @@ The main archetypes below are product-facing archetypes. They are differentiated
 - Use cases: onboarding forms, support intake, loan pre-check, service request collection.
 - Common rules: required fields, retry count, missing-field strategy, validation failure strategy, confidence threshold.
 - Composable cross-cutting archetypes: `human-handoff`, `policy-guard`, `adapter-connector`.
+- Current support: `@yutra/pack-config-core`, Rule Impact, `@yutra/rule-compiler`, CLI compile/export, and six canonical artifacts are available as a public demo/mock Core chain. Studio UI and Runtime integration are not enabled yet.
 
 ### 2. `knowledge-answering` / 知识问答型
 
@@ -47,7 +48,7 @@ The main archetypes below are product-facing archetypes. They are differentiated
 - Use cases: FAQ assistant, policy explanation, internal knowledge lookup, customer self-service.
 - Common rules: allowed sources, confidence threshold, no-answer behavior, citation requirement, stale content policy.
 - Composable cross-cutting archetypes: `human-handoff`, `policy-guard`, `feedback-optimization`.
-- Current support: `@yutra/pack-config-core` and `@yutra/rule-compiler` include a public demo/mock knowledge-answering core chain. CLI compile/export is supported. Creator Workbench UI is not enabled for this archetype yet.
+- Current support: `@yutra/pack-config-core` and `@yutra/rule-compiler` include a public demo/mock knowledge-answering core chain. CLI compile/export and Creator Workbench demo UI are supported.
 
 ### 3. `request-resolution` / 请求处理型
 
@@ -194,3 +195,9 @@ It currently proves the shared vNext pattern for governed knowledge answering:
 - six demo/mock artifacts
 
 It does not include Creator Workbench UI integration yet, Runtime execution, real LLM calls, real knowledge base content, retrieval provider configuration, real source endpoints, customer SOP, or delivery templates.
+
+## Fourth Archetype Core Chain
+
+`intake-collector` is the fourth public core chain after request-resolution, approval-decision, and knowledge-answering.
+
+It includes Pack Config validation, ConfigField provenance, archetype-isolated Rule Impact metadata, a deterministic Rule Compiler, CLI compile/export, and six canonical demo/mock artifacts. It does not include Studio UI, Runtime execution, real personal data, customer forms, databases, CRM/ERP connections, or production collection workflows.
