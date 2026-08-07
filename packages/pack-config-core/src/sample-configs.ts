@@ -1,6 +1,7 @@
 import type { PackConfig } from "./pack-config-schema";
 import {
   APPROVAL_DECISION_BASIC_CONFIG_ID,
+  DIAGNOSTIC_RESOLUTION_BASIC_CONFIG_ID,
   INTAKE_COLLECTOR_BASIC_CONFIG_ID,
   REQUEST_RESOLUTION_ECOMMERCE_BASIC_CONFIG_ID
 } from "./ids";
@@ -576,5 +577,154 @@ export const INTAKE_COLLECTOR_BASIC_CONFIG: PackConfig = {
     containsPersonalData: false,
     containsRealForm: false,
     containsRealDatabaseConfig: false
+  }
+};
+
+export const DIAGNOSTIC_RESOLUTION_BASIC_CONFIG: PackConfig = {
+  packConfigId: DIAGNOSTIC_RESOLUTION_BASIC_CONFIG_ID,
+  packConfigVersion: "0.1.0",
+  archetypeId: "diagnostic-resolution",
+  archetypeVersion: "0.1.0",
+  variantId: "basic-demo",
+  variantVersion: "0.1.0",
+  locale: "en",
+  capabilities: {
+    signalCollection: { value: true, source: "confirmedByUser", required: true },
+    diagnosticChecks: { value: true, source: "confirmedByUser", required: true },
+    branchDiagnosis: { value: true, source: "confirmedByUser", required: true },
+    remediationSuggestion: { value: true, source: "confirmedByUser", required: true },
+    safeMockRemediation: { value: true, source: "confirmedByUser" },
+    resolutionVerification: { value: true, source: "confirmedByUser", required: true },
+    handoff: { value: true, source: "confirmedByUser", required: true }
+  },
+  businessObjects: [
+    {
+      objectId: "diagnostic_context",
+      label: { en: "Generic demo diagnostic context", zhCN: "通用演示诊断上下文" },
+      fields: ["symptom_summary", "environment_hint", "observed_behavior"]
+    }
+  ],
+  rules: {
+    "diagnosticPolicy.requiredSignals": {
+      value: ["symptom_summary", "observed_behavior"],
+      source: "defaultFromPack",
+      required: true
+    },
+    "diagnosticPolicy.maxDiagnosticRounds": {
+      value: 3,
+      source: "defaultFromPack",
+      required: true
+    },
+    "diagnosticPolicy.inconclusiveStrategy": {
+      value: "ask_more_signals",
+      source: "defaultFromPack",
+      required: true
+    },
+    "diagnosticPolicy.checkFailureStrategy": {
+      value: "retry",
+      source: "defaultFromPack",
+      required: true
+    },
+    "diagnosticPolicy.remediationStrategy": {
+      value: "mock_safe_attempt",
+      source: "defaultFromPack",
+      required: true
+    },
+    "diagnosticPolicy.maxRemediationAttempts": {
+      value: 1,
+      source: "defaultFromPack",
+      required: true
+    },
+    "validationPolicy.requireEvidenceBeforeDiagnosis": {
+      value: true,
+      source: "defaultFromPack",
+      required: true
+    },
+    "validationPolicy.rejectUnknownSignals": {
+      value: true,
+      source: "defaultFromPack"
+    },
+    "validationPolicy.requireVerificationBeforeComplete": {
+      value: true,
+      source: "defaultFromPack",
+      required: true
+    },
+    "responseStyle.tone": { value: "calm_technical", source: "defaultFromPack" },
+    "responseStyle.includeDiagnosisReason": { value: true, source: "defaultFromPack" },
+    "responseStyle.includeCheckSummary": { value: true, source: "defaultFromPack" },
+    "responseStyle.includeNextSteps": { value: true, source: "defaultFromPack" }
+  },
+  policies: {
+    "diagnosticResolution.failClosed": {
+      value: true,
+      source: "defaultFromPack",
+      label: { en: "Diagnostic fail-closed", zhCN: "诊断流程 fail-closed" }
+    }
+  },
+  adapters: [
+    {
+      adapterId: "demo-diagnostic-signal-source",
+      mode: "mock",
+      contractRef: "contracts/demo-diagnostic-signal-source.md",
+      fieldMappings: {
+        symptomSummary: "symptom_summary",
+        environmentHint: "environment_hint",
+        observedBehavior: "observed_behavior"
+      },
+      containsRealEndpoint: false,
+      containsSecret: false
+    }
+  ],
+  templates: [
+    {
+      templateId: "ask_more_signals",
+      purpose: "Request missing generic demo signals.",
+      text: { value: "Demo: provide the listed generic signals.", source: "defaultFromPack" }
+    },
+    {
+      templateId: "remediation_suggestion",
+      purpose: "Present a generic mock-only remediation suggestion.",
+      text: { value: "Demo: review the safe remediation suggestion.", source: "defaultFromPack" }
+    },
+    {
+      templateId: "resolution_complete",
+      purpose: "Confirm a verified generic demo disposition.",
+      text: { value: "Demo: the diagnostic disposition is verified.", source: "defaultFromPack" }
+    }
+  ],
+  tests: [
+    {
+      testCaseId: "diagnosis_complete_demo",
+      title: "Known demo diagnosis reaches verified completion",
+      input: { symptom_summary: "demo_symptom", observed_behavior: "demo_observation" },
+      expectedOutcome: "complete"
+    },
+    {
+      testCaseId: "diagnosis_missing_signal_demo",
+      title: "Missing generic signal requests more information",
+      input: { symptom_summary: "demo_symptom", missing_signals: true },
+      expectedOutcome: "request_more_signals"
+    }
+  ],
+  governance: {
+    environment: "demo",
+    publishable: false,
+    requiresHumanReview: true,
+    unconfirmedFieldPolicy: "block_publish",
+    missingFieldPolicy: "block_compile",
+    sideEffectPolicy: {
+      maxAutoSideEffect: "read",
+      requiresPolicyGuardFrom: "write"
+    }
+  },
+  metadata: {
+    publicDemo: true,
+    containsCustomerData: false,
+    containsPersonalData: false,
+    containsRealDiagnosticAssets: false,
+    containsRealSystemAccess: false,
+    containsShellExecution: false,
+    containsRealEndpoint: false,
+    containsProductionRemediation: false
   }
 };

@@ -194,10 +194,16 @@ It currently proves the shared vNext pattern for governed knowledge answering:
 - CLI compile/export path
 - six demo/mock artifacts
 
-It does not include Creator Workbench UI integration yet, Runtime execution, real LLM calls, real knowledge base content, retrieval provider configuration, real source endpoints, customer SOP, or delivery templates.
+Creator Workbench UI is now enabled for its demo Pack Config, while Runtime execution, real LLM calls, real knowledge base content, retrieval provider configuration, real source endpoints, customer SOP, and delivery templates remain excluded.
 
 ## Fourth Archetype Core Chain
 
 `intake-collector` is the fourth public core chain after request-resolution, approval-decision, and knowledge-answering.
 
-It includes Pack Config validation, ConfigField provenance, archetype-isolated Rule Impact metadata, a deterministic Rule Compiler, CLI compile/export, and six canonical demo/mock artifacts. It does not include Studio UI, Runtime execution, real personal data, customer forms, databases, CRM/ERP connections, or production collection workflows.
+It includes Pack Config validation, ConfigField provenance, archetype-isolated Rule Impact metadata, a deterministic Rule Compiler, CLI compile/export, six canonical demo/mock artifacts, and Creator Workbench integration. It does not include Runtime execution, real personal data, customer forms, databases, CRM/ERP connections, or production collection workflows.
+
+## Fifth Archetype Core Chain
+
+`diagnostic-resolution` is the fifth public core chain. It adds an allowlisted generic-signal Pack Config, eight Rule Impact definitions, deterministic six-artifact compilation, CLI export, diagnostic and remediation budgets, explicit inconclusive/retry/handoff/stop paths, and mock-safe remediation with `sideEffect=none`.
+
+Studio and Runtime are not enabled for this archetype. It performs no real diagnostics, device access, shell execution, external API calls, or production remediation.

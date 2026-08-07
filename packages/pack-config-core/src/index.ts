@@ -31,6 +31,11 @@ export {
   INTAKE_COLLECTOR_FIELD_IDS
 } from "./intake-collector-config";
 export {
+  DIAGNOSTIC_RESOLUTION_DEMO_SIGNAL_IDS,
+  DIAGNOSTIC_RESOLUTION_FIELD_DEFINITIONS,
+  DIAGNOSTIC_RESOLUTION_FIELD_IDS
+} from "./diagnostic-resolution-config";
+export {
   KNOWLEDGE_ANSWERING_FIELD_DEFINITIONS,
   KNOWLEDGE_ANSWERING_FIELD_IDS
 } from "./knowledge-answering-config";
@@ -46,6 +51,7 @@ export type {
 } from "./rule-impact";
 export {
   APPROVAL_DECISION_RULE_IMPACTS,
+  DIAGNOSTIC_RESOLUTION_RULE_IMPACTS,
   INTAKE_COLLECTOR_RULE_IMPACTS,
   KNOWLEDGE_ANSWERING_RULE_IMPACTS,
   REQUEST_RESOLUTION_RULE_IMPACTS,
@@ -55,6 +61,7 @@ export {
 } from "./rule-impact";
 export {
   APPROVAL_DECISION_BASIC_CONFIG,
+  DIAGNOSTIC_RESOLUTION_BASIC_CONFIG,
   INTAKE_COLLECTOR_BASIC_CONFIG,
   KNOWLEDGE_ANSWERING_BASIC_CONFIG,
   REQUEST_RESOLUTION_ECOMMERCE_BASIC_CONFIG
@@ -63,6 +70,7 @@ export { createPackConfigFingerprint, stripFieldVolatileMetadata } from "./confi
 export {
   canPublishPackConfig,
   validateApprovalDecisionConfig,
+  validateDiagnosticResolutionConfig,
   validateIntakeCollectorConfig,
   validateKnowledgeAnsweringConfig,
   validatePackConfig,
@@ -71,6 +79,7 @@ export {
 export { explainPackConfig } from "./explain-pack-config";
 export {
   APPROVAL_DECISION_BASIC_CONFIG_ID,
+  DIAGNOSTIC_RESOLUTION_BASIC_CONFIG_ID,
   INTAKE_COLLECTOR_BASIC_CONFIG_ID,
   REQUEST_RESOLUTION_ECOMMERCE_BASIC_CONFIG_ID,
   isSafePublicConfigId

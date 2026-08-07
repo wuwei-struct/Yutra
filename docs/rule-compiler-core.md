@@ -6,7 +6,7 @@ It compiles a validated Pack Config into a fixed set of demo/mock artifacts.
 
 Current scope is intentionally narrow:
 
-- archetypes: `request-resolution`, `approval-decision`, `knowledge-answering`, and `intake-collector`
+- archetypes: `request-resolution`, `approval-decision`, `knowledge-answering`, `intake-collector`, and `diagnostic-resolution`
 - input: public demo Pack Config from `@yutra/pack-config-core`
 - output: six deterministic artifacts
 - mode: `preview` and `publish` gates
@@ -18,7 +18,8 @@ P6-05A adds a local Studio Compile Preview through builder-runner. That preview 
 P6-06A adds Rule Impact Explanation in the Creator Workbench using Pack Config metadata. That layer explains field impact but does not change compiler output.
 P6-06B adds Certification Readiness Preview derived from compile output. It does not execute Runtime, does not execute test cases, and does not run official certification.
 P6-11B.1 adds a separate Scenario Composition Compile Preview that calls this package once per namespaced Slot. It does not merge Pack Configs, change the three individual compilers, generate a top-level executable DSL, or execute Runtime.
-P6-13A adds the fourth individual compiler for `intake-collector`. It is available through Core and CLI only; Studio UI and Runtime integration remain disabled.
+P6-13A adds the fourth individual compiler for `intake-collector`; P6-13B enables its Creator Workbench UI while Runtime remains disabled.
+P6-14A adds the fifth individual compiler for `diagnostic-resolution`. It is available through Core and CLI only; Studio UI and Runtime integration remain disabled.
 
 ## Position in the vNext Chain
 
@@ -155,7 +156,15 @@ The fourth compiler supports the public `intake-collector` basic config. It comp
 
 The generated DSL is deterministic and can be parsed and inspected by `@yutra/dsl`. Missing fields, invalid fields, duplicate handling, exhausted clarification budget, and unconfirmed completion remain explicit and fail-closed.
 
-This compiler is demo/mock only. It contains no real personal data collection, customer form, database or CRM integration, endpoint, or secret. It is not enabled in Studio and is not connected to Runtime.
+This compiler is demo/mock only. It contains no real personal data collection, customer form, database or CRM integration, endpoint, or secret. Creator Workbench is enabled, but it is not connected to Runtime.
+
+## Diagnostic-resolution Basic Compiler
+
+The fifth compiler supports the public `diagnostic-resolution` basic config. It compiles signal collection, evidence validation, diagnostic checks, diagnosis evaluation, remediation suggestion, mock-safe remediation, verification, completion, handoff, and stopped paths.
+
+Diagnostic round and remediation attempt budgets are explicit in policy, tests, and Trace expectations. Inconclusive diagnosis, check failure, missing evidence, unknown diagnosis, and budget exhaustion remain fail-closed. `perform_mock_safe_remediation` is fixed at `sideEffect=none`.
+
+This compiler does not execute real diagnostics, access a device, run shell commands, connect an external API or LLM, or perform production remediation. Studio and Runtime are not enabled for this archetype.
 
 Creator Workbench UI is demo-enabled for `approval-decision`. The current support remains demo/mock only: Pack Config + Rule Compiler + CLI + Compile Preview UI, with no Runtime execution or real approval system integration.
 

@@ -667,7 +667,134 @@ export const INTAKE_COLLECTOR_RULE_IMPACTS: RuleImpactDefinition[] = [
   })
 ];
 
+export const DIAGNOSTIC_RESOLUTION_RULE_IMPACTS: RuleImpactDefinition[] = [
+  impact({
+    fieldPath: "rules.diagnosticPolicy.requiredSignals",
+    label: { en: "Required diagnostic signals", zhCN: "诊断必需信号" },
+    summary: {
+      en: "Defines the generic evidence required before diagnostic checks can begin.",
+      zhCN: "定义开始诊断检查前必须具备的通用证据信号。"
+    },
+    affects: [
+      target("guard", "missing_signals", "Missing-signal guard", "缺失信号 Guard"),
+      target("transition", "validate_signals -> request_more_signals", "Signal collection path", "信号采集路径"),
+      target("test_case", "missing signals", "Missing-signal tests", "缺失信号测试"),
+      target("trace_expectation", "required_signal_guard", "Required-signal evidence", "必需信号证据")
+    ],
+    artifacts: ["agent.yutra.yaml", "policy.yaml", "test-cases.json", "trace.expectation.json"],
+    safetyNotes: failClosedNotes
+  }),
+  impact({
+    fieldPath: "rules.diagnosticPolicy.maxDiagnosticRounds",
+    label: { en: "Maximum diagnostic rounds", zhCN: "最大诊断轮次" },
+    summary: {
+      en: "Sets the diagnostic budget and its explicit exhaustion fallback.",
+      zhCN: "设置诊断预算及其显式耗尽兜底。"
+    },
+    affects: [
+      target("guard", "diagnostic_budget_exhausted", "Diagnostic budget guard", "诊断预算 Guard"),
+      target("policy", "diagnostic round budget", "Diagnostic round budget", "诊断轮次预算"),
+      target("transition", "run_diagnostic_checks -> handoff / stopped", "Budget fallback", "预算兜底"),
+      target("test_case", "diagnostic budget exhausted", "Budget boundary test", "预算边界测试")
+    ],
+    artifacts: ["agent.yutra.yaml", "policy.yaml", "test-cases.json", "trace.expectation.json"],
+    safetyNotes: failClosedNotes
+  }),
+  impact({
+    fieldPath: "rules.diagnosticPolicy.inconclusiveStrategy",
+    label: { en: "Inconclusive strategy", zhCN: "无法判定策略" },
+    summary: {
+      en: "Selects ask-more-signals, handoff, or stop-with-reason for an inconclusive diagnosis.",
+      zhCN: "为无法判定的诊断选择补充信号、转人工或说明原因后停止。"
+    },
+    affects: [
+      target("guard", "diagnosis_inconclusive", "Inconclusive diagnosis guard", "无法判定 Guard"),
+      target("transition", "evaluate_diagnosis -> request_more_signals / handoff / stopped", "Inconclusive path", "无法判定路径"),
+      target("template", "ask_more_signals / stop_with_reason", "Inconclusive responses", "无法判定回复")
+    ],
+    artifacts: ["agent.yutra.yaml", "policy.yaml", "templates.json", "test-cases.json"],
+    safetyNotes: failClosedNotes
+  }),
+  impact({
+    fieldPath: "rules.diagnosticPolicy.checkFailureStrategy",
+    label: { en: "Check failure strategy", zhCN: "检查失败策略" },
+    summary: {
+      en: "Routes a failed diagnostic check to explicit retry, handoff, or stopped behavior.",
+      zhCN: "将诊断检查失败显式路由到重试、转人工或停止。"
+    },
+    affects: [
+      target("guard", "diagnostic_check_failed", "Diagnostic check failure guard", "诊断检查失败 Guard"),
+      target("transition", "run_diagnostic_checks -> retry / handoff / stopped", "Check failure path", "检查失败路径"),
+      target("test_case", "diagnostic check failure", "Check failure test", "检查失败测试")
+    ],
+    artifacts: ["agent.yutra.yaml", "policy.yaml", "test-cases.json", "trace.expectation.json"],
+    safetyNotes: failClosedNotes
+  }),
+  impact({
+    fieldPath: "rules.diagnosticPolicy.remediationStrategy",
+    label: { en: "Remediation strategy", zhCN: "处置策略" },
+    summary: {
+      en: "Selects suggestion-only, mock-safe remediation, or human handoff without real execution.",
+      zhCN: "在不执行真实修复的前提下选择仅建议、安全模拟处置或转人工。"
+    },
+    affects: [
+      target("transition", "evaluate_diagnosis -> suggest_remediation / mock_safe_remediation / handoff", "Remediation path", "处置路径"),
+      target("action", "perform_mock_safe_remediation", "Mock-only remediation", "仅模拟处置"),
+      target("template", "remediation_suggestion", "Remediation response", "处置建议回复")
+    ],
+    artifacts: ["agent.yutra.yaml", "policy.yaml", "templates.json", "test-cases.json"],
+    safetyNotes: failClosedNotes
+  }),
+  impact({
+    fieldPath: "rules.diagnosticPolicy.maxRemediationAttempts",
+    label: { en: "Maximum remediation attempts", zhCN: "最大处置尝试次数" },
+    summary: {
+      en: "Sets the mock remediation budget and fail-closed exhaustion path.",
+      zhCN: "设置模拟处置预算和 fail-closed 耗尽路径。"
+    },
+    affects: [
+      target("guard", "remediation_attempts_exhausted", "Remediation budget guard", "处置预算 Guard"),
+      target("policy", "remediation attempt budget", "Remediation attempt budget", "处置尝试预算"),
+      target("transition", "mock_safe_remediation -> handoff", "Remediation fallback", "处置兜底")
+    ],
+    artifacts: ["agent.yutra.yaml", "policy.yaml", "test-cases.json", "trace.expectation.json"],
+    safetyNotes: failClosedNotes
+  }),
+  impact({
+    fieldPath: "rules.validationPolicy.requireEvidenceBeforeDiagnosis",
+    label: { en: "Evidence before diagnosis", zhCN: "诊断前证据要求" },
+    summary: {
+      en: "Blocks diagnostic checks until explicit generic evidence is present.",
+      zhCN: "在明确的通用证据存在前阻止诊断检查。"
+    },
+    affects: [
+      target("guard", "evidence_available", "Evidence guard", "证据 Guard"),
+      target("transition", "validate_signals -> run_diagnostic_checks", "Diagnosis transition", "诊断转移"),
+      target("test_case", "evidence missing", "Evidence boundary test", "证据边界测试")
+    ],
+    artifacts: ["agent.yutra.yaml", "policy.yaml", "test-cases.json", "trace.expectation.json"],
+    safetyNotes: failClosedNotes
+  }),
+  impact({
+    fieldPath: "rules.validationPolicy.requireVerificationBeforeComplete",
+    label: { en: "Verification before completion", zhCN: "完成前验证" },
+    summary: {
+      en: "Requires an explicit verification guard before the diagnostic disposition completes.",
+      zhCN: "要求诊断处置结果完成前通过显式验证 Guard。"
+    },
+    affects: [
+      target("guard", "resolution_verified", "Resolution verification guard", "处置验证 Guard"),
+      target("transition", "verify_resolution -> complete / handoff", "Verified completion", "验证后完成"),
+      target("test_case", "verification required", "Verification test", "验证测试"),
+      target("trace_expectation", "verification_guard", "Verification evidence", "验证证据")
+    ],
+    artifacts: ["agent.yutra.yaml", "policy.yaml", "test-cases.json", "trace.expectation.json"],
+    safetyNotes: failClosedNotes
+  })
+];
+
 const ALL_RULE_IMPACTS = [
+  ...DIAGNOSTIC_RESOLUTION_RULE_IMPACTS,
   ...INTAKE_COLLECTOR_RULE_IMPACTS,
   ...KNOWLEDGE_ANSWERING_RULE_IMPACTS,
   ...REQUEST_RESOLUTION_RULE_IMPACTS,

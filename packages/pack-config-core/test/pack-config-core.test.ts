@@ -3,6 +3,9 @@ import {
   APPROVAL_DECISION_BASIC_CONFIG,
   APPROVAL_DECISION_FIELD_DEFINITIONS,
   APPROVAL_DECISION_RULE_IMPACTS,
+  DIAGNOSTIC_RESOLUTION_BASIC_CONFIG,
+  DIAGNOSTIC_RESOLUTION_FIELD_DEFINITIONS,
+  DIAGNOSTIC_RESOLUTION_RULE_IMPACTS,
   KNOWLEDGE_ANSWERING_BASIC_CONFIG,
   KNOWLEDGE_ANSWERING_FIELD_DEFINITIONS,
   KNOWLEDGE_ANSWERING_RULE_IMPACTS,
@@ -19,6 +22,7 @@ import {
   explainRuleImpact,
   getRuleImpact,
   validateApprovalDecisionConfig,
+  validateDiagnosticResolutionConfig,
   validateKnowledgeAnsweringConfig,
   validateIntakeCollectorConfig,
   validatePackConfig,
@@ -336,5 +340,62 @@ describe("@yutra/pack-config-core", () => {
     expect(serialized).not.toContain("crm_endpoint");
     expect(INTAKE_COLLECTOR_BASIC_CONFIG.adapters.every((adapter) => adapter.mode === "mock")).toBe(true);
     expect(INTAKE_COLLECTOR_BASIC_CONFIG.adapters.every((adapter) => adapter.containsRealEndpoint === false && adapter.containsSecret === false)).toBe(true);
+  });
+
+  it("diagnostic-resolution basic config validates with deterministic fingerprint", () => {
+    expect(validatePackConfig(DIAGNOSTIC_RESOLUTION_BASIC_CONFIG).ok).toBe(true);
+    expect(validateDiagnosticResolutionConfig(DIAGNOSTIC_RESOLUTION_BASIC_CONFIG).ok).toBe(true);
+    const first = createPackConfigFingerprint(DIAGNOSTIC_RESOLUTION_BASIC_CONFIG);
+    expect(first).toBe(createPackConfigFingerprint(DIAGNOSTIC_RESOLUTION_BASIC_CONFIG));
+    expect(first).toMatch(/^sha256:/);
+  });
+
+  it("diagnostic-resolution fields cover signal, diagnosis, remediation, evidence, and verification policy", () => {
+    const ids = DIAGNOSTIC_RESOLUTION_FIELD_DEFINITIONS.map((field) => field.fieldId);
+    expect(ids).toEqual(
+      expect.arrayContaining([
+        "capabilities.signalCollection",
+        "capabilities.diagnosticChecks",
+        "rules.diagnosticPolicy.requiredSignals",
+        "rules.diagnosticPolicy.maxDiagnosticRounds",
+        "rules.diagnosticPolicy.inconclusiveStrategy",
+        "rules.diagnosticPolicy.checkFailureStrategy",
+        "rules.diagnosticPolicy.remediationStrategy",
+        "rules.diagnosticPolicy.maxRemediationAttempts",
+        "rules.validationPolicy.requireEvidenceBeforeDiagnosis",
+        "rules.validationPolicy.requireVerificationBeforeComplete"
+      ])
+    );
+  });
+
+  it("diagnostic-resolution validation rejects non-generic signals and invalid budgets", () => {
+    const config = structuredClone(DIAGNOSTIC_RESOLUTION_BASIC_CONFIG);
+    config.rules["diagnosticPolicy.requiredSignals"].value = ["account_identifier"];
+    config.rules["diagnosticPolicy.maxDiagnosticRounds"].value = 99;
+    const result = validateDiagnosticResolutionConfig(config);
+    expect(result.ok).toBe(false);
+    expect(result.issues.filter((issue) => issue.code === "PACK_CONFIG_FIELD_TYPE_INVALID")).toHaveLength(2);
+  });
+
+  it("diagnostic-resolution rule impacts remain isolated and cover every governed branch", () => {
+    expect(DIAGNOSTIC_RESOLUTION_RULE_IMPACTS).toHaveLength(8);
+    expect(getRuleImpact("rules.diagnosticPolicy.requiredSignals")?.affects.some((target) => target.id === "missing_signals")).toBe(true);
+    expect(getRuleImpact("rules.diagnosticPolicy.maxDiagnosticRounds")?.affects.some((target) => target.id === "diagnostic_budget_exhausted")).toBe(true);
+    expect(getRuleImpact("rules.diagnosticPolicy.checkFailureStrategy")?.affects.some((target) => target.id === "diagnostic_check_failed")).toBe(true);
+    expect(getRuleImpact("rules.diagnosticPolicy.maxRemediationAttempts")?.affects.some((target) => target.id === "remediation_attempts_exhausted")).toBe(true);
+    expect(getRuleImpact("rules.validationPolicy.requireEvidenceBeforeDiagnosis")?.affects.some((target) => target.id === "evidence_available")).toBe(true);
+    expect(getRuleImpact("rules.validationPolicy.requireVerificationBeforeComplete")?.affects.some((target) => target.id === "resolution_verified")).toBe(true);
+  });
+
+  it("diagnostic-resolution sample stays generic and mock-only", () => {
+    const serialized = JSON.stringify(DIAGNOSTIC_RESOLUTION_BASIC_CONFIG).toLowerCase();
+    expect(serialized).not.toContain("https://");
+    expect(serialized).not.toContain("api_key");
+    expect(serialized).not.toContain("bearer ");
+    expect(serialized).not.toContain("phone_number");
+    expect(serialized).not.toContain("account_id");
+    expect(serialized).not.toContain("shell_command");
+    expect(DIAGNOSTIC_RESOLUTION_BASIC_CONFIG.adapters.every((adapter) => adapter.mode === "mock")).toBe(true);
+    expect(DIAGNOSTIC_RESOLUTION_BASIC_CONFIG.adapters.every((adapter) => adapter.containsRealEndpoint === false && adapter.containsSecret === false)).toBe(true);
   });
 });

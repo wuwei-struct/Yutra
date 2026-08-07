@@ -5,6 +5,7 @@ import { resolveCompileOptions } from "./compile-options";
 import { hasCompilerErrors, type RuleCompilerIssue } from "./errors";
 import { validateCompileInput } from "./fail-closed";
 import { approvalDecisionCompiler } from "./approval-decision-compiler";
+import { diagnosticResolutionCompiler } from "./diagnostic-resolution-compiler";
 import { knowledgeAnsweringCompiler } from "./knowledge-answering-compiler";
 import { intakeCollectorCompiler } from "./intake-collector-compiler";
 import { requestResolutionCompiler } from "./request-resolution-compiler";
@@ -97,7 +98,8 @@ export function compilePackConfig(input: RuleCompilerInput): RuleCompilerOutput 
     input.config.archetypeId !== "request-resolution" &&
     input.config.archetypeId !== "approval-decision" &&
     input.config.archetypeId !== "knowledge-answering" &&
-    input.config.archetypeId !== "intake-collector"
+    input.config.archetypeId !== "intake-collector" &&
+    input.config.archetypeId !== "diagnostic-resolution"
   ) {
     const issues: RuleCompilerIssue[] = [
       {
@@ -124,6 +126,8 @@ export function compilePackConfig(input: RuleCompilerInput): RuleCompilerOutput 
         ? knowledgeAnsweringCompiler(input.config)
         : input.config.archetypeId === "intake-collector"
           ? intakeCollectorCompiler(input.config)
+          : input.config.archetypeId === "diagnostic-resolution"
+            ? diagnosticResolutionCompiler(input.config)
           : requestResolutionCompiler(input.config, options.locale);
   const outputShell: RuleCompilerOutput = {
     ok: true,

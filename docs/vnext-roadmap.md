@@ -45,7 +45,7 @@ Non-goal:
 
 Goal: define Pack Config as the customer-facing configuration model.
 
-Current status: `@yutra/pack-config-core` provides the Pack Config contract, field provenance, validation, publish gate, fingerprint, and demo-only `request-resolution`, `approval-decision`, `knowledge-answering`, and `intake-collector` samples.
+Current status: `@yutra/pack-config-core` provides the Pack Config contract, field provenance, validation, publish gate, fingerprint, and demo-only `request-resolution`, `approval-decision`, `knowledge-answering`, `intake-collector`, and `diagnostic-resolution` samples.
 
 Scope:
 
@@ -70,7 +70,7 @@ Field types:
 
 Goal: compile Pack Config into executable and certifiable assets.
 
-Current status: `@yutra/rule-compiler` provides public demo/mock compilers for `request-resolution`, `approval-decision`, `knowledge-answering`, and `intake-collector`. `yutra compile` can export those artifacts locally, and Creator Workbench supports all four through the shared in-memory Compile Preview path.
+Current status: `@yutra/rule-compiler` provides public demo/mock compilers for `request-resolution`, `approval-decision`, `knowledge-answering`, `intake-collector`, and `diagnostic-resolution`. `yutra compile` can export all five locally. Creator Workbench supports the first four through the shared in-memory Compile Preview path; diagnostic-resolution is not yet enabled in Studio.
 
 Scope:
 
@@ -140,6 +140,7 @@ Current status:
 - `approval-decision` Pack Config, Rule Impact metadata, Rule Compiler, CLI demo, and Creator Workbench demo UI are supported.
 - `knowledge-answering` Pack Config, Rule Impact metadata, Rule Compiler, CLI demo, and Creator Workbench demo UI are supported.
 - `intake-collector` Pack Config, Rule Impact metadata, Rule Compiler, CLI demo, six canonical artifacts, and Creator Workbench integration are supported; Runtime remains unconnected.
+- `diagnostic-resolution` Pack Config, Rule Impact metadata, Rule Compiler, CLI demo, and six canonical artifacts are supported; Studio and Runtime remain unconnected.
 - Studio UI remains demo/mock only and does not model real approval systems.
 
 Expected proof:

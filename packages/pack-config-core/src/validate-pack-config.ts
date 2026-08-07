@@ -1,6 +1,10 @@
 import { isArchetypeId, type SideEffectLevel } from "@yutra/archetype-core";
 import { packConfigSchema, type AdapterConfig, type PackConfig } from "./pack-config-schema";
 import { APPROVAL_DECISION_FIELD_IDS } from "./approval-decision-config";
+import {
+  DIAGNOSTIC_RESOLUTION_DEMO_SIGNAL_IDS,
+  DIAGNOSTIC_RESOLUTION_FIELD_IDS
+} from "./diagnostic-resolution-config";
 import { KNOWLEDGE_ANSWERING_FIELD_IDS } from "./knowledge-answering-config";
 import { INTAKE_COLLECTOR_FIELD_IDS } from "./intake-collector-config";
 import { REQUEST_RESOLUTION_FIELD_IDS } from "./request-resolution-config";
@@ -258,6 +262,103 @@ export function validateIntakeCollectorConfig(input: unknown): PackConfigValidat
         severity: "warning",
         message: `Unknown intake-collector capability ${capabilityId}.`,
         path: ["capabilities", capabilityId]
+      });
+    }
+  }
+
+  return makeResult(issues);
+}
+
+export function validateDiagnosticResolutionConfig(input: unknown): PackConfigValidationResult {
+  const base = validatePackConfig(input);
+  const issues = [...base.issues];
+  const parsed = packConfigSchema.safeParse(input);
+  if (!parsed.success) {
+    return makeResult(issues);
+  }
+
+  const config = parsed.data;
+  if (config.archetypeId !== "diagnostic-resolution") {
+    issues.push({
+      code: "PACK_CONFIG_ARCHETYPE_INVALID",
+      severity: "error",
+      message: "Diagnostic-resolution config must use archetypeId=diagnostic-resolution.",
+      path: ["archetypeId"]
+    });
+  }
+
+  const knownCapabilityIds = new Set(
+    DIAGNOSTIC_RESOLUTION_FIELD_IDS.filter((id) => id.startsWith("capabilities.")).map(
+      (id) => id.replace("capabilities.", "")
+    )
+  );
+  for (const capabilityId of Object.keys(config.capabilities)) {
+    if (!knownCapabilityIds.has(capabilityId)) {
+      issues.push({
+        code: "PACK_CONFIG_UNKNOWN_CAPABILITY",
+        severity: "warning",
+        message: `Unknown diagnostic-resolution capability ${capabilityId}.`,
+        path: ["capabilities", capabilityId]
+      });
+    }
+  }
+
+  const requiredSignals = config.rules["diagnosticPolicy.requiredSignals"]?.value;
+  const allowedSignals = new Set<string>(DIAGNOSTIC_RESOLUTION_DEMO_SIGNAL_IDS);
+  if (
+    !Array.isArray(requiredSignals) ||
+    requiredSignals.length === 0 ||
+    requiredSignals.some((signal) => typeof signal !== "string" || !allowedSignals.has(signal))
+  ) {
+    issues.push({
+      code: "PACK_CONFIG_FIELD_TYPE_INVALID",
+      severity: "error",
+      message: "requiredSignals must contain only allowlisted generic demo signal identifiers.",
+      path: ["rules", "diagnosticPolicy.requiredSignals"]
+    });
+  }
+
+  for (const [key, min, max] of [
+    ["diagnosticPolicy.maxDiagnosticRounds", 1, 8],
+    ["diagnosticPolicy.maxRemediationAttempts", 0, 3]
+  ] as const) {
+    const value = config.rules[key]?.value;
+    if (!Number.isSafeInteger(value) || (value as number) < min || (value as number) > max) {
+      issues.push({
+        code: "PACK_CONFIG_FIELD_TYPE_INVALID",
+        severity: "error",
+        message: `${key} must be a safe integer between ${min} and ${max}.`,
+        path: ["rules", key]
+      });
+    }
+  }
+
+  for (const [key, allowed] of [
+    ["diagnosticPolicy.inconclusiveStrategy", ["ask_more_signals", "handoff", "stop_with_reason"]],
+    ["diagnosticPolicy.checkFailureStrategy", ["retry", "handoff", "stop_with_reason"]],
+    ["diagnosticPolicy.remediationStrategy", ["suggest_only", "mock_safe_attempt", "handoff"]]
+  ] as const) {
+    if (!allowed.includes(config.rules[key]?.value as never)) {
+      issues.push({
+        code: "PACK_CONFIG_FIELD_TYPE_INVALID",
+        severity: "error",
+        message: `${key} must use a supported explicit strategy.`,
+        path: ["rules", key]
+      });
+    }
+  }
+
+  for (const key of [
+    "validationPolicy.requireEvidenceBeforeDiagnosis",
+    "validationPolicy.rejectUnknownSignals",
+    "validationPolicy.requireVerificationBeforeComplete"
+  ]) {
+    if (typeof config.rules[key]?.value !== "boolean") {
+      issues.push({
+        code: "PACK_CONFIG_FIELD_TYPE_INVALID",
+        severity: "error",
+        message: `${key} must be boolean.`,
+        path: ["rules", key]
       });
     }
   }

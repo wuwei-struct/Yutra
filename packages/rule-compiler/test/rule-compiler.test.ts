@@ -1,6 +1,7 @@
 import { parseDsl, inspectDsl } from "@yutra/dsl";
 import {
   APPROVAL_DECISION_BASIC_CONFIG,
+  DIAGNOSTIC_RESOLUTION_BASIC_CONFIG,
   INTAKE_COLLECTOR_BASIC_CONFIG,
   REQUEST_RESOLUTION_ECOMMERCE_BASIC_CONFIG,
   type PackConfig
@@ -342,6 +343,98 @@ describe("@yutra/rule-compiler", () => {
     expect(combined).not.toContain("phone_number");
     expect(combined).not.toContain("identity_number");
     const adapters = output.artifacts?.adapterConfig.data.adapters as Array<Record<string, unknown>>;
+    expect(adapters.every((adapter) => adapter.containsRealEndpoint === false && adapter.containsSecret === false)).toBe(true);
+  });
+
+  it("supports diagnostic-resolution with six deterministic canonical artifacts", () => {
+    const first = compilePackConfig({ config: DIAGNOSTIC_RESOLUTION_BASIC_CONFIG });
+    const second = compilePackConfig({ config: DIAGNOSTIC_RESOLUTION_BASIC_CONFIG });
+    expect(first.ok, JSON.stringify(first.issues, null, 2)).toBe(true);
+    expect(first.report.archetypeId).toBe("diagnostic-resolution");
+    expect(Object.keys(first.artifacts ?? {})).toEqual([
+      "agent",
+      "policy",
+      "adapterConfig",
+      "templates",
+      "testCases",
+      "traceExpectation"
+    ]);
+    expect(second.report.artifactHashes).toEqual(first.report.artifactHashes);
+  });
+
+  it("diagnostic-resolution DSL inspects with explicit diagnosis, remediation, verification, and fallback states", () => {
+    const output = compilePackConfig({ config: DIAGNOSTIC_RESOLUTION_BASIC_CONFIG });
+    expect(output.ok, JSON.stringify(output.issues, null, 2)).toBe(true);
+    const inspected = inspectDsl(parseDsl(output.artifacts?.agent.content ?? "", "yaml"), { format: "yaml" });
+    expect(inspected.issues).toEqual([]);
+    expect(inspected.canonical.agent).toBe("diagnostic_resolution_basic");
+    expect(Object.keys(inspected.canonical.states)).toEqual(
+      expect.arrayContaining([
+        "collect_signals",
+        "validate_signals",
+        "run_diagnostic_checks",
+        "evaluate_diagnosis",
+        "request_more_signals",
+        "suggest_remediation",
+        "mock_safe_remediation",
+        "verify_resolution",
+        "complete",
+        "handoff",
+        "stopped"
+      ])
+    );
+    const mockAction = inspected.canonical.actions.find((action) => action.name === "perform_mock_safe_remediation");
+    expect(mockAction?.sideEffect).toBe("none");
+    expect(inspected.canonical.states.handoff?.handoff).toBe(true);
+  });
+
+  it("diagnostic-resolution artifacts include both budgets and all explicit fail-closed paths", () => {
+    const output = compilePackConfig({ config: DIAGNOSTIC_RESOLUTION_BASIC_CONFIG });
+    expect(output.ok).toBe(true);
+    expect(output.artifacts?.policy.data.diagnosticRoundBudget).toMatchObject({ maxRounds: 3 });
+    expect(output.artifacts?.policy.data.remediationAttemptBudget).toMatchObject({ maxAttempts: 1 });
+    expect(output.artifacts?.policy.data.remediationPolicy).toMatchObject({ mockOnly: true, realExecutionAllowed: false });
+    expect(output.artifacts?.policy.data.failClosedBoundary).toMatchObject({ enabled: true });
+    for (const key of [
+      "ask_more_signals",
+      "diagnosis_summary",
+      "remediation_suggestion",
+      "verification_failed",
+      "handoff",
+      "stop_with_reason",
+      "resolution_complete"
+    ]) {
+      expect(output.artifacts?.templates.data).toHaveProperty(key);
+    }
+    const tests = output.artifacts?.testCases.data.testCases as Array<Record<string, unknown>>;
+    expect(tests).toHaveLength(8);
+    expect(tests.map((test) => test.testCaseId)).toEqual(
+      expect.arrayContaining([
+        "diagnostic_missing_signals",
+        "diagnostic_inconclusive",
+        "diagnostic_check_failure",
+        "diagnostic_budget_exhausted",
+        "diagnostic_mock_remediation",
+        "diagnostic_remediation_budget_exhausted",
+        "diagnostic_evidence_missing"
+      ])
+    );
+  });
+
+  it("diagnostic-resolution artifacts contain no real diagnostics, shell execution, endpoint, or secret", () => {
+    const output = compilePackConfig({ config: DIAGNOSTIC_RESOLUTION_BASIC_CONFIG });
+    expect(output.ok).toBe(true);
+    const combined = Object.values(output.artifacts ?? {})
+      .map((artifact) => artifact.content)
+      .join("\n")
+      .toLowerCase();
+    expect(combined).not.toContain("https://");
+    expect(combined).not.toContain("api_key");
+    expect(combined).not.toContain("bearer ");
+    expect(combined).not.toContain("shell_command");
+    expect(combined).not.toContain("account_id");
+    const adapters = output.artifacts?.adapterConfig.data.adapters as Array<Record<string, unknown>>;
+    expect(adapters.every((adapter) => adapter.mode === "mock")).toBe(true);
     expect(adapters.every((adapter) => adapter.containsRealEndpoint === false && adapter.containsSecret === false)).toBe(true);
   });
 

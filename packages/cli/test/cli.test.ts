@@ -12,6 +12,7 @@ const compileConfigPath = "examples/request-resolution-ecommerce-basic/pack.conf
 const approvalCompileConfigPath = "examples/approval-decision-basic/pack.config.json";
 const knowledgeCompileConfigPath = "examples/knowledge-answering-basic/pack.config.json";
 const intakeCompileConfigPath = "examples/intake-collector-basic/pack.config.json";
+const diagnosticCompileConfigPath = "examples/diagnostic-resolution-basic/pack.config.json";
 const customerCompositionPlanPath = "examples/customer-complaint-composition/plan.json";
 const ecommerceCompositionPlanPath = "examples/ecommerce-refund-composition/plan.json";
 const compiledArtifactFiles = [
@@ -662,6 +663,36 @@ describe("@yutra/cli", () => {
     });
     expect(inspected.issues).toHaveLength(0);
     expect(inspected.canonical.agent).toBe("intake_collector_basic");
+    await rm(dir, { recursive: true, force: true });
+  });
+
+  it("compile diagnostic-resolution demo config --dry-run succeeds without writing", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "yutra-compile-diagnostic-dry-"));
+    const outDir = join(dir, "out");
+    const { io, stdout, stderr } = createMemoryIO();
+    const code = await runCli(["compile", diagnosticCompileConfigPath, "--out", outDir, "--dry-run"], io);
+
+    expect(code, [...stdout, ...stderr].join("\n")).toBe(0);
+    expect(stdout.some((line) => line.includes("dryRun: true"))).toBe(true);
+    expect(stdout.some((line) => line.includes("agent.yutra.yaml"))).toBe(true);
+    expect(existsSync(outDir)).toBe(false);
+    await rm(dir, { recursive: true, force: true });
+  });
+
+  it("compile diagnostic-resolution demo config writes inspectable canonical artifacts", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "yutra-compile-diagnostic-out-"));
+    const { io, stdout, stderr } = createMemoryIO();
+    const code = await runCli(["compile", diagnosticCompileConfigPath, "--out", dir], io);
+
+    expect(code, [...stdout, ...stderr].join("\n")).toBe(0);
+    for (const file of compiledArtifactFiles) {
+      expect(existsSync(join(dir, file))).toBe(true);
+    }
+    const inspected = inspectDsl(parseDsl(readFileSync(join(dir, "agent.yutra.yaml"), "utf8"), "yaml"), {
+      format: "yaml"
+    });
+    expect(inspected.issues).toHaveLength(0);
+    expect(inspected.canonical.agent).toBe("diagnostic_resolution_basic");
     await rm(dir, { recursive: true, force: true });
   });
 

@@ -12,6 +12,7 @@ export type { RuleCompilerIssue, RuleCompilerIssueCode } from "./errors";
 export { createCertificationReadinessPreview } from "./certification-readiness";
 export { compilePackConfig } from "./compile-pack-config";
 export { approvalDecisionCompiler } from "./approval-decision-compiler";
+export { diagnosticResolutionCompiler } from "./diagnostic-resolution-compiler";
 export { knowledgeAnsweringCompiler } from "./knowledge-answering-compiler";
 export { intakeCollectorCompiler } from "./intake-collector-compiler";
 export { requestResolutionCompiler } from "./request-resolution-compiler";

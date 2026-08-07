@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Added the demo/mock `diagnostic-resolution` fifth Product Archetype Core chain with an allowlisted generic-signal Pack Config, archetype-specific validation and Rule Impact metadata, deterministic six-artifact Rule Compiler, CLI compile/export, explicit diagnostic and remediation budgets, fail-closed inconclusive/retry/handoff/stop paths, and mock remediation fixed at `sideEffect=none`; Studio, Runtime, real diagnostics, device access, shell execution, external APIs, LLMs, and production remediation remain excluded.
+
 ### Added
 
 - Enabled the demo/mock `intake-collector` as the fourth Creator Workbench Product Archetype with a generic-field business-rule editor, Core Rule Impact display, six-artifact Compile Preview, warning and Certification Readiness display, manual DSL Editor bridge, and English/Chinese UI; Runtime, database, CRM, real form, endpoint, and personal-data integration remain excluded.

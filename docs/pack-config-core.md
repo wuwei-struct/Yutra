@@ -29,6 +29,8 @@ This package only defines and validates Pack Config. It does not compile DSL and
 - knowledge-answering public rule impact metadata
 - intake-collector public base field definitions
 - intake-collector public rule impact metadata
+- diagnostic-resolution public base field definitions
+- diagnostic-resolution public rule impact metadata
 - demo-only sample config
 - publish gate validation
 - deterministic config fingerprint
@@ -129,9 +131,15 @@ Fields cover field collection and validation capabilities, required generic fiel
 
 This is a demo/mock contract only. It contains no real personal data, customer form, database, CRM/ERP connection, endpoint, secret, or production collection workflow.
 
+## Diagnostic-resolution Base Config
+
+`DIAGNOSTIC_RESOLUTION_BASIC_CONFIG` uses only allowlisted generic demo signals. Its contract defines diagnostic and remediation budgets, inconclusive/check-failure/remediation strategies, evidence and verification requirements, and mock-only adapter metadata.
+
+The archetype-specific validator rejects unknown signal identifiers, unsupported strategy values, and invalid budgets. It does not validate or connect a real diagnostic target.
+
 ## Rule Impact Metadata
 
-`REQUEST_RESOLUTION_RULE_IMPACTS`, `APPROVAL_DECISION_RULE_IMPACTS`, `KNOWLEDGE_ANSWERING_RULE_IMPACTS`, and `INTAKE_COLLECTOR_RULE_IMPACTS` explain how public demo/basic fields affect generated governed behavior.
+`REQUEST_RESOLUTION_RULE_IMPACTS`, `APPROVAL_DECISION_RULE_IMPACTS`, `KNOWLEDGE_ANSWERING_RULE_IMPACTS`, `INTAKE_COLLECTOR_RULE_IMPACTS`, and `DIAGNOSTIC_RESOLUTION_RULE_IMPACTS` explain how public demo/basic fields affect generated governed behavior.
 
 Examples:
 
@@ -144,12 +152,14 @@ Examples:
 - `rules.sourcePolicy.requireSourceCitation` affects citation policy, generic answer templates, source-reference tests, and trace expectations.
 - `rules.intakePolicy.requiredFields` affects the missing-fields Guard, completion transition, test cases, and field-completeness trace expectations.
 - `rules.intakePolicy.maxClarificationRounds` affects the clarification budget and handoff/stop fallback boundary.
+- `rules.diagnosticPolicy.maxDiagnosticRounds` affects the diagnostic budget and fail-closed exhaustion path.
+- `rules.diagnosticPolicy.remediationStrategy` selects suggestion, mock-safe remediation, or handoff without real execution.
 
 This metadata is explanatory. It does not compile DSL, change Runtime behavior, or define customer SOP.
 
 ## Sample Config
 
-`REQUEST_RESOLUTION_ECOMMERCE_BASIC_CONFIG`, `APPROVAL_DECISION_BASIC_CONFIG`, `KNOWLEDGE_ANSWERING_BASIC_CONFIG`, and `INTAKE_COLLECTOR_BASIC_CONFIG` are mock/demo samples.
+`REQUEST_RESOLUTION_ECOMMERCE_BASIC_CONFIG`, `APPROVAL_DECISION_BASIC_CONFIG`, `KNOWLEDGE_ANSWERING_BASIC_CONFIG`, `INTAKE_COLLECTOR_BASIC_CONFIG`, and `DIAGNOSTIC_RESOLUTION_BASIC_CONFIG` are mock/demo samples.
 
 It uses:
 

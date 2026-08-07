@@ -24,7 +24,7 @@ See [Archetype Taxonomy](archetype-taxonomy.md).
 
 ## Current Scope
 
-The current public implementation covers request-resolution, approval-decision, knowledge-answering, and intake-collector demo/basic fields. The first three are visible in Creator Workbench demo UI; intake-collector is Core/Compiler/CLI only for now:
+The current public implementation covers request-resolution, approval-decision, knowledge-answering, intake-collector, and diagnostic-resolution demo/basic fields. The first four are visible in Creator Workbench demo UI; diagnostic-resolution is Core/Compiler/CLI only for now:
 
 - capabilities
 - refund policy basics
@@ -34,6 +34,7 @@ The current public implementation covers request-resolution, approval-decision, 
 - knowledge policy basics
 - source citation policy basics
 - intake, validation, duplicate, clarification, and confirmation policy basics
+- diagnostic signal, budget, failure, remediation, evidence, and verification policy basics
 - response style basics
 
 This is public demo metadata. It is not a customer SOP, not a complete industry rule matrix, and not a production adapter mapping.
