@@ -8,13 +8,13 @@ const readinessPath = "docs/v0.4-preview-release-readiness.md";
 const read = (path: string): string => readFileSync(resolve(root, path), "utf8");
 
 describe("P6-12C v0.4 Preview publication preparation", () => {
-  it("ships exact-version prerelease candidate notes", () => {
+  it("keeps the exact-version notes current after publication", () => {
     expect(existsSync(resolve(root, releaseNotesPath))).toBe(true);
     const notes = read(releaseNotesPath);
     expect(notes).toContain("Version: 0.4.0-vnext-preview.1");
     expect(notes).toContain("Tag: v0.4.0-vnext-preview.1");
-    expect(notes).toContain("Type: GitHub prerelease candidate");
-    expect(notes).toContain("Publication: Pending");
+    expect(notes).toContain("Type: GitHub prerelease");
+    expect(notes).toContain("Publication: Published");
   });
 
   it("records the frozen v0.4 capability scope", () => {
@@ -62,24 +62,23 @@ describe("P6-12C v0.4 Preview publication preparation", () => {
     expect(read("README.zh-CN.md")).toContain(releaseNotesPath);
   });
 
-  it("adds a pending-publication CHANGELOG section", () => {
+  it("keeps the published CHANGELOG section", () => {
     const changelog = read("CHANGELOG.md");
-    expect(changelog).toContain(
-      "## [0.4.0-vnext-preview.1] - Pending publication"
-    );
+    expect(changelog).toContain("## [0.4.0-vnext-preview.1] - 2026-08-07");
     expect(changelog).toContain("## Unreleased");
     expect(changelog).toContain("## [0.3.0-vnext-preview.1] - 2026-07-16");
   });
 
-  it("opens the next release gate without claiming publication", () => {
+  it("records publication without claiming npm publication", () => {
     const readiness = read(readinessPath);
     for (const state of [
       "releaseNotesReady: true",
       "publicationPreflightReady: true",
       "releaseTagReady: true",
       "releaseTagBlocker: none",
-      "tagCreated: false",
-      "githubReleaseCreated: false",
+      "tagCreated: true",
+      "githubReleaseCreated: true",
+      "githubReleaseType: prerelease",
       "npmPublished: false"
     ]) {
       expect(readiness).toContain(state);

@@ -44,7 +44,7 @@ describe("P6-12B fixed v0.4 Preview version alignment", () => {
     expect(`v${rootPackage.version}`).toBe(candidateTag);
 
     const candidate = read(readinessPath);
-    expect(candidate.includes(`Candidate tag: \`${candidateTag}\``)).toBe(true);
+    expect(candidate.includes(`Released tag: \`${candidateTag}\``)).toBe(true);
   });
 
   it("opens release tagging only after publication preparation", () => {
@@ -56,10 +56,10 @@ describe("P6-12B fixed v0.4 Preview version alignment", () => {
     expect(candidate.includes("releaseTagBlocker: none")).toBe(true);
   });
 
-  it("does not claim tag, GitHub Release, or npm publication", () => {
+  it("records tag and GitHub prerelease without npm publication", () => {
     const candidate = read(readinessPath);
-    expect(candidate.includes("tagCreated: false")).toBe(true);
-    expect(candidate.includes("githubReleaseCreated: false")).toBe(true);
+    expect(candidate.includes("tagCreated: true")).toBe(true);
+    expect(candidate.includes("githubReleaseCreated: true")).toBe(true);
     expect(candidate.includes("npmPublished: false")).toBe(true);
   });
 

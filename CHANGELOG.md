@@ -4,7 +4,7 @@
 
 No changes recorded after the v0.4 Preview candidate scope freeze.
 
-## [0.4.0-vnext-preview.1] - Pending publication
+## [0.4.0-vnext-preview.1] - 2026-08-07
 
 ### Added
 

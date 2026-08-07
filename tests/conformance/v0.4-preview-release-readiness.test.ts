@@ -11,7 +11,7 @@ describe("P6-12A v0.4 Preview release readiness conformance", () => {
     expect(existsSync(resolve(root, readinessPath))).toBe(true);
     const readiness = read(readinessPath);
     expect(readiness).toContain("Candidate version: `0.4.0-vnext-preview.1`");
-    expect(readiness).toContain("Candidate tag: `v0.4.0-vnext-preview.1`");
+    expect(readiness).toContain("Released tag: `v0.4.0-vnext-preview.1`");
   });
 
   it("freezes the expected Scenario release scope", () => {
@@ -37,7 +37,7 @@ describe("P6-12A v0.4 Preview release readiness conformance", () => {
     }
   });
 
-  it("records completed preparation without claiming publication", () => {
+  it("records completed preparation and prerelease publication", () => {
     const readiness = read(readinessPath);
     expect(readiness).toContain("browserSmokeReady: true");
     expect(readiness).toContain("cliSmokeReady: true");
@@ -48,8 +48,9 @@ describe("P6-12A v0.4 Preview release readiness conformance", () => {
     expect(readiness).toContain("publicationPreflightReady: true");
     expect(readiness).toContain("releaseTagReady: true");
     expect(readiness).toContain("releaseTagBlocker: none");
-    expect(readiness).toContain("tagCreated: false");
-    expect(readiness).toContain("githubReleaseCreated: false");
+    expect(readiness).toContain("tagCreated: true");
+    expect(readiness).toContain("githubReleaseCreated: true");
+    expect(readiness).toContain("githubReleaseType: prerelease");
     expect(readiness).toContain("npmPublished: false");
   });
 

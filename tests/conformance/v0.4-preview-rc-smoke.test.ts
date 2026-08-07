@@ -68,7 +68,7 @@ describe("P6-12B v0.4 Preview RC smoke conformance", () => {
     expect(evidence).toContain("zero Scenario Run API requests");
   });
 
-  it("keeps smoke ready while publication preparation opens tagging", () => {
+  it("keeps smoke evidence linked after prerelease publication", () => {
     const readiness = read(readinessPath);
     for (const state of [
       "versionAligned: true",
@@ -81,8 +81,9 @@ describe("P6-12B v0.4 Preview RC smoke conformance", () => {
       "publicationPreflightReady: true",
       "releaseTagReady: true",
       "releaseTagBlocker: none",
-      "tagCreated: false",
-      "githubReleaseCreated: false",
+      "tagCreated: true",
+      "githubReleaseCreated: true",
+      "githubReleaseType: prerelease",
       "npmPublished: false"
     ]) {
       expect(readiness).toContain(state);
