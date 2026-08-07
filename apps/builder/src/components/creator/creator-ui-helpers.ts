@@ -1,6 +1,7 @@
 import type { ConfigField, ConfigFieldSource, PackConfig } from "@yutra/pack-config-core";
 import {
   APPROVAL_DECISION_RULE_IMPACTS,
+  INTAKE_COLLECTOR_RULE_IMPACTS,
   KNOWLEDGE_ANSWERING_RULE_IMPACTS,
   REQUEST_RESOLUTION_RULE_IMPACTS,
   type RuleImpactDefinition
@@ -70,7 +71,12 @@ export function getConfigField(config: PackConfig, fieldPath: string): ConfigFie
 }
 
 export function isSupportedCreatorArchetype(archetypeId: string): archetypeId is SupportedCreatorArchetype {
-  return archetypeId === "request-resolution" || archetypeId === "approval-decision" || archetypeId === "knowledge-answering";
+  return (
+    archetypeId === "request-resolution" ||
+    archetypeId === "approval-decision" ||
+    archetypeId === "knowledge-answering" ||
+    archetypeId === "intake-collector"
+  );
 }
 
 export function getRuleImpactsForArchetype(archetypeId: string): RuleImpactDefinition[] {
@@ -79,6 +85,9 @@ export function getRuleImpactsForArchetype(archetypeId: string): RuleImpactDefin
   }
   if (archetypeId === "knowledge-answering") {
     return KNOWLEDGE_ANSWERING_RULE_IMPACTS;
+  }
+  if (archetypeId === "intake-collector") {
+    return INTAKE_COLLECTOR_RULE_IMPACTS;
   }
   return REQUEST_RESOLUTION_RULE_IMPACTS;
 }

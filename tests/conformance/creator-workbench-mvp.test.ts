@@ -108,7 +108,7 @@ describe("P6-05A Creator Workbench MVP conformance", () => {
 
   it("docs state request-resolution, approval-decision, and knowledge-answering are supported archetypes", () => {
     const docs = read("docs/creator-workbench.md");
-    expect(docs).toContain("supports three archetypes");
+    expect(docs).toContain("supports four archetypes");
     expect(docs).toContain("request-resolution");
     expect(docs).toContain("approval-decision");
     expect(docs).toContain("knowledge-answering");

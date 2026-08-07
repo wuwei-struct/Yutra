@@ -21,8 +21,8 @@ Builder Core
 - AI Draft Assistant with mock provider by default.
 - Manual Apply to Editor.
 - DSL editor with Validate DSL, Inspect DSL, Apply DSL as Run Source, Reset from Builder, and Copy DSL.
-- Creator Workbench Compile Preview for public `request-resolution`, `approval-decision`, and `knowledge-answering` demo Pack Configs.
-- Rule Impact Explanation for public `request-resolution`, `approval-decision`, and `knowledge-answering` demo fields.
+- Creator Workbench Compile Preview for public `request-resolution`, `approval-decision`, `knowledge-answering`, and `intake-collector` demo Pack Configs.
+- Rule Impact Explanation for public `request-resolution`, `approval-decision`, `knowledge-answering`, and `intake-collector` demo fields.
 - Certification Readiness Preview for demo/mock compile output.
 - Manual Run Preview Evidence for showing user-triggered run evidence in the readiness panel.
 - Manual bridge from compiled `agent.yutra.yaml` to the DSL Editor.
@@ -33,6 +33,10 @@ Builder Core
 - Run Preview through local builder-runner.
 - Embedded trace timeline, event detail, and audit summary.
 - English / 中文 UI switching from the top bar.
+
+The `intake-collector` editor exposes only generic demo field identifiers and existing intake/validation policies. It displays six canonical artifacts, compile warnings, and Certification Readiness through the shared in-memory Compile Preview path. Sending its `agent.yutra.yaml` to the DSL Editor remains manual and does not automatically Inspect, Apply, or Run.
+
+No real personal information, customer form, database, CRM/ERP, endpoint, credential, or automatic Runtime execution is enabled for intake collection.
 
 The language switch only affects Studio UI labels. DSL text, Trace event type strings, payload raw fields, file paths, code blocks, and canonical IR are not translated or rewritten.
 
@@ -95,7 +99,7 @@ The DSL Editor remains valuable as an advanced inspection and override surface, 
 P6-05A is the first step in that direction:
 
 ```text
-request-resolution, approval-decision, or knowledge-answering Pack Config
+request-resolution, approval-decision, knowledge-answering, or intake-collector Pack Config
 -> /creator/compile-preview
 -> six demo/mock compiler artifacts
 -> compile report
@@ -123,7 +127,7 @@ Pack Config field
 -> affected compiler artifacts
 ```
 
-This explanation layer helps users understand generated behavior for request-resolution, approval-decision, and knowledge-answering demo configs. It does not run Runtime, does not auto-apply DSL, and does not include customer SOP, real approval procedures, real LLM calls, or real RAG / knowledge provider integration.
+This explanation layer helps users understand generated behavior for request-resolution, approval-decision, knowledge-answering, and intake-collector demo configs. It does not run Runtime, does not auto-apply DSL, and does not include customer SOP, real approval procedures, real personal information, real LLM calls, or real RAG / knowledge provider integration.
 
 P6-06B adds Certification Readiness Preview:
 
@@ -160,7 +164,7 @@ P6-08E adds taxonomy-aware archetype selection:
 -> Archetype Fit Test guidance
 ```
 
-`request-resolution`, `approval-decision`, and `knowledge-answering` are compile-enabled in Studio. Other archetypes remain visible as taxonomy metadata with coming-soon status.
+`request-resolution`, `approval-decision`, `knowledge-answering`, and `intake-collector` are compile-enabled in Studio. Other archetypes remain visible as taxonomy metadata with coming-soon status.
 
 ## Scenario Composition Workbench
 

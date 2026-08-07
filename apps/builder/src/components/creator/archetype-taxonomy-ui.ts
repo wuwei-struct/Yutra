@@ -14,7 +14,8 @@ export const creatorArchetypeOptions: CreatorArchetypeOption[] = BUILTIN_ARCHETY
   enabled:
     manifest.archetypeId === "request-resolution" ||
     manifest.archetypeId === "approval-decision" ||
-    manifest.archetypeId === "knowledge-answering",
+    manifest.archetypeId === "knowledge-answering" ||
+    manifest.archetypeId === "intake-collector",
   manifest
 }));
 

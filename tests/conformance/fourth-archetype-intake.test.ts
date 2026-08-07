@@ -24,9 +24,9 @@ describe("P6-13A intake-collector fourth archetype conformance", () => {
     expect(docs).toContain("six canonical compiler artifacts");
   });
 
-  it("keeps Studio and Runtime outside this iteration", () => {
+  it("records Studio support while keeping Runtime outside the supported chain", () => {
     const docs = read("docs/intake-collector-basic.md");
-    expect(docs).toContain("Studio UI is not enabled");
+    expect(docs).toContain("Creator Workbench is enabled");
     expect(docs).toContain("not connected to Runtime");
   });
 

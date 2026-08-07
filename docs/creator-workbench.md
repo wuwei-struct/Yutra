@@ -33,7 +33,7 @@ DSL Editor remains available as an advanced mode, but it should not be the defau
 
 ### 1. Archetype Selection
 
-Choose a business action structure such as `request-resolution`, `approval-decision`, or `knowledge-answering`.
+Choose a business action structure such as `request-resolution`, `approval-decision`, `knowledge-answering`, or `intake-collector`.
 
 The UI should explain what the archetype does, what rules it needs, and what outputs it can generate.
 
@@ -185,16 +185,17 @@ P6-05B adds a manual bridge from the compiled `agent.yutra.yaml` artifact to the
 
 ## Current MVP: Compile Preview
 
-The current Creator Workbench MVP supports three archetypes:
+The current Creator Workbench MVP supports four archetypes:
 
 - enabled: `request-resolution`
 - enabled: `approval-decision`
 - enabled: `knowledge-answering`
+- enabled: `intake-collector`
 - disabled / coming later: all other main and cross-cutting archetypes
 
-The archetype selector is taxonomy-aware. It shows why `request-resolution` is appropriate for business action results, why `approval-decision` is appropriate for authorization decisions, and why `knowledge-answering` is appropriate for governed source-constrained answers. It does not claim that all 14 archetypes are compile-enabled.
+The archetype selector is taxonomy-aware. It shows why `request-resolution` is appropriate for business action results, why `approval-decision` is appropriate for authorization decisions, why `knowledge-answering` is appropriate for governed source-constrained answers, and why `intake-collector` is appropriate for structured intake records. It does not claim that all 14 archetypes are compile-enabled.
 
-The request-resolution, approval-decision, and knowledge-answering forms edit public demo/mock Pack Configs:
+The request-resolution, approval-decision, knowledge-answering, and intake-collector forms edit public demo/mock Pack Configs:
 
 - capabilities
 - refund policy basics
@@ -203,6 +204,7 @@ The request-resolution, approval-decision, and knowledge-answering forms edit pu
 - risk policy basics
 - knowledge policy basics
 - source policy basics
+- intake, validation, clarification-budget, duplicate, and confirmation policy basics
 - response style basics
 
 Each editable field shows source provenance, affected artifact chips, and an Impact control that opens the Rule Impact Explanation panel.
@@ -240,7 +242,7 @@ Important boundaries:
 
 ## Rule Impact Explanation
 
-The Creator Workbench includes a Rule Impact panel for public `request-resolution`, `approval-decision`, and `knowledge-answering` demo configs.
+The Creator Workbench includes a Rule Impact panel for public `request-resolution`, `approval-decision`, `knowledge-answering`, and `intake-collector` demo configs.
 
 The panel explains:
 

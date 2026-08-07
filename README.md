@@ -44,7 +44,7 @@ Implemented today:
 - Creator Workbench Compile Preview
 - Creator Workbench UI flow polish
 - Taxonomy-aware Creator Workbench archetype selection
-- Creator Workbench currently supports three demo-enabled product archetypes: `request-resolution`, `approval-decision`, and `knowledge-answering`.
+- Creator Workbench currently supports four demo-enabled product archetypes: `request-resolution`, `approval-decision`, `knowledge-answering`, and `intake-collector`.
 - Archetype Taxonomy metadata in `@yutra/archetype-core`
 - Rule Impact Explanation
 - Certification Readiness Preview
@@ -52,7 +52,7 @@ Implemented today:
 - Manual Run Preview Evidence in the readiness panel
 - approval-decision second archetype support (Pack Config + Rule Compiler + CLI + Creator Workbench demo-enabled UI)
 - knowledge-answering third archetype support (Pack Config + Rule Impact + Rule Compiler + CLI + Creator Workbench demo-enabled UI)
-- intake-collector fourth archetype Core support (Pack Config + Rule Impact + Rule Compiler + CLI; Studio and Runtime not enabled)
+- intake-collector fourth archetype support (Pack Config + Rule Impact + Rule Compiler + CLI + Creator Workbench; Runtime not enabled)
 
 ## Why Yutra
 
@@ -142,9 +142,9 @@ Yutra Studio is the local single-user Agent Editor Workbench prototype.
 It includes:
 - left navigation and top operation bar
 - AI Draft Assistant
-- Creator Workbench Compile Preview for public `request-resolution`, `approval-decision`, and `knowledge-answering` demo Pack Configs
+- Creator Workbench Compile Preview for public `request-resolution`, `approval-decision`, `knowledge-answering`, and `intake-collector` demo Pack Configs
 - Creator Workflow: Select archetype -> Configure business rules -> Review rule impact -> Compile preview -> Send to DSL editor -> Inspect DSL manually -> Apply DSL manually -> Run Preview manually -> Review Trace / Audit
-- Rule Impact Explanation for public `request-resolution`, `approval-decision`, and `knowledge-answering` demo fields
+- Rule Impact Explanation for public `request-resolution`, `approval-decision`, `knowledge-answering`, and `intake-collector` demo fields
 - Certification Readiness Preview for demo/mock compile output; it does not run Runtime or claim production readiness
 - Manual Run Preview Evidence after a user-triggered Run Preview; it does not make official certification ready
 - manual bridge from compiled `agent.yutra.yaml` to the DSL Editor

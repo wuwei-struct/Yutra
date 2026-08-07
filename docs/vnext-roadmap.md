@@ -70,7 +70,7 @@ Field types:
 
 Goal: compile Pack Config into executable and certifiable assets.
 
-Current status: `@yutra/rule-compiler` provides public demo/mock compilers for `request-resolution`, `approval-decision`, `knowledge-answering`, and `intake-collector`. `yutra compile` can export those artifacts locally. Creator Workbench demo UI supports the first three; intake-collector Studio integration remains a later task.
+Current status: `@yutra/rule-compiler` provides public demo/mock compilers for `request-resolution`, `approval-decision`, `knowledge-answering`, and `intake-collector`. `yutra compile` can export those artifacts locally, and Creator Workbench supports all four through the shared in-memory Compile Preview path.
 
 Scope:
 
@@ -87,7 +87,7 @@ Compiler must be deterministic. AI may draft configuration but must not directly
 
 Goal: prove the creation layer using a public request-resolution demo pack without exposing customer-ready SOP or implementation playbooks.
 
-Current status: Yutra Studio Creator Workbench Compile Preview supports `request-resolution`, `approval-decision`, and `knowledge-answering` demo Pack Configs. It can edit basic demo fields and show the six Rule Compiler artifacts plus compile report. It does not run Runtime, save artifacts, publish, connect real adapters, or call real LLM / RAG / knowledge base integrations.
+Current status: Yutra Studio Creator Workbench Compile Preview supports `request-resolution`, `approval-decision`, `knowledge-answering`, and `intake-collector` demo Pack Configs. It can edit basic demo fields and show the six Rule Compiler artifacts plus compile report. It does not run Runtime, save artifacts, publish, connect real adapters or databases, collect real personal information, or call real LLM / RAG / knowledge base integrations.
 
 Focus:
 
@@ -139,7 +139,7 @@ Current status:
 
 - `approval-decision` Pack Config, Rule Impact metadata, Rule Compiler, CLI demo, and Creator Workbench demo UI are supported.
 - `knowledge-answering` Pack Config, Rule Impact metadata, Rule Compiler, CLI demo, and Creator Workbench demo UI are supported.
-- `intake-collector` Pack Config, Rule Impact metadata, Rule Compiler, CLI demo, and six canonical artifacts are supported; Studio UI and Runtime are not connected.
+- `intake-collector` Pack Config, Rule Impact metadata, Rule Compiler, CLI demo, six canonical artifacts, and Creator Workbench integration are supported; Runtime remains unconnected.
 - Studio UI remains demo/mock only and does not model real approval systems.
 
 Expected proof:

@@ -28,6 +28,7 @@ import { getRuleImpactForArchetype, isSupportedCreatorArchetype, type SendCompil
 
 export function CreatorWorkbenchPanel(props: {
   onSendCompiledDslToEditor?: (dslText: string, meta?: SendCompiledDslMeta) => void;
+  onResetCompiledDslMetadata?: () => void;
   runPreviewEvidence?: RunPreviewEvidence;
 }) {
   const { t } = useI18n();
@@ -52,6 +53,7 @@ export function CreatorWorkbenchPanel(props: {
     setResponse(undefined);
     setError("");
     setLoading(false);
+    props.onResetCompiledDslMetadata?.();
   };
 
   const onCompile = async () => {

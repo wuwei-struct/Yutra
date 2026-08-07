@@ -272,6 +272,10 @@ export function useStudioState() {
     setRunError("Compiled DSL sent to editor. Inspect it before using as run source.");
   };
 
+  const resetCompiledDslMetadata = () => {
+    setCompiledDslMeta(undefined);
+  };
+
   const recordRunPreviewEvidence = (response: BuilderRunPreviewResponse) => {
     const eventCount = response.events?.length ?? 0;
     const runId = response.run?.runId;
@@ -431,6 +435,7 @@ export function useStudioState() {
     applyDslAsRunSource,
     resetDslFromBuilder,
     sendCompiledDslToEditor,
+    resetCompiledDslMetadata,
     runCurrentPreview,
     resetRunInput: () => {
       const sample = runPreviewSamples.find((item) => item.id === selectedSampleId) ?? runPreviewSamples[0];

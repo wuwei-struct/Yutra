@@ -12,15 +12,16 @@ This keeps users focused on Product Archetypes instead of low-level Behavior Pri
 
 ## Current compile-enabled archetypes
 
-Creator Workbench currently enables three demo/mock Product Archetypes:
+Creator Workbench currently enables four demo/mock Product Archetypes:
 
 - `request-resolution`
 - `approval-decision`
 - `knowledge-answering`
+- `intake-collector`
 
 Other Product Archetypes and all Cross-cutting Archetypes are visible as taxonomy metadata, but they are still `coming soon` for Creator Workbench compile preview.
 
-## request-resolution vs approval-decision vs knowledge-answering
+## Four compile-enabled Product Archetypes
 
 Use `request-resolution` when the primary output is a business action result.
 
@@ -48,6 +49,16 @@ Examples:
 - return no-answer with reason when evidence is missing
 - hand off sensitive or unsafe questions
 
+Use `intake-collector` when the primary output is a structured intake record.
+
+Examples:
+
+- collect generic required fields
+- validate completeness and request correction
+- detect duplicate demo records
+- require confirmation before completion
+- hand off or stop safely after the clarification budget is exhausted
+
 If one real business case mixes multiple outputs, it is probably a Scenario Pattern rather than a new main archetype.
 
 ## What the selector shows
@@ -71,7 +82,7 @@ This is a public demo/mock selection experience.
 It does not:
 
 - enable every archetype for compile preview
-- add a third archetype
+- accept real personal-data fields or customer forms
 - change Rule Compiler behavior
 - change Pack Config schema behavior
 - run Runtime automatically

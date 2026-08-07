@@ -4,7 +4,8 @@
 
 ### Added
 
-- `intake-collector` fourth Product Archetype Core chain with Pack Config validation, Rule Impact metadata, deterministic Rule Compiler, CLI compile/export, six canonical demo/mock artifacts, and a generic no-personal-data example; Studio and Runtime integration remain excluded.
+- Enabled the demo/mock `intake-collector` as the fourth Creator Workbench Product Archetype with a generic-field business-rule editor, Core Rule Impact display, six-artifact Compile Preview, warning and Certification Readiness display, manual DSL Editor bridge, and English/Chinese UI; Runtime, database, CRM, real form, endpoint, and personal-data integration remain excluded.
+- `intake-collector` fourth Product Archetype Core chain with Pack Config validation, Rule Impact metadata, deterministic Rule Compiler, CLI compile/export, six canonical demo/mock artifacts, and a generic no-personal-data example.
 
 ## [0.4.0-vnext-preview.1] - 2026-08-07
 

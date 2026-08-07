@@ -150,7 +150,7 @@ function mockDslInspectFailure() {
   });
 }
 
-function mockCompilePreviewSuccess(options?: { agentName?: string; archetypeId?: string; packConfigId?: string }) {
+function mockCompilePreviewSuccess(options?: { agentName?: string; archetypeId?: string; packConfigId?: string; withWarning?: boolean }) {
   const agentName = options?.agentName ?? "request-resolution-ecommerce-basic";
   const archetypeId = options?.archetypeId ?? "request-resolution";
   const packConfigId = options?.packConfigId ?? "request-resolution:ecommerce-basic-demo";
@@ -236,7 +236,7 @@ function mockCompilePreviewSuccess(options?: { agentName?: string; archetypeId?:
         "test-cases.json": "sha256:test",
         "trace.expectation.json": "sha256:trace"
       },
-      warnings: []
+      warnings: options?.withWarning ? ["State stopped is unreachable for the selected demo strategy."] : []
     },
     certificationReadiness: {
       overall: "warning",
@@ -330,7 +330,15 @@ function mockCompilePreviewSuccess(options?: { agentName?: string; archetypeId?:
         productionReady: false
       }
     },
-    issues: []
+    issues: options?.withWarning
+      ? [
+          {
+            code: "RULE_COMPILER_DSL_INVALID",
+            severity: "warning",
+            message: "State stopped is unreachable for the selected demo strategy."
+          }
+        ]
+      : []
   });
 }
 
@@ -1270,12 +1278,16 @@ describe("@yutra/builder Studio UI", () => {
     expect(workflow.textContent).toContain("Run preview manually");
   });
 
-  it("request-resolution, approval-decision, and knowledge-answering are enabled and other archetypes are disabled", () => {
+  it("four Product Archetypes are enabled and other archetypes are disabled", () => {
     renderStudio();
     expect((screen.getByRole("button", { name: /request-resolution/ }) as HTMLButtonElement).disabled).toBe(false);
     expect((screen.getByRole("button", { name: /approval-decision/ }) as HTMLButtonElement).disabled).toBe(false);
     expect((screen.getByRole("button", { name: /knowledge-answering/ }) as HTMLButtonElement).disabled).toBe(false);
-    expect((screen.getByRole("button", { name: /intake-collector/ }) as HTMLButtonElement).disabled).toBe(true);
+    expect((screen.getByRole("button", { name: /intake-collector/ }) as HTMLButtonElement).disabled).toBe(false);
+    const enabledArchetypeButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('.creator-archetype-card button[aria-pressed="false"], .creator-archetype-card button[aria-pressed="true"]')).filter(
+      (button) => !button.disabled
+    );
+    expect(enabledArchetypeButtons).toHaveLength(4);
     expect(screen.getByLabelText("Archetype Selector").textContent).toContain("selected");
     expect(screen.getAllByText("Coming soon").length).toBeGreaterThan(0);
   });
@@ -1337,6 +1349,18 @@ describe("@yutra/builder Studio UI", () => {
     expect(screen.getByLabelText("minConfidence")).toBeTruthy();
     expect(screen.getByLabelText("PackConfig Preview").textContent).toContain('"archetypeId": "knowledge-answering"');
     expect(screen.getByLabelText("Adapter Mode Summary").textContent).toContain("no real LLM");
+  });
+
+  it("intake-collector config editor renders generic intake and validation policies", () => {
+    renderStudio();
+    fireEvent.click(screen.getByRole("button", { name: /intake-collector/ }));
+    expect(screen.getByLabelText("Intake Collector Config Editor")).toBeTruthy();
+    expect(screen.getByText("Intake Policy")).toBeTruthy();
+    expect(screen.getByText("Validation Policy")).toBeTruthy();
+    expect(screen.getByLabelText("Required Fields").textContent).toContain("request_summary");
+    expect(screen.getByLabelText("Maximum Clarification Rounds")).toBeTruthy();
+    expect(screen.getByLabelText("PackConfig Preview").textContent).toContain('"archetypeId": "intake-collector"');
+    expect(screen.getByLabelText("Intake Adapter Boundary").textContent).toContain("no personal data");
   });
 
   it("Creator Workbench renders rule impact controls", () => {
@@ -1418,6 +1442,34 @@ describe("@yutra/builder Studio UI", () => {
     expect(screen.getByLabelText("Rule Impact Panel").textContent).toContain("source.checked");
   });
 
+  it("editing intake clarification rounds records confirmedByUser provenance", () => {
+    renderStudio();
+    fireEvent.click(screen.getByRole("button", { name: /intake-collector/ }));
+    fireEvent.change(screen.getByLabelText("Maximum Clarification Rounds"), { target: { value: "4" } });
+    const preview = screen.getByLabelText("PackConfig Preview").textContent ?? "";
+    expect(preview).toContain('"value": 4');
+    expect(preview).toContain('"source": "confirmedByUser"');
+  });
+
+  it("intake Rule Impact uses Core metadata for missing, validation, duplicate, budget, confirmation, and fallback paths", () => {
+    renderStudio();
+    fireEvent.click(screen.getByRole("button", { name: /intake-collector/ }));
+
+    const assertImpact = (label: string | RegExp, expected: string) => {
+      const field = screen.getByText(label).closest(".creator-field-row") ?? screen.getByLabelText(label).closest(".creator-field-row");
+      expect(field?.querySelector("button")).toBeTruthy();
+      fireEvent.click(field!.querySelector("button")!);
+      expect(screen.getByLabelText("Rule Impact Panel").textContent).toContain(expected);
+    };
+
+    assertImpact("Required Fields", "missing_fields");
+    assertImpact("Maximum Clarification Rounds", "clarification_budget");
+    assertImpact("Invalid Field Strategy", "field_validation_failed");
+    assertImpact("Duplicate Strategy", "duplicate_detected");
+    assertImpact("Require Confirmation Before Complete", "record_confirmed");
+    assertImpact("Incomplete Strategy", "ask_missing_fields / stop_with_reason");
+  });
+
   it("Compile Preview calls runner and renders artifact tabs", async () => {
     mockCompilePreviewSuccess();
     renderStudio();
@@ -1465,6 +1517,52 @@ describe("@yutra/builder Studio UI", () => {
     await waitFor(() => expect(screen.getByLabelText("Artifact Preview")).toBeTruthy());
     expect(screen.getByLabelText("Compiled Artifact Content").textContent).toContain("knowledge-answering-basic");
     expect(screen.getByLabelText("Certification Readiness Panel")).toBeTruthy();
+  });
+
+  it("intake-collector Compile Preview renders six artifacts, warning, and readiness without blocking", async () => {
+    mockCompilePreviewSuccess({
+      agentName: "intake-collector-basic",
+      archetypeId: "intake-collector",
+      packConfigId: "intake-collector:basic-demo",
+      withWarning: true
+    });
+    renderStudio();
+    fireEvent.click(screen.getByRole("button", { name: /intake-collector/ }));
+    fireEvent.click(screen.getByRole("button", { name: "Compile Preview" }));
+
+    await waitFor(() =>
+      expect(compileCreatorPreview).toHaveBeenCalledWith(
+        expect.objectContaining({ config: expect.objectContaining({ archetypeId: "intake-collector" }) })
+      )
+    );
+    await waitFor(() => expect(screen.getByLabelText("Artifact Preview")).toBeTruthy());
+    expect(screen.getByLabelText("Artifact Preview").querySelectorAll(".tabs button")).toHaveLength(6);
+    expect(screen.getByLabelText("Compiled Artifact Content").textContent).toContain("intake-collector-basic");
+    expect(screen.getByLabelText("Compile Issues").textContent).toContain("RULE_COMPILER_DSL_INVALID");
+    expect(screen.getByLabelText("Certification Readiness Panel")).toBeTruthy();
+  });
+
+  it("intake agent can be sent to DSL Editor manually and archetype switching clears bridge metadata", async () => {
+    mockCompilePreviewSuccess({
+      agentName: "intake-collector-basic",
+      archetypeId: "intake-collector",
+      packConfigId: "intake-collector:basic-demo"
+    });
+    renderStudio();
+    fireEvent.click(screen.getByRole("button", { name: /intake-collector/ }));
+    fireEvent.click(screen.getByRole("button", { name: "Compile Preview" }));
+    await waitFor(() => expect(screen.getByRole("button", { name: "Send agent.yutra.yaml to DSL Editor" })).toBeTruthy());
+
+    fireEvent.click(screen.getByRole("button", { name: "Send agent.yutra.yaml to DSL Editor" }));
+    expect((screen.getByLabelText("DSL Editor Text") as HTMLTextAreaElement).value).toBe("agent: intake-collector-basic\n");
+    expect(screen.getByLabelText("Compiled DSL Metadata").textContent).toContain("Not inspected yet");
+    expect(inspectDsl).not.toHaveBeenCalled();
+    expect(runPreview).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getByRole("button", { name: /approval-decision/ }));
+    expect(screen.queryByLabelText("Compiled DSL Metadata")).toBeNull();
+    expect(screen.queryByLabelText("Artifact Preview")).toBeNull();
+    expect(screen.getByLabelText("Rule Impact Panel").textContent).toContain("lowRiskMaxAmount");
   });
 
   it("approval-decision agent artifact can be sent to DSL Editor without auto inspect apply or run", async () => {

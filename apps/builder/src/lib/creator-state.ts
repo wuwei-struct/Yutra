@@ -2,12 +2,13 @@ import type { ConfigField, PackConfig } from "@yutra/pack-config-core";
 import type { RuleCompilerArtifacts } from "@yutra/rule-compiler";
 import {
   APPROVAL_DECISION_BASIC_CONFIG,
+  INTAKE_COLLECTOR_BASIC_CONFIG,
   KNOWLEDGE_ANSWERING_BASIC_CONFIG,
   REQUEST_RESOLUTION_ECOMMERCE_BASIC_CONFIG
 } from "../../../../packages/pack-config-core/src/sample-configs";
 
 export type CreatorArtifactTab = keyof RuleCompilerArtifacts;
-export type SupportedCreatorArchetype = "request-resolution" | "approval-decision" | "knowledge-answering";
+export type SupportedCreatorArchetype = "request-resolution" | "approval-decision" | "knowledge-answering" | "intake-collector";
 
 export const creatorArtifactTabs: Array<{ key: CreatorArtifactTab; label: string; note?: string }> = [
   { key: "agent", label: "agent.yutra.yaml", note: "not executed" },
@@ -21,7 +22,7 @@ export const creatorArtifactTabs: Array<{ key: CreatorArtifactTab; label: string
 export const creatorArchetypes: Array<{ id: string; label: string; enabled: boolean }> = [
   { id: "request-resolution", label: "request-resolution / 请求处理型", enabled: true },
   { id: "approval-decision", label: "approval-decision / 审批裁决型", enabled: true },
-  { id: "intake-collector", label: "intake-collector / 信息采集型", enabled: false },
+  { id: "intake-collector", label: "intake-collector / 信息采集型", enabled: true },
   { id: "knowledge-answering", label: "knowledge-answering / 知识问答型", enabled: true },
   { id: "diagnostic-resolution", label: "diagnostic-resolution / 诊断排障型", enabled: false },
   { id: "process-orchestration", label: "process-orchestration / 流程编排型", enabled: false },
@@ -46,6 +47,9 @@ export function getDefaultPackConfigForArchetype(archetypeId: SupportedCreatorAr
   if (archetypeId === "knowledge-answering") {
     return cloneConfig(KNOWLEDGE_ANSWERING_BASIC_CONFIG);
   }
+  if (archetypeId === "intake-collector") {
+    return cloneConfig(INTAKE_COLLECTOR_BASIC_CONFIG);
+  }
   return cloneConfig(REQUEST_RESOLUTION_ECOMMERCE_BASIC_CONFIG);
 }
 
@@ -55,6 +59,9 @@ export function getDefaultImpactPathForArchetype(archetypeId: SupportedCreatorAr
   }
   if (archetypeId === "knowledge-answering") {
     return "rules.knowledgePolicy.minConfidence";
+  }
+  if (archetypeId === "intake-collector") {
+    return "rules.intakePolicy.requiredFields";
   }
   return "rules.refundPolicy.autoRefundMaxAmount";
 }
@@ -69,6 +76,10 @@ export function createApprovalDecisionDemoConfig(): PackConfig {
 
 export function createKnowledgeAnsweringDemoConfig(): PackConfig {
   return getDefaultPackConfigForArchetype("knowledge-answering");
+}
+
+export function createIntakeCollectorDemoConfig(): PackConfig {
+  return getDefaultPackConfigForArchetype("intake-collector");
 }
 
 export function updateConfigField<T>(field: ConfigField<T> | undefined, value: T): ConfigField<T> {

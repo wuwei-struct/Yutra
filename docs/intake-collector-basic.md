@@ -24,8 +24,9 @@ The current implementation includes:
 - `yutra compile`
 - six canonical compiler artifacts
 - a demo/mock Pack Config example
+- Creator Workbench business-rule editor, Compile Preview, Rule Impact, and Certification Readiness
 
-Studio UI is not enabled for `intake-collector` in this iteration. The compiler output is not connected to Runtime.
+Creator Workbench is enabled for `intake-collector`. It uses the existing in-memory Compile Preview endpoint and remains not connected to Runtime.
 
 ## Pack Config
 
@@ -74,6 +75,14 @@ pnpm exec yutra dsl inspect .tmp/intake-collector/agent.yutra.yaml
 
 The compile command only exports inspectable artifacts. It does not run the generated Agent.
 
+## Creator Workbench
+
+Studio exposes `intake-collector` as the fourth enabled Product Archetype. The form supports capabilities, intake policy, validation policy, and response style fields from the existing Pack Config contract.
+
+`requiredFields` is restricted to `topic`, `request_summary`, and `context_note`; the UI does not accept arbitrary field names or real field values. Each editable rule retains ConfigField provenance and reuses the Core Rule Impact metadata.
+
+Compile Preview returns the same six canonical artifacts, warning list, compile report, and Certification Readiness. The generated `agent.yutra.yaml` can be sent manually to the DSL Editor, but Studio does not inspect, apply, or run it automatically.
+
 ## Public Boundary
 
 This implementation is demo/mock only:
@@ -83,7 +92,7 @@ This implementation is demo/mock only:
 - no database or CRM/ERP connection
 - no real endpoint or secret
 - no production collection workflow
-- no Studio UI integration
-- no Runtime execution
+- Creator Workbench does not run Runtime automatically
+- no Runtime execution or production collection integration
 
 The example uses only generic fields such as `topic`, `request_summary`, and `context_note`.

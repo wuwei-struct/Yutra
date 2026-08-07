@@ -52,7 +52,7 @@ Yutra 关注这些问题：
 - Creator Workbench Compile Preview。
 - Creator Workbench UI 信息架构整理。
 - Creator Workbench taxonomy-aware 母型选择体验。
-- Creator Workbench 当前支持三个 demo-enabled 产物型主母型：`request-resolution`、`approval-decision` 与 `knowledge-answering`。
+- Creator Workbench 当前支持四个 demo-enabled 产物型主母型：`request-resolution`、`approval-decision`、`knowledge-answering` 与 `intake-collector`。
 - `@yutra/archetype-core` 中的 Archetype Taxonomy metadata。
 - Rule Impact Explanation。
 - Certification Readiness Preview。
@@ -60,7 +60,7 @@ Yutra 关注这些问题：
 - Certification Readiness Panel 中的手动 Run Preview Evidence。
 - approval-decision 第二母型支持（Pack Config + Rule Compiler + CLI + Creator Workbench demo UI）。
 - knowledge-answering 第三母型支持（Pack Config + Rule Impact + Rule Compiler + CLI + Creator Workbench demo UI）。
-- intake-collector 第四母型 Core 支持（Pack Config + Rule Impact + Rule Compiler + CLI；尚未接入 Studio 与 Runtime）。
+- intake-collector 第四母型支持（Pack Config + Rule Impact + Rule Compiler + CLI + Creator Workbench；尚未接入 Runtime）。
 
 ## 开源边界
 
@@ -125,9 +125,9 @@ Yutra Studio 是本地单用户工作台原型，用于把 Builder Core、AI Dra
 
 - 左侧导航栏与顶部操作栏
 - AI Draft Assistant
-- Creator Workbench Compile Preview：基于公开 `request-resolution`、`approval-decision` 与 `knowledge-answering` demo Pack Config 预览编译产物
+- Creator Workbench Compile Preview：基于公开 `request-resolution`、`approval-decision`、`knowledge-answering` 与 `intake-collector` demo Pack Config 预览编译产物
 - Creator Workflow：选择母型 -> 配置业务规则 -> 查看规则影响 -> 编译预览 -> 发送到 DSL 编辑器 -> 手动检查 DSL -> 手动应用 DSL -> 手动运行预览 -> 查看 Trace / Audit
-- Rule Impact Explanation：解释公开 `request-resolution`、`approval-decision` 与 `knowledge-answering` demo 字段会影响哪些 Guard / Action / Transition / Policy / Trace Expectation
+- Rule Impact Explanation：解释公开 `request-resolution`、`approval-decision`、`knowledge-answering` 与 `intake-collector` demo 字段会影响哪些 Guard / Action / Transition / Policy / Trace Expectation
 - Certification Readiness Preview：基于 demo/mock compile output 展示认证准备度；不运行 Runtime，也不声明生产就绪
 - 手动 Run Preview Evidence：用户手动运行预览后展示 runId / event count / trace / audit evidence；不让正式认证门禁变为 ready
 - 可将编译出的 `agent.yutra.yaml` 手动发送到 DSL 编辑器
